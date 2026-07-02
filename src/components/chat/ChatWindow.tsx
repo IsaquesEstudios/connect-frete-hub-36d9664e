@@ -98,7 +98,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
         : "bg-primary";
 
   return (
-    <div className="flex h-full flex-col bg-[hsl(var(--chat-bg))]">
+    <div className="flex h-full flex-col bg-background">
       <header className="flex items-center gap-3 border-b bg-card px-4 py-3">
         <div
           className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${otherColor}`}
