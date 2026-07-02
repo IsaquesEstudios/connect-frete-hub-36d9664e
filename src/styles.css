@@ -61,50 +61,49 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-company: hsl(var(--company));
   --color-driver: hsl(var(--driver));
-  --color-chat-bg: hsl(var(--chat-bg));
+  --color-chat-bg: var(--chat-bg);
 }
 
 :root {
   --radius: 0.625rem;
-  /* ConectaFrete brand — inspired by freteemtemporeal.com.br
-     Deep navy background, vivid blue primary, red accent. */
-  --background: oklch(0.19 0.04 260);
-  --foreground: oklch(0.98 0.01 240);
-  --card: oklch(0.24 0.05 260);
-  --card-foreground: oklch(0.98 0.01 240);
-  --popover: oklch(0.24 0.05 260);
-  --popover-foreground: oklch(0.98 0.01 240);
-  --primary: oklch(0.62 0.20 255);
-  --primary-foreground: oklch(0.99 0.01 240);
+  /* ConectaFrete brand — light theme (white background) */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.2 0 0);
+  --card: oklch(0.97 0 0);
+  --card-foreground: oklch(0.2 0 0);
+  --popover: oklch(0.97 0 0);
+  --popover-foreground: oklch(0.2 0 0);
+  --primary: oklch(0.55 0.20 255);
+  --primary-foreground: oklch(0.99 0 0);
   /* Company (empresa) = red like "SOU EMPRESA" button */
   --company: 0 78% 58%;
   /* Driver (motorista/caminhoneiro) = blue like "SOU CAMINHONEIRO" button */
   --driver: 217 91% 55%;
-  --chat-bg: 222 40% 14%;
-  --secondary: oklch(0.30 0.05 260);
-  --secondary-foreground: oklch(0.98 0.01 240);
-  --muted: oklch(0.28 0.04 260);
-  --muted-foreground: oklch(0.72 0.03 250);
-  --accent: oklch(0.62 0.22 25);
-  --accent-foreground: oklch(0.99 0.01 240);
-  --destructive: oklch(0.62 0.22 25);
-  --destructive-foreground: oklch(0.99 0.01 240);
-  --border: oklch(0.32 0.04 260);
-  --input: oklch(0.30 0.04 260);
-  --ring: oklch(0.62 0.20 255);
-  --chart-1: oklch(0.62 0.20 255);
-  --chart-2: oklch(0.62 0.22 25);
+  --chat-bg: oklch(0.97 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.92 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.92 0 0);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.55 0.20 255);
+  --chart-1: oklch(0.55 0.20 255);
+  --chart-2: oklch(0.55 0.22 25);
   --chart-3: oklch(0.72 0.15 200);
   --chart-4: oklch(0.75 0.18 85);
   --chart-5: oklch(0.65 0.20 320);
-  --sidebar: oklch(0.22 0.04 260);
-  --sidebar-foreground: oklch(0.98 0.01 240);
-  --sidebar-primary: oklch(0.62 0.20 255);
-  --sidebar-primary-foreground: oklch(0.99 0.01 240);
-  --sidebar-accent: oklch(0.30 0.05 260);
-  --sidebar-accent-foreground: oklch(0.98 0.01 240);
-  --sidebar-border: oklch(0.32 0.04 260);
-  --sidebar-ring: oklch(0.62 0.20 255);
+  --sidebar: oklch(0.96 0 0);
+  --sidebar-foreground: oklch(0.2 0 0);
+  --sidebar-primary: oklch(0.55 0.20 255);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.92 0 0);
+  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-border: oklch(0.88 0 0);
+  --sidebar-ring: oklch(0.55 0.20 255);
 }
 
 
