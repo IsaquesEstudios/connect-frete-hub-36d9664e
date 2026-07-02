@@ -22,15 +22,15 @@ export const Route = createFileRoute("/_app/admin")({
 
 type FilterTab = "todos" | "empresas" | "motoristas";
 
-function timeAgo(ts?: number) {
-  if (!ts) return "";
+function lastSeenLabel(ts: number | null): string {
+  if (!ts) return "nunca acessou";
   const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 60) return `${s}s`;
+  if (s < 60) return `há ${s}s`;
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m`;
+  if (m < 60) return `há ${m}min`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  return `${Math.floor(h / 24)}d`;
+  if (h < 24) return `há ${h}h`;
+  return `há ${Math.floor(h / 24)}d`;
 }
 
 function AdminPanel() {
