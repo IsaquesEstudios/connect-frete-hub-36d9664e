@@ -184,7 +184,60 @@ class LocalRepository implements Repository {
     writeJSON(K_CONV_TAGS, all);
   }
 
-  // ============ presence ============
+  // ============ broadcasts ============
+  resolveBroadcastRecipients(audience: BroadcastAudience): User[] {
+    const users = this.listUsers().filter((u) => u.type !== "admin");
+    if (audience.kind === "all") return users;
+    if (audience.kind === "empresas") return users.filter((u) => u.type === "empresa");
+    if (audience.kind === "motoristas") return users.filter((u) => u.type === "motorista");
+    const convTags = readJSON<ConversationTag[]>(K_CONV_TAGS, []);
+    const ids = new Set(
+      convTags.filter((c) => c.tagId === audience.tagId).map((c) => c.conversationId),
+    );
+    return users.filter((u) => ids.has(u.id));
+  }
+
+  sendBroadcast(input: {
+    body: string;
+    audience: BroadcastAudience;
+    fromUserId: string;
+  }): BroadcastMessage {
+    const recipients = this.resolveBroadcastRecipients(input.audience);
+    const now = Date.now();
+    const msgs = readJSON<Message[]>(K_MSGS, []);
+    for (const r of recipients) {
+      msgs.push({
+        id: `m_${now}_${Math.random().toString(36).slice(2, 7)}`,
+        conversationId: r.id,
+        fromUserId: input.fromUserId,
+        toUserId: r.id,
+        body: input.body,
+        createdAt: now,
+        readByAdmin: true,
+        readByUser: false,
+      });
+    }
+    writeJSON(K_MSGS, msgs);
+
+    const audienceKind = input.audience.kind;
+    const record: BroadcastMessage = {
+      id: `b_${now}_${Math.random().toString(36).slice(2, 7)}`,
+      body: input.body,
+      audience: audienceKind,
+      tagId: input.audience.kind === "tag" ? input.audience.tagId : undefined,
+      sentAt: now,
+      recipientCount: recipients.length,
+    };
+    const all = readJSON<BroadcastMessage[]>(K_BROADCASTS, []);
+    all.push(record);
+    writeJSON(K_BROADCASTS, all);
+    return record;
+  }
+
+  listBroadcasts(): BroadcastMessage[] {
+    return readJSON<BroadcastMessage[]>(K_BROADCASTS, []).sort((a, b) => b.sentAt - a.sentAt);
+  }
+
   setPresence(userId: string, online: boolean) {
     if (online) {
       presence.set(userId, Date.now());
