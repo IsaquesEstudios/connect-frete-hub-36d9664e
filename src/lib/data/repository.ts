@@ -1,4 +1,4 @@
-import type { Message, User, UserType } from "./types";
+import type { Message, Tag, User, UserType } from "./types";
 
 export type NewUserInput =
   | { type: "empresa"; name: string; password: string; cnpj: string }
@@ -15,8 +15,20 @@ export interface Repository {
   sendMessage(input: { fromUserId: string; toUserId: string; body: string }): Message;
   markConversationRead(conversationId: string, viewer: "admin" | "user"): void;
   unreadCount(conversationId: string, viewer: "admin" | "user"): number;
-  // conversations = list of non-admin users
-  listConversations(): { user: User; lastMessage?: Message; unreadForAdmin: number }[];
+  // conversations
+  listConversations(): {
+    user: User;
+    lastMessage?: Message;
+    unreadForAdmin: number;
+    tagIds: string[];
+  }[];
+  // tags
+  listTags(): Tag[];
+  createTag(input: { label: string; color: string }): Tag;
+  updateTag(id: string, patch: { label?: string; color?: string }): Tag | undefined;
+  deleteTag(id: string): void;
+  getConversationTagIds(conversationId: string): string[];
+  setConversationTags(conversationId: string, tagIds: string[]): void;
   // presence / typing (ephemeral)
   setPresence(userId: string, online: boolean): void;
   isOnline(userId: string): boolean;
