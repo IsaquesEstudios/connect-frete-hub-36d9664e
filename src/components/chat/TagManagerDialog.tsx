@@ -87,9 +87,7 @@ export function TagManagerDialog({ trigger }: { trigger: React.ReactNode }) {
                 </button>
                 <button
                   className="text-muted-foreground hover:text-destructive"
-                  onClick={() => {
-                    if (confirm(`Excluir tag "${t.label}"?`)) repo.deleteTag(t.id);
-                  }}
+                  onClick={() => setDeleting({ id: t.id, label: t.label })}
                   aria-label="Excluir"
                 >
                   <Trash2 className="h-3 w-3" />
