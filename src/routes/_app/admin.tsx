@@ -242,9 +242,24 @@ function AdminPanel() {
                           {c.user.type === "empresa" ? "Empresa" : "Motorista"}
                         </span>
                       </div>
-                      <div className="text-[10px] text-muted-foreground shrink-0">
-                        {timeAgo(c.lastMessage?.createdAt)}
-                      </div>
+                      {(() => {
+                        const online = repo.isOnline(c.user.id);
+                        const last = repo.getLastSeen(c.user.id);
+                        return (
+                          <div className="flex items-center gap-1 shrink-0">
+                            {online ? (
+                              <>
+                                <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+                                <span className="text-[10px] text-emerald-600 font-medium">online</span>
+                              </>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">
+                                {lastSeenLabel(last)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div className="text-xs text-muted-foreground truncate">
