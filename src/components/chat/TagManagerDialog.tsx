@@ -42,6 +42,7 @@ export function TagManagerDialog({ trigger }: { trigger: React.ReactNode }) {
   const [label, setLabel] = useState("");
   const [color, setColor] = useState(PALETTE[0]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; label: string } | null>(null);
 
   const reset = () => {
     setLabel("");
