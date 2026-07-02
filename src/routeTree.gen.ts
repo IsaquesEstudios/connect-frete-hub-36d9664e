@@ -14,6 +14,7 @@ import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppMotoristaRouteImport } from './routes/_app/motorista'
 import { Route as AppEmpresaRouteImport } from './routes/_app/empresa'
+import { Route as AppConfiguracoesRouteImport } from './routes/_app/configuracoes'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 
 const AuthRoute = AuthRouteImport.update({
@@ -40,6 +41,11 @@ const AppEmpresaRoute = AppEmpresaRouteImport.update({
   path: '/empresa',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppAdminRoute = AppAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -50,6 +56,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AppAdminRoute
+  '/configuracoes': typeof AppConfiguracoesRoute
   '/empresa': typeof AppEmpresaRoute
   '/motorista': typeof AppMotoristaRoute
 }
@@ -57,6 +64,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AppAdminRoute
+  '/configuracoes': typeof AppConfiguracoesRoute
   '/empresa': typeof AppEmpresaRoute
   '/motorista': typeof AppMotoristaRoute
 }
@@ -66,20 +74,28 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/admin': typeof AppAdminRoute
+  '/_app/configuracoes': typeof AppConfiguracoesRoute
   '/_app/empresa': typeof AppEmpresaRoute
   '/_app/motorista': typeof AppMotoristaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/admin' | '/empresa' | '/motorista'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/admin'
+    | '/configuracoes'
+    | '/empresa'
+    | '/motorista'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/admin' | '/empresa' | '/motorista'
+  to: '/' | '/auth' | '/admin' | '/configuracoes' | '/empresa' | '/motorista'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/auth'
     | '/_app/admin'
+    | '/_app/configuracoes'
     | '/_app/empresa'
     | '/_app/motorista'
   fileRoutesById: FileRoutesById
@@ -127,6 +143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEmpresaRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/configuracoes': {
+      id: '/_app/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AppConfiguracoesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/admin': {
       id: '/_app/admin'
       path: '/admin'
@@ -139,12 +162,14 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
+  AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppEmpresaRoute: typeof AppEmpresaRoute
   AppMotoristaRoute: typeof AppMotoristaRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppAdminRoute: AppAdminRoute,
+  AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppEmpresaRoute: AppEmpresaRoute,
   AppMotoristaRoute: AppMotoristaRoute,
 }
