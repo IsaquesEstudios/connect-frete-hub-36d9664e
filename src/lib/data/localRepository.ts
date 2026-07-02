@@ -1,4 +1,4 @@
-import type { Repository } from "./repository";
+import type { NewUserInput, Repository } from "./repository";
 import type { Message, User, UserType } from "./types";
 import { ADMIN_ID, seedMessages, seedTags, seedUsers } from "./seed";
 import {

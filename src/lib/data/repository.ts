@@ -1,10 +1,15 @@
 import type { Message, User, UserType } from "./types";
 
+export type NewUserInput =
+  | { type: "empresa"; name: string; password: string; cnpj: string }
+  | { type: "motorista"; name: string; password: string; placa: string; veiculo: string }
+  | { type: "admin"; name: string; password: string };
+
 export interface Repository {
   // users
   listUsers(): User[];
   getUser(id: string): User | undefined;
-  createUser(u: Omit<User, "id" | "number" | "createdAt"> & { password: string }): User;
+  createUser(u: NewUserInput): User;
   // messages
   listMessages(conversationId: string): Message[];
   sendMessage(input: { fromUserId: string; toUserId: string; body: string }): Message;
