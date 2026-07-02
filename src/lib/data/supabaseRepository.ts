@@ -10,6 +10,7 @@ type ProfileRow = {
   cnpj: string | null;
   placa: string | null;
   veiculo: string | null;
+  last_seen_at?: string | null;
 };
 
 type MessageRow = {
@@ -73,6 +74,10 @@ class SupabaseRepository implements Repository {
   private subs = new Set<() => void>();
   private adminAuthId: string | null = null;
   private realtimeStarted = false;
+  private onlineIds = new Set<string>();
+  private lastSeen = new Map<string, number>();
+  private heartbeatTimer: number | null = null;
+  private presenceChannel: ReturnType<typeof supabase.channel> | null = null;
 
   constructor() {
     if (typeof window !== "undefined") {
