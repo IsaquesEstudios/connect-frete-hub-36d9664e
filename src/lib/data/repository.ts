@@ -1,4 +1,10 @@
-import type { Message, Tag, User, UserType } from "./types";
+import type { BroadcastMessage, Message, Tag, User, UserType } from "./types";
+
+export type BroadcastAudience =
+  | { kind: "all" }
+  | { kind: "empresas" }
+  | { kind: "motoristas" }
+  | { kind: "tag"; tagId: string };
 
 export type NewUserInput =
   | { type: "empresa"; name: string; password: string; cnpj: string }
