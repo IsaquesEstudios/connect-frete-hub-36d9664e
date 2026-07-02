@@ -54,6 +54,15 @@ function AdminPanel() {
     () => Object.fromEntries(allTags.map((t) => [t.id, t] as const)),
     [allTags],
   );
+  const usedTagIds = useMemo(() => {
+    const s = new Set<string>();
+    for (const c of conversations) for (const id of c.tagIds) s.add(id);
+    return s;
+  }, [conversations]);
+  const visibleTags = useMemo(
+    () => allTags.filter((t) => usedTagIds.has(t.id)),
+    [allTags, usedTagIds],
+  );
 
   const filtered = useMemo(() => {
     return conversations.filter((c) => {
