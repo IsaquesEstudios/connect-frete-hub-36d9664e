@@ -98,6 +98,15 @@ class SupabaseRepository implements Repository {
     ]);
     const admin = this.users.find((u) => u.type === "admin");
     this.adminAuthId = admin?.id ?? null;
+
+    // Purge orphan tags (no conversation using them)
+    const usedTagIds = new Set(this.convTags.map((c) => c.tagId));
+    const orphans = this.tags.filter((t) => !usedTagIds.has(t.id)).map((t) => t.id);
+    if (orphans.length > 0) {
+      this.tags = this.tags.filter((t) => usedTagIds.has(t.id));
+      void supabase.from("tags").delete().in("id", orphans);
+    }
+
     this.notify();
     if (!this.realtimeStarted) {
       this.realtimeStarted = true;
@@ -340,8 +349,20 @@ class SupabaseRepository implements Repository {
     return this.convTags.filter((c) => c.conversationId === conversationId).map((c) => c.tagId);
   }
   setConversationTags(conversationId: string, tagIds: string[]) {
+    const removedTagIds = this.convTags
+      .filter((c) => c.conversationId === conversationId && !tagIds.includes(c.tagId))
+      .map((c) => c.tagId);
     this.convTags = this.convTags.filter((c) => c.conversationId !== conversationId);
     for (const tagId of tagIds) this.convTags.push({ conversationId, tagId });
+
+    // Purge tags that no longer have any conversation using them
+    const orphanTagIds = removedTagIds.filter(
+      (id) => !this.convTags.some((c) => c.tagId === id),
+    );
+    if (orphanTagIds.length > 0) {
+      this.tags = this.tags.filter((t) => !orphanTagIds.includes(t.id));
+    }
+
     this.notify();
     void (async () => {
       await supabase.from("conversation_tags").delete().eq("conversation_id", conversationId);
@@ -349,6 +370,9 @@ class SupabaseRepository implements Repository {
         await supabase
           .from("conversation_tags")
           .insert(tagIds.map((tag_id) => ({ conversation_id: conversationId, tag_id })));
+      }
+      if (orphanTagIds.length > 0) {
+        await supabase.from("tags").delete().in("id", orphanTagIds);
       }
     })();
   }
