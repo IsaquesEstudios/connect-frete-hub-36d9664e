@@ -98,6 +98,15 @@ class SupabaseRepository implements Repository {
     ]);
     const admin = this.users.find((u) => u.type === "admin");
     this.adminAuthId = admin?.id ?? null;
+
+    // Purge orphan tags (no conversation using them)
+    const usedTagIds = new Set(this.convTags.map((c) => c.tagId));
+    const orphans = this.tags.filter((t) => !usedTagIds.has(t.id)).map((t) => t.id);
+    if (orphans.length > 0) {
+      this.tags = this.tags.filter((t) => usedTagIds.has(t.id));
+      void supabase.from("tags").delete().in("id", orphans);
+    }
+
     this.notify();
     if (!this.realtimeStarted) {
       this.realtimeStarted = true;
