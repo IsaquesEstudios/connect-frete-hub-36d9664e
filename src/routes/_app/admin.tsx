@@ -154,12 +154,12 @@ function AdminPanel() {
 
             <div className="flex items-start gap-2">
               <div className="flex-1 flex flex-wrap gap-1">
-                {allTags.length === 0 && (
+                {visibleTags.length === 0 && (
                   <div className="text-[11px] text-muted-foreground py-1">
-                    Sem tags. Crie a primeira →
+                    Nenhuma tag em uso.
                   </div>
                 )}
-                {allTags.map((t) => {
+                {visibleTags.map((t) => {
                   const on = tagFilter.has(t.id);
                   return (
                     <button
