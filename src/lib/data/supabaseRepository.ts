@@ -383,7 +383,20 @@ class SupabaseRepository implements Repository {
       read_by_admin: true,
       read_by_user: false,
     }));
-    if (rows.length > 0) void supabase.from("messages").insert(rows);
+    if (rows.length > 0)
+      void supabase
+        .from("messages")
+        .insert(rows)
+        .select("*")
+        .then(({ data }) => {
+          if (data) {
+            for (const row of data as MessageRow[]) {
+              const m = mapMessage(row);
+              if (!this.messages.find((x) => x.id === m.id)) this.messages.push(m);
+            }
+            this.notify();
+          }
+        });
     const record: BroadcastMessage = {
       id: `tmp_${now}`,
       body,

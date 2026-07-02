@@ -54,6 +54,15 @@ function AdminPanel() {
     () => Object.fromEntries(allTags.map((t) => [t.id, t] as const)),
     [allTags],
   );
+  const usedTagIds = useMemo(() => {
+    const s = new Set<string>();
+    for (const c of conversations) for (const id of c.tagIds) s.add(id);
+    return s;
+  }, [conversations]);
+  const visibleTags = useMemo(
+    () => allTags.filter((t) => usedTagIds.has(t.id)),
+    [allTags, usedTagIds],
+  );
 
   const filtered = useMemo(() => {
     return conversations.filter((c) => {
@@ -145,12 +154,12 @@ function AdminPanel() {
 
             <div className="flex items-start gap-2">
               <div className="flex-1 flex flex-wrap gap-1">
-                {allTags.length === 0 && (
+                {visibleTags.length === 0 && (
                   <div className="text-[11px] text-muted-foreground py-1">
-                    Sem tags. Crie a primeira →
+                    Nenhuma tag em uso.
                   </div>
                 )}
-                {allTags.map((t) => {
+                {visibleTags.map((t) => {
                   const on = tagFilter.has(t.id);
                   return (
                     <button
@@ -221,7 +230,18 @@ function AdminPanel() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="font-medium truncate text-sm">{c.user.name}</div>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <div className="font-medium truncate text-sm">{c.user.name}</div>
+                        <span
+                          className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0 text-white ${
+                            c.user.type === "empresa"
+                              ? "bg-[hsl(var(--company))]"
+                              : "bg-[hsl(var(--driver))]"
+                          }`}
+                        >
+                          {c.user.type === "empresa" ? "Empresa" : "Motorista"}
+                        </span>
+                      </div>
                       <div className="text-[10px] text-muted-foreground shrink-0">
                         {timeAgo(c.lastMessage?.createdAt)}
                       </div>
