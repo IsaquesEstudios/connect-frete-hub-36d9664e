@@ -7,6 +7,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { repo } from "@/lib/data";
@@ -32,6 +42,7 @@ export function TagManagerDialog({ trigger }: { trigger: React.ReactNode }) {
   const [label, setLabel] = useState("");
   const [color, setColor] = useState(PALETTE[0]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; label: string } | null>(null);
 
   const reset = () => {
     setLabel("");
@@ -76,9 +87,7 @@ export function TagManagerDialog({ trigger }: { trigger: React.ReactNode }) {
                 </button>
                 <button
                   className="text-muted-foreground hover:text-destructive"
-                  onClick={() => {
-                    if (confirm(`Excluir tag "${t.label}"?`)) repo.deleteTag(t.id);
-                  }}
+                  onClick={() => setDeleting({ id: t.id, label: t.label })}
                   aria-label="Excluir"
                 >
                   <Trash2 className="h-3 w-3" />
@@ -131,6 +140,31 @@ export function TagManagerDialog({ trigger }: { trigger: React.ReactNode }) {
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir tag</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a tag{" "}
+              <span className="font-semibold text-foreground">"{deleting?.label}"</span>? Ela será
+              removida de todas as conversas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (deleting) repo.deleteTag(deleting.id);
+                setDeleting(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
