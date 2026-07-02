@@ -1,4 +1,4 @@
-import type { Message, Tag, User } from "./types";
+import type { ConversationTag, Message, Tag, User } from "./types";
 
 export const ADMIN_ID = "ADM-0001";
 
