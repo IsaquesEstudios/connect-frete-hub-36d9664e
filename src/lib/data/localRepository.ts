@@ -1,6 +1,6 @@
 import type { NewUserInput, Repository } from "./repository";
-import type { Message, User, UserType } from "./types";
-import { ADMIN_ID, seedMessages, seedTags, seedUsers } from "./seed";
+import type { ConversationTag, Message, Tag, User, UserType } from "./types";
+import { ADMIN_ID, seedConversationTags, seedMessages, seedTags, seedUsers } from "./seed";
 import {
   broadcastEphemeral,
   readJSON,
@@ -12,13 +12,15 @@ import {
 const K_USERS = "users";
 const K_MSGS = "messages";
 const K_TAGS = "tags";
-const K_SEEDED = "seeded_v1";
+const K_CONV_TAGS = "conversation_tags";
+const K_SEEDED = "seeded_v2";
 
 function ensureSeed() {
   if (readJSON<boolean>(K_SEEDED, false)) return;
   writeJSON(K_USERS, seedUsers);
   writeJSON(K_MSGS, seedMessages);
   writeJSON(K_TAGS, seedTags);
+  writeJSON(K_CONV_TAGS, seedConversationTags);
   writeJSON(K_SEEDED, true);
 }
 
@@ -108,16 +110,73 @@ class LocalRepository implements Repository {
   listConversations() {
     const users = this.listUsers().filter((u) => u.type !== "admin");
     const msgs = readJSON<Message[]>(K_MSGS, []);
+    const convTags = readJSON<ConversationTag[]>(K_CONV_TAGS, []);
     return users
       .map((user) => {
         const conv = msgs.filter((m) => m.conversationId === user.id);
         const lastMessage = conv.sort((a, b) => b.createdAt - a.createdAt)[0];
-        const unreadForAdmin = conv.filter((m) => m.toUserId === ADMIN_ID && !m.readByAdmin).length;
-        return { user, lastMessage, unreadForAdmin };
+        const unreadForAdmin = conv.filter(
+          (m) => m.toUserId === ADMIN_ID && !m.readByAdmin,
+        ).length;
+        const tagIds = convTags.filter((c) => c.conversationId === user.id).map((c) => c.tagId);
+        return { user, lastMessage, unreadForAdmin, tagIds };
       })
       .sort((a, b) => (b.lastMessage?.createdAt ?? 0) - (a.lastMessage?.createdAt ?? 0));
   }
 
+  // ============ tags ============
+  listTags(): Tag[] {
+    return readJSON<Tag[]>(K_TAGS, []);
+  }
+
+  createTag(input: { label: string; color: string }): Tag {
+    const tag: Tag = {
+      id: `t_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      label: input.label,
+      color: input.color,
+    };
+    const tags = this.listTags();
+    tags.push(tag);
+    writeJSON(K_TAGS, tags);
+    return tag;
+  }
+
+  updateTag(id: string, patch: { label?: string; color?: string }): Tag | undefined {
+    const tags = this.listTags();
+    const t = tags.find((x) => x.id === id);
+    if (!t) return undefined;
+    if (patch.label !== undefined) t.label = patch.label;
+    if (patch.color !== undefined) t.color = patch.color;
+    writeJSON(K_TAGS, tags);
+    return t;
+  }
+
+  deleteTag(id: string): void {
+    writeJSON(
+      K_TAGS,
+      this.listTags().filter((t) => t.id !== id),
+    );
+    writeJSON(
+      K_CONV_TAGS,
+      readJSON<ConversationTag[]>(K_CONV_TAGS, []).filter((c) => c.tagId !== id),
+    );
+  }
+
+  getConversationTagIds(conversationId: string): string[] {
+    return readJSON<ConversationTag[]>(K_CONV_TAGS, [])
+      .filter((c) => c.conversationId === conversationId)
+      .map((c) => c.tagId);
+  }
+
+  setConversationTags(conversationId: string, tagIds: string[]): void {
+    const all = readJSON<ConversationTag[]>(K_CONV_TAGS, []).filter(
+      (c) => c.conversationId !== conversationId,
+    );
+    for (const tagId of tagIds) all.push({ conversationId, tagId });
+    writeJSON(K_CONV_TAGS, all);
+  }
+
+  // ============ presence ============
   setPresence(userId: string, online: boolean) {
     if (online) {
       presence.set(userId, Date.now());
@@ -142,7 +201,6 @@ class LocalRepository implements Repository {
   }
 
   subscribeEphemeral(cb: (e: { type: string; payload: unknown }) => void) {
-    // Track presence updates locally
     const wrap = (e: { type: string; payload: unknown }) => {
       if (e.type === "presence") {
         const p = e.payload as { userId: string; ts: number };

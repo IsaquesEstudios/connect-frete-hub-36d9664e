@@ -1,4 +1,4 @@
-import type { Message, Tag, User } from "./types";
+import type { ConversationTag, Message, Tag, User } from "./types";
 
 export const ADMIN_ID = "ADM-0001";
 
@@ -108,3 +108,16 @@ export const seedMessages: Message[] = [
   // MOT-0005
   mkMsg("m19", "MOT-0005", "MOT-0005", ADMIN_ID, "Problema mecânico, atrasarei 2h.", 5),
 ];
+
+export const seedConversationTags: ConversationTag[] = [
+  { conversationId: "EMP-0001", tagId: "t-sp" },
+  { conversationId: "EMP-0001", tagId: "t-vip" },
+  { conversationId: "EMP-0003", tagId: "t-novo" },
+  { conversationId: "EMP-0004", tagId: "t-urgente" },
+  { conversationId: "EMP-0005", tagId: "t-frota" },
+  { conversationId: "MOT-0001", tagId: "t-sp" },
+  { conversationId: "MOT-0004", tagId: "t-vip" },
+  { conversationId: "MOT-0005", tagId: "t-problema" },
+  { conversationId: "MOT-0005", tagId: "t-urgente" },
+];
+

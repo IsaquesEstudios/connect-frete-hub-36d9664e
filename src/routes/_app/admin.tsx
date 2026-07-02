@@ -1,8 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Settings2 } from "lucide-react";
 import { AppHeader } from "@/components/chat/AppHeader";
 import { ChatWindow } from "@/components/chat/ChatWindow";
+import { ConversationTagPicker } from "@/components/chat/ConversationTagPicker";
+import { TagBadges } from "@/components/chat/TagBadges";
+import { TagManagerDialog } from "@/components/chat/TagManagerDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,19 +45,30 @@ function AdminPanel() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [mobileChat, setMobileChat] = useState(false);
+  const [tagFilter, setTagFilter] = useState<Set<string>>(new Set());
 
   const conversations = useMemo(() => repo.listConversations(), [v]);
+  const allTags = useMemo(() => repo.listTags(), [v]);
+  const tagsById = useMemo(
+    () => Object.fromEntries(allTags.map((t) => [t.id, t] as const)),
+    [allTags],
+  );
+
   const filtered = useMemo(() => {
     return conversations.filter((c) => {
       if (tab === "empresas" && c.user.type !== "empresa") return false;
       if (tab === "motoristas" && c.user.type !== "motorista") return false;
+      if (tagFilter.size > 0) {
+        // AND: conversa precisa conter TODAS as tags selecionadas
+        for (const id of tagFilter) if (!c.tagIds.includes(id)) return false;
+      }
       if (query) {
         const q = query.toLowerCase();
         return c.user.name.toLowerCase().includes(q) || c.user.number.toLowerCase().includes(q);
       }
       return true;
     });
-  }, [conversations, tab, query]);
+  }, [conversations, tab, query, tagFilter]);
 
   const stats = useMemo(() => {
     const empresas = conversations.filter((c) => c.user.type === "empresa").length;
@@ -67,6 +81,13 @@ function AdminPanel() {
   if (user.type !== "admin") return null;
 
   const selectedUser = selected ? repo.getUser(selected) : null;
+
+  const toggleTagFilter = (id: string) => {
+    const next = new Set(tagFilter);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setTagFilter(next);
+  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -110,9 +131,49 @@ function AdminPanel() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <div className="rounded-md bg-muted/60 px-2 py-1 text-[11px] text-muted-foreground">
-              Broadcast e tags · em breve
+
+            <div className="flex items-start gap-2">
+              <div className="flex-1 flex flex-wrap gap-1">
+                {allTags.length === 0 && (
+                  <div className="text-[11px] text-muted-foreground py-1">
+                    Sem tags. Crie a primeira →
+                  </div>
+                )}
+                {allTags.map((t) => {
+                  const on = tagFilter.has(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => toggleTagFilter(t.id)}
+                      className={`text-[10px] rounded-full px-2 py-0.5 font-medium border transition ${
+                        on ? "text-white" : "text-foreground/70 bg-transparent"
+                      }`}
+                      style={{
+                        borderColor: t.color,
+                        backgroundColor: on ? t.color : "transparent",
+                      }}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <TagManagerDialog
+                trigger={
+                  <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" aria-label="Gerenciar tags">
+                    <Settings2 className="h-4 w-4" />
+                  </Button>
+                }
+              />
             </div>
+            {tagFilter.size > 0 && (
+              <button
+                onClick={() => setTagFilter(new Set())}
+                className="text-[10px] text-muted-foreground hover:text-foreground underline"
+              >
+                Limpar filtro de tags ({tagFilter.size})
+              </button>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto">
             {filtered.length === 0 && (
@@ -124,6 +185,9 @@ function AdminPanel() {
               const isActive = selected === c.user.id;
               const color =
                 c.user.type === "empresa" ? "bg-[hsl(var(--company))]" : "bg-[hsl(var(--driver))]";
+              const convTags = c.tagIds
+                .map((id) => tagsById[id])
+                .filter((t): t is NonNullable<typeof t> => !!t);
               return (
                 <button
                   key={c.user.id}
@@ -162,6 +226,11 @@ function AdminPanel() {
                         </span>
                       )}
                     </div>
+                    {convTags.length > 0 && (
+                      <div className="mt-1">
+                        <TagBadges tags={convTags} />
+                      </div>
+                    )}
                   </div>
                 </button>
               );
@@ -182,6 +251,9 @@ function AdminPanel() {
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
                 </Button>
+              </div>
+              <div className="border-b bg-card px-4 py-2">
+                <ConversationTagPicker conversationId={selectedUser.id} />
               </div>
               <div className="flex-1 min-h-0">
                 <ChatWindow me={user} other={selectedUser} viewer="admin" />
