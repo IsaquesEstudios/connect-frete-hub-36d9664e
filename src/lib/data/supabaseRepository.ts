@@ -121,7 +121,13 @@ class SupabaseRepository implements Repository {
 
   private async loadUsers() {
     const { data } = await supabase.from("profiles").select("*");
-    if (data) this.users = (data as ProfileRow[]).map(profileToUser);
+    if (data) {
+      const rows = data as ProfileRow[];
+      this.users = rows.map(profileToUser);
+      for (const r of rows) {
+        if (r.last_seen_at) this.lastSeen.set(r.id, new Date(r.last_seen_at).getTime());
+      }
+    }
   }
   private async loadTags() {
     const { data } = await supabase.from("tags").select("*").order("label");
