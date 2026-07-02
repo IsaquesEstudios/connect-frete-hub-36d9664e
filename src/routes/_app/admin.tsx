@@ -230,7 +230,18 @@ function AdminPanel() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="font-medium truncate text-sm">{c.user.name}</div>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <div className="font-medium truncate text-sm">{c.user.name}</div>
+                        <span
+                          className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0 text-white ${
+                            c.user.type === "empresa"
+                              ? "bg-[hsl(var(--company))]"
+                              : "bg-[hsl(var(--driver))]"
+                          }`}
+                        >
+                          {c.user.type === "empresa" ? "Empresa" : "Motorista"}
+                        </span>
+                      </div>
                       <div className="text-[10px] text-muted-foreground shrink-0">
                         {timeAgo(c.lastMessage?.createdAt)}
                       </div>
