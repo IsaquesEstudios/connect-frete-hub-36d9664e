@@ -47,7 +47,7 @@ class LocalRepository implements Repository {
     return `${prefix}-${String(next).padStart(4, "0")}`;
   }
 
-  createUser(input: Omit<User, "id" | "number" | "createdAt"> & { password: string }): User {
+  createUser(input: NewUserInput): User {
     const number = this.nextNumberFor(input.type);
     const user = { ...input, id: number, number, createdAt: Date.now() } as User;
     const users = this.listUsers();
