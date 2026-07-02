@@ -140,6 +140,31 @@ export function TagManagerDialog({ trigger }: { trigger: React.ReactNode }) {
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir tag</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a tag{" "}
+              <span className="font-semibold text-foreground">"{deleting?.label}"</span>? Ela será
+              removida de todas as conversas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (deleting) repo.deleteTag(deleting.id);
+                setDeleting(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
