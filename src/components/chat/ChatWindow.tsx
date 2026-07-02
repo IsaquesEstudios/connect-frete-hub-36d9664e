@@ -33,7 +33,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<number | null>(null);
 
-  const conversationId = other.type === "admin" ? me.id : other.id;
+  const conversationId = other.type === "admin" ? me.number : other.number;
 
   const messages = useMemo(() => repo.listMessages(conversationId), [conversationId, v]);
 

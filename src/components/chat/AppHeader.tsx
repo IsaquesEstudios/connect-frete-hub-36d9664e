@@ -51,8 +51,8 @@ export function AppHeader({ user, accent }: { user: User; accent: string }) {
           variant="ghost"
           size="sm"
           className="text-white hover:bg-white/10"
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await logout();
             navigate({ to: "/auth" });
           }}
         >

@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { repo } from "@/lib/data";
 import { homeFor } from "@/lib/auth/session";
-import { usePresenceHeartbeat, useRepoVersion } from "@/lib/hooks/useRepo";
+import { useAuth } from "@/lib/auth/useAuth";
+import { useRepoVersion } from "@/lib/hooks/useRepo";
 
 export const Route = createFileRoute("/_app/admin")({
   head: () => ({ meta: [{ title: "Admin — ConectaFrete" }] }),
@@ -33,13 +34,12 @@ function timeAgo(ts?: number) {
 }
 
 function AdminPanel() {
-  const { user } = Route.useRouteContext();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  usePresenceHeartbeat(user.id);
   const v = useRepoVersion();
 
   useEffect(() => {
-    if (user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
+    if (user && user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
   }, [user, navigate]);
 
   const [tab, setTab] = useState<FilterTab>("todos");
@@ -79,7 +79,7 @@ function AdminPanel() {
     return { empresas, motoristas, active, unread };
   }, [conversations]);
 
-  if (user.type !== "admin") return null;
+  if (!user || user.type !== "admin") return null;
 
   const selectedUser = selected ? repo.getUser(selected) : null;
 
@@ -264,7 +264,7 @@ function AdminPanel() {
                 </Button>
               </div>
               <div className="border-b bg-card px-4 py-2">
-                <ConversationTagPicker conversationId={selectedUser.id} />
+                <ConversationTagPicker conversationId={selectedUser.number} />
               </div>
               <div className="flex-1 min-h-0">
                 <ChatWindow me={user} other={selectedUser} viewer="admin" />
