@@ -1,3 +1,3 @@
-export { repo } from "./localRepository";
-export { ADMIN_ID } from "./seed";
+export { repo } from "./supabaseRepository";
+export const ADMIN_ID = "ADM-0001";
 export type * from "./types";
