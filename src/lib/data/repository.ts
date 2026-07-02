@@ -1,4 +1,10 @@
-import type { Message, Tag, User, UserType } from "./types";
+import type { BroadcastMessage, Message, Tag, User, UserType } from "./types";
+
+export type BroadcastAudience =
+  | { kind: "all" }
+  | { kind: "empresas" }
+  | { kind: "motoristas" }
+  | { kind: "tag"; tagId: string };
 
 export type NewUserInput =
   | { type: "empresa"; name: string; password: string; cnpj: string }
@@ -29,6 +35,10 @@ export interface Repository {
   deleteTag(id: string): void;
   getConversationTagIds(conversationId: string): string[];
   setConversationTags(conversationId: string, tagIds: string[]): void;
+  // broadcasts
+  resolveBroadcastRecipients(audience: BroadcastAudience): User[];
+  sendBroadcast(input: { body: string; audience: BroadcastAudience; fromUserId: string }): BroadcastMessage;
+  listBroadcasts(): BroadcastMessage[];
   // presence / typing (ephemeral)
   setPresence(userId: string, online: boolean): void;
   isOnline(userId: string): boolean;

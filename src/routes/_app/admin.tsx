@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Search, Settings2 } from "lucide-react";
+import { ArrowLeft, Megaphone, Search, Settings2 } from "lucide-react";
 import { AppHeader } from "@/components/chat/AppHeader";
+import { BroadcastDialog } from "@/components/chat/BroadcastDialog";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ConversationTagPicker } from "@/components/chat/ConversationTagPicker";
 import { TagBadges } from "@/components/chat/TagBadges";
@@ -94,11 +95,21 @@ function AdminPanel() {
       <AppHeader user={user} accent="bg-primary" />
 
       {/* Dashboard */}
-      <div className="grid grid-cols-4 gap-2 border-b bg-card px-4 py-2 text-xs">
-        <Stat label="Empresas" value={stats.empresas} />
-        <Stat label="Motoristas" value={stats.motoristas} />
-        <Stat label="Conversas" value={stats.active} />
-        <Stat label="Não lidas" value={stats.unread} highlight={stats.unread > 0} />
+      <div className="flex items-center gap-4 border-b bg-card px-4 py-2 text-xs">
+        <div className="grid grid-cols-4 gap-4 flex-1">
+          <Stat label="Empresas" value={stats.empresas} />
+          <Stat label="Motoristas" value={stats.motoristas} />
+          <Stat label="Conversas" value={stats.active} />
+          <Stat label="Não lidas" value={stats.unread} highlight={stats.unread > 0} />
+        </div>
+        <BroadcastDialog
+          adminId={user.id}
+          trigger={
+            <Button size="sm" className="shrink-0">
+              <Megaphone className="h-4 w-4 mr-1" /> Nova mensagem em massa
+            </Button>
+          }
+        />
       </div>
 
       <div className="flex-1 min-h-0 flex">
