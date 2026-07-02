@@ -15,7 +15,7 @@ import {
 export function AppHeader({ user, accent }: { user: User; accent: string }) {
   const navigate = useNavigate();
   return (
-    <header className={`flex items-center gap-3 px-4 py-3 text-white ${accent}`}>
+    <header className={`flex items-center gap-3 pl-12 pr-4 py-3 text-white ${accent}`}>
       <div className="font-semibold tracking-tight">ConectaFrete</div>
       <div className="ml-auto flex items-center gap-2">
         <Sheet>

@@ -10,6 +10,7 @@ type ProfileRow = {
   cnpj: string | null;
   placa: string | null;
   veiculo: string | null;
+  last_seen_at?: string | null;
 };
 
 type MessageRow = {
@@ -73,6 +74,10 @@ class SupabaseRepository implements Repository {
   private subs = new Set<() => void>();
   private adminAuthId: string | null = null;
   private realtimeStarted = false;
+  private onlineIds = new Set<string>();
+  private lastSeen = new Map<string, number>();
+  private heartbeatTimer: number | null = null;
+  private presenceChannel: ReturnType<typeof supabase.channel> | null = null;
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -116,7 +121,13 @@ class SupabaseRepository implements Repository {
 
   private async loadUsers() {
     const { data } = await supabase.from("profiles").select("*");
-    if (data) this.users = (data as ProfileRow[]).map(profileToUser);
+    if (data) {
+      const rows = data as ProfileRow[];
+      this.users = rows.map(profileToUser);
+      for (const r of rows) {
+        if (r.last_seen_at) this.lastSeen.set(r.id, new Date(r.last_seen_at).getTime());
+      }
+    }
   }
   private async loadTags() {
     const { data } = await supabase.from("tags").select("*").order("label");
@@ -468,10 +479,65 @@ class SupabaseRepository implements Repository {
     return this.broadcasts;
   }
 
-  // ============ presence / typing (no-op — Supabase Realtime handles chat) ============
-  setPresence(): void {}
+  // ============ presence ============
+  setPresence(userId: string, online: boolean): void {
+    if (!userId) return;
+    if (online) {
+      // Start heartbeat + join realtime presence channel
+      if (this.presenceChannel && this.heartbeatTimer) return;
+      this.startPresence(userId);
+    } else {
+      this.stopPresence(userId);
+    }
+  }
+
+  private startPresence(userId: string) {
+    // Join a shared presence channel
+    const channel = supabase.channel("cf-presence", {
+      config: { presence: { key: userId } },
+    });
+    channel
+      .on("presence", { event: "sync" }, () => {
+        const state = channel.presenceState();
+        this.onlineIds = new Set(Object.keys(state));
+        this.notify();
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") await channel.track({ online_at: Date.now() });
+      });
+    this.presenceChannel = channel;
+
+    const beat = async () => {
+      const iso = new Date().toISOString();
+      this.lastSeen.set(userId, Date.now());
+      await supabase.from("profiles").update({ last_seen_at: iso }).eq("id", userId);
+    };
+    void beat();
+    this.heartbeatTimer = window.setInterval(beat, 30_000);
+
+    window.addEventListener("beforeunload", () => this.stopPresence(userId));
+  }
+
+  private stopPresence(userId: string) {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+    if (this.presenceChannel) {
+      void this.presenceChannel.untrack();
+      void supabase.removeChannel(this.presenceChannel);
+      this.presenceChannel = null;
+    }
+    const iso = new Date().toISOString();
+    this.lastSeen.set(userId, Date.now());
+    void supabase.from("profiles").update({ last_seen_at: iso }).eq("id", userId);
+  }
+
   isOnline(userId: string): boolean {
-    return userId === this.adminAuthId;
+    return this.onlineIds.has(userId);
+  }
+  getLastSeen(userId: string): number | null {
+    return this.lastSeen.get(userId) ?? null;
   }
   sendTyping(): void {}
 

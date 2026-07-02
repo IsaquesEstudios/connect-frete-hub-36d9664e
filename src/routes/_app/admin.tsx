@@ -22,15 +22,15 @@ export const Route = createFileRoute("/_app/admin")({
 
 type FilterTab = "todos" | "empresas" | "motoristas";
 
-function timeAgo(ts?: number) {
-  if (!ts) return "";
+function lastSeenLabel(ts: number | null): string {
+  if (!ts) return "nunca acessou";
   const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 60) return `${s}s`;
+  if (s < 60) return `há ${s}s`;
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m`;
+  if (m < 60) return `há ${m}min`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  return `${Math.floor(h / 24)}d`;
+  if (h < 24) return `há ${h}h`;
+  return `há ${Math.floor(h / 24)}d`;
 }
 
 function AdminPanel() {
@@ -242,9 +242,24 @@ function AdminPanel() {
                           {c.user.type === "empresa" ? "Empresa" : "Motorista"}
                         </span>
                       </div>
-                      <div className="text-[10px] text-muted-foreground shrink-0">
-                        {timeAgo(c.lastMessage?.createdAt)}
-                      </div>
+                      {(() => {
+                        const online = repo.isOnline(c.user.id);
+                        const last = repo.getLastSeen(c.user.id);
+                        return (
+                          <div className="flex items-center gap-1 shrink-0">
+                            {online ? (
+                              <>
+                                <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+                                <span className="text-[10px] text-emerald-600 font-medium">online</span>
+                              </>
+                            ) : (
+                              <span className="text-[10px] text-muted-foreground">
+                                {lastSeenLabel(last)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <div className="text-xs text-muted-foreground truncate">
