@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "ConectaFrete — Central de mensagens" },
+      { name: "description", content: "ConnectHub Admin is a real-time messaging application for managing communication between companies, drivers, and administrators." },
+      { property: "og:description", content: "ConnectHub Admin is a real-time messaging application for managing communication between companies, drivers, and administrators." },
+      { name: "twitter:description", content: "ConnectHub Admin is a real-time messaging application for managing communication between companies, drivers, and administrators." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/99d31a1a-6fea-46c4-985b-dde6723b9aa9/id-preview-36e70958--665e8163-8821-4fca-a03b-cc57d00c5b88.lovable.app-1783020301829.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/99d31a1a-6fea-46c4-985b-dde6723b9aa9/id-preview-36e70958--665e8163-8821-4fca-a03b-cc57d00c5b88.lovable.app-1783020301829.png" },
     ],
     links: [
       {
