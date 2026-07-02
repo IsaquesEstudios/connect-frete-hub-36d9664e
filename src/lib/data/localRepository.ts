@@ -1,5 +1,12 @@
-import type { NewUserInput, Repository } from "./repository";
-import type { ConversationTag, Message, Tag, User, UserType } from "./types";
+import type { BroadcastAudience, NewUserInput, Repository } from "./repository";
+import type {
+  BroadcastMessage,
+  ConversationTag,
+  Message,
+  Tag,
+  User,
+  UserType,
+} from "./types";
 import { ADMIN_ID, seedConversationTags, seedMessages, seedTags, seedUsers } from "./seed";
 import {
   broadcastEphemeral,
@@ -13,6 +20,7 @@ const K_USERS = "users";
 const K_MSGS = "messages";
 const K_TAGS = "tags";
 const K_CONV_TAGS = "conversation_tags";
+const K_BROADCASTS = "broadcast_messages";
 const K_SEEDED = "seeded_v2";
 
 function ensureSeed() {
