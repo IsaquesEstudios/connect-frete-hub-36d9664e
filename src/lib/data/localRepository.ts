@@ -253,6 +253,10 @@ class LocalRepository implements Repository {
     return !!ts && Date.now() - ts < ONLINE_WINDOW;
   }
 
+  getLastSeen(userId: string): number | null {
+    return presence.get(userId) ?? null;
+  }
+
   sendTyping(conversationId: string, fromUserId: string) {
     broadcastEphemeral("typing", { conversationId, fromUserId, ts: Date.now() });
   }
