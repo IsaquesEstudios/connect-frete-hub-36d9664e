@@ -42,6 +42,7 @@ export interface Repository {
   // presence / typing (ephemeral)
   setPresence(userId: string, online: boolean): void;
   isOnline(userId: string): boolean;
+  getLastSeen(userId: string): number | null;
   sendTyping(conversationId: string, fromUserId: string): void;
   // subs
   subscribe(cb: () => void): () => void;
