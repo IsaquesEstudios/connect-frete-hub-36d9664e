@@ -1,0 +1,73 @@
+import { useNavigate } from "@tanstack/react-router";
+import { LogOut, User as UserIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { logout } from "@/lib/auth/session";
+import type { User } from "@/lib/data";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
+export function AppHeader({ user, accent }: { user: User; accent: string }) {
+  const navigate = useNavigate();
+  return (
+    <header className={`flex items-center gap-3 px-4 py-3 text-white ${accent}`}>
+      <div className="font-semibold tracking-tight">ConectaFrete</div>
+      <div className="ml-auto flex items-center gap-2">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
+              <UserIcon className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">
+                {user.name} · {user.number}
+              </span>
+              <span className="sm:hidden">{user.number}</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Perfil</SheetTitle>
+              <SheetDescription>Dados da sua conta</SheetDescription>
+            </SheetHeader>
+            <div className="mt-6 space-y-3 text-sm">
+              <Field label="Nome" value={user.name} />
+              <Field label="Número de usuário" value={user.number} />
+              <Field label="Tipo" value={user.type} />
+              {user.type === "empresa" && <Field label="CNPJ" value={user.cnpj} />}
+              {user.type === "motorista" && (
+                <>
+                  <Field label="Placa" value={user.placa} />
+                  <Field label="Veículo" value={user.veiculo} />
+                </>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white hover:bg-white/10"
+          onClick={() => {
+            logout();
+            navigate({ to: "/auth" });
+          }}
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
+      </div>
+    </header>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-medium capitalize">{value}</div>
+    </div>
+  );
+}
