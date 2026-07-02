@@ -339,10 +339,24 @@ class SupabaseRepository implements Repository {
     return t;
   }
   deleteTag(id: string): void {
+    const prevTags = this.tags;
+    const prevConv = this.convTags;
     this.tags = this.tags.filter((t) => t.id !== id);
     this.convTags = this.convTags.filter((c) => c.tagId !== id);
     this.notify();
-    void supabase.from("tags").delete().eq("id", id);
+    void (async () => {
+      await supabase.from("conversation_tags").delete().eq("tag_id", id);
+      const { error } = await supabase.from("tags").delete().eq("id", id);
+      if (error) {
+        console.error("deleteTag failed", error);
+        this.tags = prevTags;
+        this.convTags = prevConv;
+        this.notify();
+        alert(
+          "Não foi possível excluir a tag no banco (provavelmente falta política RLS DELETE).",
+        );
+      }
+    })();
   }
 
   getConversationTagIds(conversationId: string) {
