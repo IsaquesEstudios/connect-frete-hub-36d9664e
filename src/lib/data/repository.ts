@@ -35,6 +35,10 @@ export interface Repository {
   deleteTag(id: string): void;
   getConversationTagIds(conversationId: string): string[];
   setConversationTags(conversationId: string, tagIds: string[]): void;
+  // broadcasts
+  resolveBroadcastRecipients(audience: BroadcastAudience): User[];
+  sendBroadcast(input: { body: string; audience: BroadcastAudience; fromUserId: string }): BroadcastMessage;
+  listBroadcasts(): BroadcastMessage[];
   // presence / typing (ephemeral)
   setPresence(userId: string, online: boolean): void;
   isOnline(userId: string): boolean;
