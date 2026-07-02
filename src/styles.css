@@ -136,6 +136,9 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+  --company: 217 91% 60%;
+  --driver: 152 55% 45%;
+  --chat-bg: 210 20% 12%;
 }
 
 @layer base {
