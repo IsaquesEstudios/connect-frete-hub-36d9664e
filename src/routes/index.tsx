@@ -1,12 +1,20 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { currentUser, homeFor } from "@/lib/auth/session";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useAuth } from "@/lib/auth/useAuth";
+import { homeFor } from "@/lib/auth/session";
 
 export const Route = createFileRoute("/")({
   ssr: false,
-  beforeLoad: () => {
-    const u = currentUser();
-    if (u) throw redirect({ to: homeFor(u) as "/admin" });
-    throw redirect({ to: "/auth" });
-  },
-  component: () => null,
+  component: IndexRedirect,
 });
+
+function IndexRedirect() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (loading) return;
+    if (user) navigate({ to: homeFor(user) as "/admin" });
+    else navigate({ to: "/auth" });
+  }, [user, loading, navigate]);
+  return null;
+}

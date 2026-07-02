@@ -12,15 +12,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { currentUser, homeFor, login } from "@/lib/auth/session";
-import { repo, type UserType } from "@/lib/data";
+import { homeFor, login, signup } from "@/lib/auth/session";
+import { useAuth } from "@/lib/auth/useAuth";
+import type { User, UserType } from "@/lib/data";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
       { title: "Entrar — ConectaFrete" },
-      { name: "description", content: "Acesse o ConectaFrete com seu número de usuário." },
+      { name: "description", content: "Acesse o ConectaFrete com seu email e senha." },
     ],
   }),
   component: AuthPage,
@@ -28,11 +29,13 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const u = currentUser();
-    if (u) navigate({ to: homeFor(u) as "/admin" });
-  }, [navigate]);
+    if (!loading && user) navigate({ to: homeFor(user) as "/admin" });
+  }, [user, loading, navigate]);
+
+  const goHome = (u: User) => navigate({ to: homeFor(u) as "/admin" });
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
@@ -61,10 +64,10 @@ function AuthPage() {
               <TabsTrigger value="signup">Cadastrar</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
-              <LoginForm onDone={(u) => navigate({ to: homeFor(u) as "/admin" })} />
+              <LoginForm onDone={goHome} />
             </TabsContent>
             <TabsContent value="signup">
-              <SignupForm onDone={(u) => navigate({ to: homeFor(u) as "/admin" })} />
+              <SignupForm onDone={goHome} />
             </TabsContent>
           </Tabs>
         </div>
@@ -73,31 +76,35 @@ function AuthPage() {
   );
 }
 
-function LoginForm({ onDone }: { onDone: (u: ReturnType<typeof login>) => void }) {
-  const [number, setNumber] = useState("");
+function LoginForm({ onDone }: { onDone: (u: User) => void }) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   return (
     <form
       className="space-y-4 pt-4"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
-          const u = login(number, password);
+          const u = await login(email, password);
           toast.success(`Bem-vindo, ${u.name}`);
           onDone(u);
         } catch (err) {
           toast.error((err as Error).message);
+        } finally {
+          setLoading(false);
         }
       }}
     >
       <div>
-        <Label htmlFor="num">Número de usuário</Label>
+        <Label htmlFor="em">Email</Label>
         <Input
-          id="num"
-          value={number}
-          onChange={(e) => setNumber(e.target.value)}
-          placeholder="EMP-0001, MOT-0001 ou ADM-0001"
+          id="em"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           autoComplete="username"
           required
         />
@@ -109,56 +116,55 @@ function LoginForm({ onDone }: { onDone: (u: ReturnType<typeof login>) => void }
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="senha (mock: 123 / admin)"
           autoComplete="current-password"
           required
         />
       </div>
-      <Button type="submit" className="w-full">
-        Entrar
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Entrando..." : "Entrar"}
       </Button>
       <div className="rounded-md bg-muted p-3 text-xs text-muted-foreground space-y-1">
-        <div className="font-medium text-foreground">Contas de teste</div>
-        <div>Admin: ADM-0001 / admin</div>
-        <div>Empresas: EMP-0001..0005 / 123</div>
-        <div>Motoristas: MOT-0001..0005 / 123</div>
+        <div className="font-medium text-foreground">Contas de teste (seed)</div>
+        <div>Admin: admin@conectafrete.com / admin123</div>
+        <div>Empresas: empresa1@conectafrete.com, empresa2@... / 123456</div>
+        <div>Motoristas: motorista1@conectafrete.com, motorista2@... / 123456</div>
       </div>
     </form>
   );
 }
 
-function SignupForm({ onDone }: { onDone: (u: ReturnType<typeof login>) => void }) {
+function SignupForm({ onDone }: { onDone: (u: User) => void }) {
   const [type, setType] = useState<UserType>("empresa");
+  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [placa, setPlaca] = useState("");
   const [veiculo, setVeiculo] = useState("");
+  const [loading, setLoading] = useState(false);
 
   return (
     <form
       className="space-y-4 pt-4"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
-          if (!name.trim() || !password.trim()) throw new Error("Preencha os campos");
-          const base = { type, name: name.trim(), password };
-          const user =
-            type === "empresa"
-              ? repo.createUser({ ...base, type: "empresa", cnpj: cnpj || "00.000.000/0001-00" })
-              : type === "motorista"
-                ? repo.createUser({
-                    ...base,
-                    type: "motorista",
-                    placa: placa || "XXX-0000",
-                    veiculo: veiculo || "Não informado",
-                  })
-                : repo.createUser({ ...base, type: "admin" });
-          const u = login(user.number, password);
+          const u = await signup({
+            email,
+            password,
+            name: name.trim(),
+            type,
+            cnpj: type === "empresa" ? cnpj || "00.000.000/0001-00" : undefined,
+            placa: type === "motorista" ? placa || "XXX-0000" : undefined,
+            veiculo: type === "motorista" ? veiculo || "Não informado" : undefined,
+          });
           toast.success(`Cadastro criado: ${u.number}`);
           onDone(u);
         } catch (err) {
           toast.error((err as Error).message);
+        } finally {
+          setLoading(false);
         }
       }}
     >
@@ -176,14 +182,25 @@ function SignupForm({ onDone }: { onDone: (u: ReturnType<typeof login>) => void 
         </Select>
       </div>
       <div>
+        <Label htmlFor="em">Email</Label>
+        <Input
+          id="em"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+      <div>
         <Label htmlFor="n">Nome</Label>
         <Input id="n" value={name} onChange={(e) => setName(e.target.value)} required />
       </div>
       <div>
-        <Label htmlFor="p">Senha</Label>
+        <Label htmlFor="p">Senha (mín. 6)</Label>
         <Input
           id="p"
           type="password"
+          minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -207,8 +224,8 @@ function SignupForm({ onDone }: { onDone: (u: ReturnType<typeof login>) => void 
           </div>
         </>
       )}
-      <Button type="submit" className="w-full">
-        Criar conta e entrar
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Criando..." : "Criar conta e entrar"}
       </Button>
     </form>
   );
