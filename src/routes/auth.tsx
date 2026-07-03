@@ -1,21 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
-import { homeFor, login, signup } from "@/lib/auth/session";
+import { homeFor, login } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
-import type { User, UserType } from "@/lib/data";
+import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { SignupWizard } from "@/components/auth/SignupWizard";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -92,8 +85,9 @@ function AuthPage() {
           {mode === "login" ? (
             <LoginForm onDone={goHome} />
           ) : (
-            <SignupForm onDone={goHome} />
+            <SignupWizard onDone={goHome} onBackToLogin={() => setMode("login")} />
           )}
+
 
           <div className="mt-6 text-center text-sm text-slate-400">
             {mode === "login" ? (
@@ -218,128 +212,6 @@ function LoginForm({ onDone }: { onDone: (u: User) => void }) {
         <div>Empresas: empresa1@conectafrete.com / 123456</div>
         <div>Motoristas: motorista1@conectafrete.com / 123456</div>
       </div>
-    </form>
-  );
-}
-
-function SignupForm({ onDone }: { onDone: (u: User) => void }) {
-  const [type, setType] = useState<UserType>("empresa");
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [cnpj, setCnpj] = useState("");
-  const [placa, setPlaca] = useState("");
-  const [veiculo, setVeiculo] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  return (
-    <form
-      className="space-y-3"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-          const u = await signup({
-            email,
-            password,
-            name: name.trim(),
-            type,
-            cnpj: type === "empresa" ? cnpj || "00.000.000/0001-00" : undefined,
-            placa: type === "motorista" ? placa || "XXX-0000" : undefined,
-            veiculo: type === "motorista" ? veiculo || "Não informado" : undefined,
-          });
-          toast.success(`Cadastro criado: ${u.number}`);
-          onDone(u);
-        } catch (err) {
-          toast.error((err as Error).message);
-        } finally {
-          setLoading(false);
-        }
-      }}
-    >
-      <div className={cn(fieldWrap)}>
-        <Label className={fieldLabel}>Tipo de conta</Label>
-        <Select value={type} onValueChange={(v) => setType(v as UserType)}>
-          <SelectTrigger className="h-7 border-0 bg-transparent p-0 text-sm text-white shadow-none focus:ring-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="empresa">Empresa</SelectItem>
-            <SelectItem value="motorista">Motorista</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <GlassField label="Nome">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          placeholder="Seu nome"
-          className={fieldInput}
-        />
-      </GlassField>
-      <GlassField label="Email">
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          placeholder="voce@empresa.com"
-          className={fieldInput}
-        />
-      </GlassField>
-      <GlassField label="Senha (mín. 6)" action={<SubmitArrow loading={loading} />}>
-        <Input
-          type="password"
-          minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          placeholder="••••••••"
-          className={fieldInput}
-        />
-      </GlassField>
-
-      {type === "empresa" && (
-        <GlassField label="CNPJ">
-          <Input
-            value={cnpj}
-            onChange={(e) => setCnpj(e.target.value)}
-            placeholder="00.000.000/0001-00"
-            className={fieldInput}
-          />
-        </GlassField>
-      )}
-      {type === "motorista" && (
-        <>
-          <GlassField label="Placa">
-            <Input
-              value={placa}
-              onChange={(e) => setPlaca(e.target.value)}
-              placeholder="ABC-1234"
-              className={fieldInput}
-            />
-          </GlassField>
-          <GlassField label="Veículo">
-            <Input
-              value={veiculo}
-              onChange={(e) => setVeiculo(e.target.value)}
-              placeholder="Modelo do veículo"
-              className={fieldInput}
-            />
-          </GlassField>
-        </>
-      )}
-
-      <Button
-        type="submit"
-        disabled={loading}
-        className="w-full h-11 rounded-2xl bg-gradient-to-b from-sky-300 to-sky-500 text-slate-900 font-medium hover:from-sky-200 hover:to-sky-400"
-      >
-        {loading ? "Criando..." : "Criar conta e entrar"}
-      </Button>
     </form>
   );
 }
