@@ -10,7 +10,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
   Sheet,
   SheetContent,
