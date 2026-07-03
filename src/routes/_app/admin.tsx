@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Megaphone, Search, Settings2 } from "lucide-react";
-import { AppHeader } from "@/components/chat/AppHeader";
 import { BroadcastDialog } from "@/components/chat/BroadcastDialog";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ConversationTagPicker } from "@/components/chat/ConversationTagPicker";

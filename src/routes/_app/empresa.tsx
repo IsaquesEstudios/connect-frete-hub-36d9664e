@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { AppHeader } from "@/components/chat/AppHeader";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ADMIN_ID, repo } from "@/lib/data";
 import { homeFor } from "@/lib/auth/session";
