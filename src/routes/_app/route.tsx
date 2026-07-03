@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth/useAuth";
 import { repo } from "@/lib/data";
 
@@ -39,7 +39,6 @@ function AppGate() {
       <div className="min-h-screen flex w-full">
         <AppSidebar user={user} />
         <div className="flex-1 min-w-0 flex flex-col relative">
-          <SidebarTrigger className="absolute top-2 left-2 z-30 text-white hover:bg-white/10 md:top-3" />
           <Outlet />
         </div>
       </div>

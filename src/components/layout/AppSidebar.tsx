@@ -10,7 +10,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -81,6 +84,9 @@ export function AppSidebar({ user }: { user: User }) {
                 <span>Sair</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <CollapseToggle />
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
@@ -115,5 +121,18 @@ function Field({ label, value }: { label: string; value: string }) {
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="font-medium capitalize">{value}</div>
     </div>
+  );
+}
+
+function CollapseToggle() {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+  return (
+    <SidebarMenuButton asChild tooltip={collapsed ? "Expandir menu" : "Recolher menu"}>
+      <SidebarTrigger className="w-full justify-start gap-2 h-8 px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground [&>svg]:hidden">
+        {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+        <span>{collapsed ? "Expandir" : "Recolher"}</span>
+      </SidebarTrigger>
+    </SidebarMenuButton>
   );
 }
