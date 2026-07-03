@@ -627,3 +627,162 @@ function StepCarroceria({ data, update }: StepProps) {
     />
   );
 }
+
+// ---------- EMPRESA STEPS ----------
+
+function StepBasicEmpresa({ data, update }: StepProps) {
+  return (
+    <div className="space-y-3">
+      <Field label="Email">
+        <Input
+          type="email"
+          value={data.email}
+          onChange={(e) => update("email", e.target.value)}
+          placeholder="contato@empresa.com"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Senha (mín. 6)">
+        <Input
+          type="password"
+          minLength={6}
+          value={data.senha}
+          onChange={(e) => update("senha", e.target.value)}
+          placeholder="••••••••"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="CNPJ">
+        <Input
+          value={data.documento}
+          onChange={(e) => update("documento", e.target.value)}
+          placeholder="00.000.000/0001-00"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Nome fantasia">
+        <Input
+          value={data.nomeFantasia}
+          onChange={(e) => update("nomeFantasia", e.target.value)}
+          placeholder="Nome da empresa"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Whatsapp">
+        <Input
+          value={data.whatsapp}
+          onChange={(e) => update("whatsapp", e.target.value)}
+          placeholder="(11) 90000-0000"
+          className={fieldInput}
+        />
+      </Field>
+    </div>
+  );
+}
+
+function StepDetalhesEmpresa({ data, update }: StepProps) {
+  const opts: { value: "transportador" | "embarcador" | "agenciador"; label: string; desc: string }[] = [
+    { value: "transportador", label: "Transportador", desc: "Presta serviço de transporte" },
+    { value: "embarcador", label: "Embarcador", desc: "Precisa mover cargas próprias" },
+    { value: "agenciador", label: "Agenciador", desc: "Intermedia cargas e fretes" },
+  ];
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm uppercase tracking-wider text-slate-400">Perfil da empresa</h2>
+      <div className="grid grid-cols-1 gap-2">
+        {opts.map((o) => {
+          const active = data.perfilEmpresa === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => update("perfilEmpresa", o.value)}
+              className={cn(
+                "rounded-2xl border p-3 text-left transition",
+                active
+                  ? "border-sky-300/60 bg-sky-400/10 ring-1 ring-sky-300/30"
+                  : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]",
+              )}
+            >
+              <div className="text-sm font-medium text-white">{o.label}</div>
+              <div className="text-xs text-slate-400">{o.desc}</div>
+            </button>
+          );
+        })}
+      </div>
+      <Field label="Rede social ou site (opcional)">
+        <Input
+          value={data.siteRedeSocial}
+          onChange={(e) => update("siteRedeSocial", e.target.value)}
+          placeholder="https://... ou @perfil"
+          className={fieldInput}
+        />
+      </Field>
+    </div>
+  );
+}
+
+function StepLocalByEstado({ data, update }: StepProps) {
+  const [all, setAll] = useState<Municipio[] | null>(null);
+
+  useEffect(() => {
+    void loadMunicipios()
+      .then(setAll)
+      .catch(() => toast.error("Falha ao carregar cidades do IBGE."));
+  }, []);
+
+  const ufs = useMemo(() => (all ? listUFs(all) : []), [all]);
+  const cidades = useMemo(
+    () => (all && data.estado ? citiesByUF(all, data.estado) : []),
+    [all, data.estado],
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className={fieldWrap}>
+        <Label className={fieldLabel}>Estado</Label>
+        <Select
+          value={data.estado}
+          onValueChange={(v) => {
+            update("estado", v);
+            update("cidade", "");
+          }}
+          disabled={!all}
+        >
+          <SelectTrigger className="h-7 border-0 bg-transparent p-0 text-sm text-white shadow-none focus:ring-0">
+            <SelectValue placeholder={all ? "Selecione o estado" : "Carregando..."} />
+          </SelectTrigger>
+          <SelectContent>
+            {ufs.map((s) => (
+              <SelectItem key={s.uf} value={s.uf}>
+                {s.uf} — {s.nome}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className={cn(fieldWrap, !data.estado && "opacity-50")}>
+        <Label className={fieldLabel}>Cidade</Label>
+        <Select
+          value={data.cidade}
+          onValueChange={(v) => update("cidade", v)}
+          disabled={!data.estado}
+        >
+          <SelectTrigger className="h-7 border-0 bg-transparent p-0 text-sm text-white shadow-none focus:ring-0">
+            <SelectValue
+              placeholder={data.estado ? "Selecione a cidade" : "Selecione o estado primeiro"}
+            />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            {cidades.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
