@@ -80,13 +80,8 @@ function AdminPanel() {
     });
   }, [conversations, tab, query, tagFilter]);
 
-  const stats = useMemo(() => {
-    const empresas = conversations.filter((c) => c.user.type === "empresa").length;
-    const motoristas = conversations.filter((c) => c.user.type === "motorista").length;
-    const active = conversations.filter((c) => c.lastMessage).length;
-    const unread = conversations.reduce((n, c) => n + c.unreadForAdmin, 0);
-    return { empresas, motoristas, active, unread };
-  }, [conversations]);
+
+
 
   if (!user || user.type !== "admin") return null;
 
