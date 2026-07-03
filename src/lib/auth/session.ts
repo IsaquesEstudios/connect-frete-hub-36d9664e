@@ -88,6 +88,10 @@ export interface SignupInput {
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
+  // empresa
+  nomeFantasia?: string;
+  perfilEmpresa?: "transportador" | "embarcador" | "agenciador";
+  siteRedeSocial?: string;
 }
 
 export async function signup(input: SignupInput): Promise<User> {
