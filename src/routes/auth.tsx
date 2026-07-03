@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -12,9 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { ArrowRight, Truck } from "lucide-react";
 import { homeFor, login, signup } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserType } from "@/lib/data";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [mode, setMode] = useState<"login" | "signup">("login");
 
   useEffect(() => {
     if (!loading && user) navigate({ to: homeFor(user) as "/admin" });
@@ -38,41 +40,134 @@ function AuthPage() {
   const goHome = (u: User) => navigate({ to: homeFor(u) as "/admin" });
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
-      <div className="hidden lg:flex flex-col justify-between p-10 bg-primary text-primary-foreground">
-        <div className="text-2xl font-semibold tracking-tight">ConectaFrete</div>
-        <div className="space-y-3">
-          <h1 className="text-3xl font-bold leading-tight">
-            Central de comunicação para empresas e motoristas.
-          </h1>
-          <p className="text-primary-foreground/80 max-w-md">
-            Todas as conversas passam pelo Admin — atendimento centralizado, organizado e
-            rastreável.
-          </p>
-        </div>
-        <div className="text-xs text-primary-foreground/60">© ConectaFrete</div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#050b1a] text-slate-100 flex items-center justify-center p-4">
+      {/* Deep space background */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 0%, #0f2447 0%, #071228 45%, #030814 100%)",
+        }}
+      />
+      {/* Dot grid */}
+      <div
+        className="absolute inset-0 opacity-[0.18]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(148,197,255,0.35) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+          maskImage:
+            "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+        }}
+      />
+      {/* Star sparkle */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute left-1/2 top-[18%] h-40 w-40 -translate-x-1/2 rounded-full bg-sky-400/30 blur-3xl" />
       </div>
 
-      <div className="flex items-center justify-center p-6">
-        <div className="w-full max-w-md space-y-6">
-          <div className="lg:hidden text-center">
-            <h1 className="text-2xl font-bold">ConectaFrete</h1>
+      {/* Glass card */}
+      <div className="relative w-full max-w-md">
+        {/* Top glow line */}
+        <div className="absolute -top-px left-1/2 h-px w-40 -translate-x-1/2 bg-gradient-to-r from-transparent via-sky-300 to-transparent" />
+        <div className="absolute -top-6 left-1/2 h-12 w-12 -translate-x-1/2 rounded-full bg-sky-300/40 blur-2xl" />
+
+        <div
+          className="relative rounded-3xl border border-white/10 bg-white/[0.04] px-7 py-8 backdrop-blur-xl shadow-[0_20px_80px_-20px_rgba(0,0,0,0.8)]"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+          }}
+        >
+          {/* Logo */}
+          <div className="flex flex-col items-center text-center mb-6">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-white/5 backdrop-blur">
+              <Truck className="h-5 w-5 text-sky-200" />
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">
+              {mode === "login" ? "Bem-vindo de volta" : "Criar sua conta"}
+            </h1>
+            <p className="mt-1 text-sm text-slate-400">
+              {mode === "login"
+                ? "Entre com seus dados para acessar."
+                : "Preencha para começar no ConectaFrete."}
+            </p>
           </div>
-          <Tabs defaultValue="login">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="login">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Cadastrar</TabsTrigger>
-            </TabsList>
-            <TabsContent value="login">
-              <LoginForm onDone={goHome} />
-            </TabsContent>
-            <TabsContent value="signup">
-              <SignupForm onDone={goHome} />
-            </TabsContent>
-          </Tabs>
+
+          {mode === "login" ? (
+            <LoginForm onDone={goHome} />
+          ) : (
+            <SignupForm onDone={goHome} />
+          )}
+
+          <div className="mt-6 text-center text-sm text-slate-400">
+            {mode === "login" ? (
+              <>
+                Não tem uma conta?{" "}
+                <button
+                  onClick={() => setMode("signup")}
+                  className="font-medium text-sky-300 underline underline-offset-4 hover:text-sky-200"
+                >
+                  Criar conta
+                </button>
+              </>
+            ) : (
+              <>
+                Já tem conta?{" "}
+                <button
+                  onClick={() => setMode("login")}
+                  className="font-medium text-sky-300 underline underline-offset-4 hover:text-sky-200"
+                >
+                  Entrar
+                </button>
+              </>
+            )}
+          </div>
         </div>
+
+        <p className="mt-6 text-center text-xs text-slate-500">
+          © ConectaFrete
+        </p>
       </div>
     </div>
+  );
+}
+
+const fieldWrap =
+  "group rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 focus-within:border-sky-300/50 focus-within:bg-white/[0.06] transition";
+const fieldLabel = "text-[11px] uppercase tracking-wider text-slate-400";
+const fieldInput =
+  "w-full border-0 bg-transparent p-0 text-sm text-white placeholder:text-slate-500 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none h-6";
+
+function GlassField({
+  label,
+  children,
+  action,
+}: {
+  label: string;
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className={cn(fieldWrap, "flex items-center gap-3")}>
+      <div className="flex-1 min-w-0">
+        <div className={fieldLabel}>{label}</div>
+        {children}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+function SubmitArrow({ loading }: { loading: boolean }) {
+  return (
+    <button
+      type="submit"
+      disabled={loading}
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-sky-300 to-sky-500 text-slate-900 shadow-[0_6px_20px_-6px_rgba(56,189,248,0.7)] transition hover:from-sky-200 hover:to-sky-400 disabled:opacity-60"
+      aria-label="Enviar"
+    >
+      <ArrowRight className="h-4 w-4" />
+    </button>
   );
 }
 
@@ -83,7 +178,7 @@ function LoginForm({ onDone }: { onDone: (u: User) => void }) {
 
   return (
     <form
-      className="space-y-4 pt-4"
+      className="space-y-3"
       onSubmit={async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -98,36 +193,34 @@ function LoginForm({ onDone }: { onDone: (u: User) => void }) {
         }
       }}
     >
-      <div>
-        <Label htmlFor="em">Email</Label>
+      <GlassField label="Email">
         <Input
-          id="em"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="username"
           required
+          placeholder="voce@empresa.com"
+          className={fieldInput}
         />
-      </div>
-      <div>
-        <Label htmlFor="pw">Senha</Label>
+      </GlassField>
+      <GlassField label="Senha" action={<SubmitArrow loading={loading} />}>
         <Input
-          id="pw"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
           required
+          placeholder="••••••••"
+          className={fieldInput}
         />
-      </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Entrando..." : "Entrar"}
-      </Button>
-      <div className="rounded-md bg-muted p-3 text-xs text-muted-foreground space-y-1">
-        <div className="font-medium text-foreground">Contas de teste (seed)</div>
+      </GlassField>
+
+      <div className="pt-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-slate-400">
+        <div className="mb-1 font-medium text-slate-300">Contas de teste</div>
         <div>Admin: admin@conectafrete.com / admin123</div>
-        <div>Empresas: empresa1@conectafrete.com, empresa2@... / 123456</div>
-        <div>Motoristas: motorista1@conectafrete.com, motorista2@... / 123456</div>
+        <div>Empresas: empresa1@conectafrete.com / 123456</div>
+        <div>Motoristas: motorista1@conectafrete.com / 123456</div>
       </div>
     </form>
   );
@@ -145,7 +238,7 @@ function SignupForm({ onDone }: { onDone: (u: User) => void }) {
 
   return (
     <form
-      className="space-y-4 pt-4"
+      className="space-y-3"
       onSubmit={async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -168,10 +261,10 @@ function SignupForm({ onDone }: { onDone: (u: User) => void }) {
         }
       }}
     >
-      <div>
-        <Label>Tipo de conta</Label>
+      <div className={cn(fieldWrap)}>
+        <Label className={fieldLabel}>Tipo de conta</Label>
         <Select value={type} onValueChange={(v) => setType(v as UserType)}>
-          <SelectTrigger>
+          <SelectTrigger className="h-7 border-0 bg-transparent p-0 text-sm text-white shadow-none focus:ring-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -181,50 +274,74 @@ function SignupForm({ onDone }: { onDone: (u: User) => void }) {
           </SelectContent>
         </Select>
       </div>
-      <div>
-        <Label htmlFor="em">Email</Label>
+
+      <GlassField label="Nome">
         <Input
-          id="em"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          placeholder="Seu nome"
+          className={fieldInput}
+        />
+      </GlassField>
+      <GlassField label="Email">
+        <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          placeholder="voce@empresa.com"
+          className={fieldInput}
         />
-      </div>
-      <div>
-        <Label htmlFor="n">Nome</Label>
-        <Input id="n" value={name} onChange={(e) => setName(e.target.value)} required />
-      </div>
-      <div>
-        <Label htmlFor="p">Senha (mín. 6)</Label>
+      </GlassField>
+      <GlassField label="Senha (mín. 6)" action={<SubmitArrow loading={loading} />}>
         <Input
-          id="p"
           type="password"
           minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          placeholder="••••••••"
+          className={fieldInput}
         />
-      </div>
+      </GlassField>
+
       {type === "empresa" && (
-        <div>
-          <Label htmlFor="c">CNPJ</Label>
-          <Input id="c" value={cnpj} onChange={(e) => setCnpj(e.target.value)} />
-        </div>
+        <GlassField label="CNPJ">
+          <Input
+            value={cnpj}
+            onChange={(e) => setCnpj(e.target.value)}
+            placeholder="00.000.000/0001-00"
+            className={fieldInput}
+          />
+        </GlassField>
       )}
       {type === "motorista" && (
         <>
-          <div>
-            <Label htmlFor="pl">Placa</Label>
-            <Input id="pl" value={placa} onChange={(e) => setPlaca(e.target.value)} />
-          </div>
-          <div>
-            <Label htmlFor="v">Veículo</Label>
-            <Input id="v" value={veiculo} onChange={(e) => setVeiculo(e.target.value)} />
-          </div>
+          <GlassField label="Placa">
+            <Input
+              value={placa}
+              onChange={(e) => setPlaca(e.target.value)}
+              placeholder="ABC-1234"
+              className={fieldInput}
+            />
+          </GlassField>
+          <GlassField label="Veículo">
+            <Input
+              value={veiculo}
+              onChange={(e) => setVeiculo(e.target.value)}
+              placeholder="Modelo do veículo"
+              className={fieldInput}
+            />
+          </GlassField>
         </>
       )}
-      <Button type="submit" className="w-full" disabled={loading}>
+
+      <Button
+        type="submit"
+        disabled={loading}
+        className="w-full h-11 rounded-2xl bg-gradient-to-b from-sky-300 to-sky-500 text-slate-900 font-medium hover:from-sky-200 hover:to-sky-400"
+      >
         {loading ? "Criando..." : "Criar conta e entrar"}
       </Button>
     </form>
