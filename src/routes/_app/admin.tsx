@@ -304,20 +304,3 @@ function AdminPanel() {
     </div>
   );
 }
-
-function Stat({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: number;
-  highlight?: boolean;
-}) {
-  return (
-    <div className="flex flex-col items-center">
-      <div className={`text-lg font-semibold ${highlight ? "text-primary" : ""}`}>{value}</div>
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-    </div>
-  );
-}
