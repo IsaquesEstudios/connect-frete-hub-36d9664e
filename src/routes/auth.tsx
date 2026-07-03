@@ -85,8 +85,9 @@ function AuthPage() {
           {mode === "login" ? (
             <LoginForm onDone={goHome} />
           ) : (
-            <SignupForm onDone={goHome} />
+            <SignupWizard onDone={goHome} onBackToLogin={() => setMode("login")} />
           )}
+
 
           <div className="mt-6 text-center text-sm text-slate-400">
             {mode === "login" ? (
