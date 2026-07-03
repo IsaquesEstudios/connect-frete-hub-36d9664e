@@ -34,7 +34,6 @@ function EmpresaPanel() {
 
   return (
     <div className="h-screen flex flex-col">
-      <AppHeader user={user} accent="bg-[hsl(var(--company))]" />
       <div className="flex-1 min-h-0">
         <ChatWindow me={user} other={admin} viewer="user" />
       </div>
