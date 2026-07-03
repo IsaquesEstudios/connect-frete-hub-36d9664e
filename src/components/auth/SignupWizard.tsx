@@ -20,6 +20,8 @@ import type { User } from "@/lib/data";
 import {
   CARROCERIAS,
   TIPOS_VEICULO,
+  citiesByUF,
+  listUFs,
   loadMunicipios,
   searchMunicipiosByName,
   statesForCityName,
@@ -30,25 +32,27 @@ type Kind = "empresa" | "motorista";
 
 interface WizardData {
   kind: Kind | null;
-  // Sec 1
+  // Sec 1 (compartilhado)
   nome: string;
   documentoTipo: "cnpj" | "cpf";
   documento: string;
   whatsapp: string;
   email: string;
   senha: string;
+  // Sec 1 (empresa)
+  nomeFantasia: string;
   // Sec 2
   fotoUrl: string;
-  // Sec 3
+  // Sec 3 (empresa)
+  perfilEmpresa: "transportador" | "embarcador" | "agenciador" | "";
+  siteRedeSocial: string;
+  // Sec 3/4 – Local
   cidade: string;
   estado: string;
-  // Sec 4
+  // Motorista
   placa: string;
-  // Sec 5
   tipoVeiculo: string;
-  // Sec 6
   rntrc: string;
-  // Sec 7
   carroceria: string;
 }
 
@@ -60,7 +64,10 @@ const initial: WizardData = {
   whatsapp: "",
   email: "",
   senha: "",
+  nomeFantasia: "",
   fotoUrl: "",
+  perfilEmpresa: "",
+  siteRedeSocial: "",
   cidade: "",
   estado: "",
   placa: "",
