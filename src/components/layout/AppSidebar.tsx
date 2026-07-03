@@ -84,6 +84,9 @@ export function AppSidebar({ user }: { user: User }) {
                 <span>Sair</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <CollapseToggle />
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
