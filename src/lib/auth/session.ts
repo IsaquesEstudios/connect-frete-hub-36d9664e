@@ -67,15 +67,30 @@ export async function login(email: string, password: string): Promise<User> {
   return u;
 }
 
-export async function signup(input: {
+export interface SignupInput {
   email: string;
   password: string;
   name: string;
   type: UserType;
+  // documento
+  documentoTipo?: "cnpj" | "cpf";
   cnpj?: string;
+  cpf?: string;
+  whatsapp?: string;
+  // perfil
+  fotoUrl?: string;
+  // localização
+  cidade?: string;
+  estado?: string;
+  // motorista
   placa?: string;
   veiculo?: string;
-}): Promise<User> {
+  tipoVeiculo?: string;
+  rntrc?: string;
+  carroceria?: string;
+}
+
+export async function signup(input: SignupInput): Promise<User> {
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
     password: input.password,
@@ -108,10 +123,19 @@ export async function signup(input: {
     type: input.type,
     name: input.name,
     cnpj: input.cnpj ?? null,
+    cpf: input.cpf ?? null,
+    whatsapp: input.whatsapp ?? null,
+    foto_url: input.fotoUrl ?? null,
+    cidade: input.cidade ?? null,
+    estado: input.estado ?? null,
     placa: input.placa ?? null,
     veiculo: input.veiculo ?? null,
+    tipo_veiculo: input.tipoVeiculo ?? null,
+    rntrc: input.rntrc ?? null,
+    carroceria: input.carroceria ?? null,
   });
   if (insErr) throw new Error(`Perfil: ${insErr.message}`);
+
 
   const u = await loadProfile(data.user.id);
   if (!u) throw new Error("Perfil criado mas não encontrado.");
