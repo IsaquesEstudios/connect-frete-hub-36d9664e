@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Home, LogOut, Settings, User as UserIcon } from "lucide-react";
+import { BarChart3, Home, LogOut, Settings, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import {
   Sidebar,
