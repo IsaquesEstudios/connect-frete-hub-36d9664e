@@ -25,6 +25,8 @@ import { logout } from "@/lib/auth/session";
 import { homeFor } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
 
+const ICON_CLASS = "text-white";
+
 export function AppSidebar({ user }: { user: User }) {
   const navigate = useNavigate();
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
@@ -54,7 +56,7 @@ export function AppSidebar({ user }: { user: User }) {
                       tooltip={item.title}
                     >
                       <Link to={item.url as "/admin"}>
-                        <item.icon />
+                        <item.icon className={ICON_CLASS} />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -68,7 +70,7 @@ export function AppSidebar({ user }: { user: User }) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Perfil" onClick={() => setProfileOpen(true)}>
-                <UserIcon />
+                <UserIcon className={ICON_CLASS} />
                 <span>Perfil</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -80,7 +82,7 @@ export function AppSidebar({ user }: { user: User }) {
                   navigate({ to: "/auth" });
                 }}
               >
-                <LogOut />
+                <LogOut className={ICON_CLASS} />
                 <span>Sair</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -130,7 +132,7 @@ function CollapseToggle() {
   return (
     <SidebarMenuButton asChild tooltip={collapsed ? "Expandir menu" : "Recolher menu"}>
       <SidebarTrigger className="w-full justify-start gap-2 h-8 px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground [&>svg]:hidden">
-        {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
+        {collapsed ? <PanelLeftOpen className={ICON_CLASS} /> : <PanelLeftClose className={ICON_CLASS} />}
         <span>{collapsed ? "Expandir" : "Recolher"}</span>
       </SidebarTrigger>
     </SidebarMenuButton>
