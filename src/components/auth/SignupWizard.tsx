@@ -87,13 +87,31 @@ export function SignupWizard({
   const [step, setStep] = useState(0); // 0 = pick kind; 1..N sections
   const [loading, setLoading] = useState(false);
 
-  const totalSteps = data.kind === "motorista" ? 7 : 3;
+  const isEmpresa = data.kind === "empresa";
+  const totalSteps = isEmpresa ? 4 : 7;
 
   const update = <K extends keyof WizardData>(k: K, v: WizardData[K]) =>
     setData((d) => ({ ...d, [k]: v }));
 
   const canAdvance = (): boolean => {
     if (step === 0) return data.kind !== null;
+
+    if (isEmpresa) {
+      if (step === 1)
+        return (
+          /\S+@\S+\.\S+/.test(data.email) &&
+          data.senha.length >= 6 &&
+          data.documento.trim().length >= 11 &&
+          data.nomeFantasia.trim().length > 1 &&
+          data.whatsapp.trim().length >= 8
+        );
+      if (step === 2) return true; // foto opcional
+      if (step === 3) return !!data.perfilEmpresa;
+      if (step === 4) return !!data.estado && !!data.cidade;
+      return true;
+    }
+
+    // Motorista
     if (step === 1)
       return (
         data.nome.trim().length > 1 &&
@@ -102,7 +120,7 @@ export function SignupWizard({
         /\S+@\S+\.\S+/.test(data.email) &&
         data.senha.length >= 6
       );
-    if (step === 2) return true; // foto opcional
+    if (step === 2) return true;
     if (step === 3) return !!data.cidade && !!data.estado;
     if (step === 4) return data.placa.trim().length >= 5;
     if (step === 5) return !!data.tipoVeiculo;
@@ -117,20 +135,23 @@ export function SignupWizard({
       const u = await signup({
         email: data.email,
         password: data.senha,
-        name: data.nome.trim(),
+        name: isEmpresa ? data.nomeFantasia.trim() : data.nome.trim(),
         type: data.kind as Kind,
-        documentoTipo: data.documentoTipo,
-        cnpj: data.documentoTipo === "cnpj" ? data.documento : undefined,
-        cpf: data.documentoTipo === "cpf" ? data.documento : undefined,
+        documentoTipo: isEmpresa ? "cnpj" : data.documentoTipo,
+        cnpj: isEmpresa || data.documentoTipo === "cnpj" ? data.documento : undefined,
+        cpf: !isEmpresa && data.documentoTipo === "cpf" ? data.documento : undefined,
         whatsapp: data.whatsapp,
         fotoUrl: data.fotoUrl || undefined,
         cidade: data.cidade || undefined,
         estado: data.estado || undefined,
-        placa: data.kind === "motorista" ? data.placa : undefined,
-        veiculo: data.kind === "motorista" ? data.tipoVeiculo : undefined,
-        tipoVeiculo: data.kind === "motorista" ? data.tipoVeiculo : undefined,
-        rntrc: data.kind === "motorista" ? data.rntrc : undefined,
-        carroceria: data.kind === "motorista" ? data.carroceria : undefined,
+        placa: !isEmpresa ? data.placa : undefined,
+        veiculo: !isEmpresa ? data.tipoVeiculo : undefined,
+        tipoVeiculo: !isEmpresa ? data.tipoVeiculo : undefined,
+        rntrc: !isEmpresa ? data.rntrc : undefined,
+        carroceria: !isEmpresa ? data.carroceria : undefined,
+        nomeFantasia: isEmpresa ? data.nomeFantasia.trim() : undefined,
+        perfilEmpresa: isEmpresa && data.perfilEmpresa ? data.perfilEmpresa : undefined,
+        siteRedeSocial: isEmpresa ? data.siteRedeSocial.trim() || undefined : undefined,
       });
       toast.success(`Cadastro criado: ${u.number}`);
       onDone(u);
@@ -153,18 +174,22 @@ export function SignupWizard({
 
   return (
     <div className="space-y-5">
-      {step > 0 && (
-        <ProgressBar current={step} total={totalSteps} />
-      )}
+      {step > 0 && <ProgressBar current={step} total={totalSteps} />}
 
       {step === 0 && <StepKind data={data} update={update} />}
-      {step === 1 && <StepBasic data={data} update={update} />}
-      {step === 2 && <StepFoto data={data} update={update} />}
-      {step === 3 && <StepLocal data={data} update={update} />}
-      {step === 4 && <StepPlaca data={data} update={update} />}
-      {step === 5 && <StepTipoVeiculo data={data} update={update} />}
-      {step === 6 && <StepRntrc data={data} update={update} />}
-      {step === 7 && <StepCarroceria data={data} update={update} />}
+
+      {isEmpresa && step === 1 && <StepBasicEmpresa data={data} update={update} />}
+      {isEmpresa && step === 2 && <StepFoto data={data} update={update} />}
+      {isEmpresa && step === 3 && <StepDetalhesEmpresa data={data} update={update} />}
+      {isEmpresa && step === 4 && <StepLocalByEstado data={data} update={update} />}
+
+      {!isEmpresa && step === 1 && <StepBasic data={data} update={update} />}
+      {!isEmpresa && step === 2 && <StepFoto data={data} update={update} />}
+      {!isEmpresa && step === 3 && <StepLocal data={data} update={update} />}
+      {!isEmpresa && step === 4 && <StepPlaca data={data} update={update} />}
+      {!isEmpresa && step === 5 && <StepTipoVeiculo data={data} update={update} />}
+      {!isEmpresa && step === 6 && <StepRntrc data={data} update={update} />}
+      {!isEmpresa && step === 7 && <StepCarroceria data={data} update={update} />}
 
       <div className="flex items-center gap-2 pt-2">
         <Button
