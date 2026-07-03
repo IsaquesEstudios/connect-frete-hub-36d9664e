@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { AppHeader } from "@/components/chat/AppHeader";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ADMIN_ID, repo } from "@/lib/data";
 import { homeFor } from "@/lib/auth/session";
@@ -34,7 +33,6 @@ function EmpresaPanel() {
 
   return (
     <div className="h-screen flex flex-col">
-      <AppHeader user={user} accent="bg-[hsl(var(--company))]" />
       <div className="flex-1 min-h-0">
         <ChatWindow me={user} other={admin} viewer="user" />
       </div>
