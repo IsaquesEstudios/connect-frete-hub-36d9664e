@@ -103,14 +103,7 @@ function AdminPanel() {
     <div className="h-screen flex flex-col">
       <AppHeader user={user} accent="bg-primary" />
 
-      {/* Dashboard */}
-      <div className="flex items-center gap-4 border-b bg-card px-4 py-2 text-xs">
-        <div className="grid grid-cols-4 gap-4 flex-1">
-          <Stat label="Empresas" value={stats.empresas} />
-          <Stat label="Motoristas" value={stats.motoristas} />
-          <Stat label="Conversas" value={stats.active} />
-          <Stat label="Não lidas" value={stats.unread} highlight={stats.unread > 0} />
-        </div>
+      <div className="flex items-center justify-end gap-2 border-b bg-card px-4 py-2">
         <BroadcastDialog
           adminId={user.id}
           trigger={
@@ -120,6 +113,7 @@ function AdminPanel() {
           }
         />
       </div>
+
 
       <div className="flex-1 min-h-0 flex">
         {/* Sidebar */}
