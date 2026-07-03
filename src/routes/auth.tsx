@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowRight, Truck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { homeFor, login, signup } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserType } from "@/lib/data";
@@ -78,11 +78,7 @@ function AuthPage() {
               "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
           }}
         >
-          {/* Logo */}
           <div className="flex flex-col items-center text-center mb-6">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-white/15 bg-white/5 backdrop-blur">
-              <Truck className="h-5 w-5 text-sky-200" />
-            </div>
             <h1 className="text-2xl font-semibold tracking-tight text-white">
               {mode === "login" ? "Bem-vindo de volta" : "Criar sua conta"}
             </h1>
