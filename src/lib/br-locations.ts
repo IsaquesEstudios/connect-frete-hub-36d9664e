@@ -70,6 +70,23 @@ export function statesForCityName(all: Municipio[], cityName: string): Municipio
   return all.filter((m) => m.nome === cityName);
 }
 
+export function listUFs(all: Municipio[]): { uf: string; nome: string }[] {
+  const map = new Map<string, string>();
+  for (const m of all) {
+    if (m.uf && !map.has(m.uf)) map.set(m.uf, m.ufNome);
+  }
+  return Array.from(map.entries())
+    .map(([uf, nome]) => ({ uf, nome }))
+    .sort((a, b) => a.uf.localeCompare(b.uf));
+}
+
+export function citiesByUF(all: Municipio[], uf: string): string[] {
+  return all
+    .filter((m) => m.uf === uf)
+    .map((m) => m.nome)
+    .sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
 export const TIPOS_VEICULO: { grupo: string; opcoes: string[] }[] = [
   {
     grupo: "Veículos pesados",
