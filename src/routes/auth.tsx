@@ -1,21 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
-import { homeFor, login, signup } from "@/lib/auth/session";
+import { homeFor, login } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
-import type { User, UserType } from "@/lib/data";
+import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { SignupWizard } from "@/components/auth/SignupWizard";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
