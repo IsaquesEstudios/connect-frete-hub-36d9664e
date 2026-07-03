@@ -127,14 +127,15 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 function CollapseToggle() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   return (
-    <SidebarMenuButton asChild tooltip={collapsed ? "Expandir menu" : "Recolher menu"}>
-      <SidebarTrigger className="w-full justify-start gap-2 h-8 px-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground [&>svg]:hidden">
-        {collapsed ? <PanelLeftOpen className={ICON_CLASS} /> : <PanelLeftClose className={ICON_CLASS} />}
-        <span>{collapsed ? "Expandir" : "Recolher"}</span>
-      </SidebarTrigger>
+    <SidebarMenuButton
+      tooltip={collapsed ? "Expandir menu" : "Recolher menu"}
+      onClick={toggleSidebar}
+    >
+      {collapsed ? <PanelLeftOpen className={ICON_CLASS} /> : <PanelLeftClose className={ICON_CLASS} />}
+      <span>{collapsed ? "Expandir" : "Recolher"}</span>
     </SidebarMenuButton>
   );
 }
