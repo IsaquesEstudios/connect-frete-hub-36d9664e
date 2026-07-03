@@ -39,7 +39,6 @@ function AppGate() {
       <div className="min-h-screen flex w-full">
         <AppSidebar user={user} />
         <div className="flex-1 min-w-0 flex flex-col relative">
-          <SidebarTrigger className="absolute top-2 left-2 z-30 text-white hover:bg-white/10 md:top-3" />
           <Outlet />
         </div>
       </div>
