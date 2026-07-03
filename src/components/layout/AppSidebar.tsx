@@ -30,6 +30,9 @@ export function AppSidebar({ user }: { user: User }) {
 
   const items = [
     { title: "Início", url: home, icon: Home },
+    ...(user.type === "admin"
+      ? [{ title: "Métricas", url: "/metricas", icon: BarChart3 }]
+      : []),
     { title: "Configurações", url: "/configuracoes", icon: Settings },
   ];
 
