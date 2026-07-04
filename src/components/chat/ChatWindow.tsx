@@ -3,7 +3,18 @@ import { ADMIN_ID, repo, type Message, type User } from "@/lib/data";
 import { useEphemeralVersion, useRepoVersion } from "@/lib/hooks/useRepo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Camera, ImagePlus, Mic, Send, Square, Trash2 } from "lucide-react";
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
@@ -20,6 +31,17 @@ function fmtDay(ts: number) {
   return d.toLocaleDateString();
 }
 
+const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024; // 5MB
+
+function fileToDataUrl(file: File | Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(file);
+  });
+}
+
 interface Props {
   me: User;
   other: User;
@@ -31,57 +53,106 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const ev = useEphemeralVersion();
   const [text, setText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [recording, setRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
 
   const conversationId = other.type === "admin" ? me.number : other.number;
 
   const messages = useMemo(() => repo.listMessages(conversationId), [conversationId, v]);
-
   const otherOnline = useMemo(() => repo.isOnline(other.id), [other.id, ev, v]);
 
-  // Typing indicator: is the other side typing in this conversation right now?
-  const [otherTyping, setOtherTyping] = useState<number>(0);
-  useEffect(() => {
-    return repo.subscribeEphemeral((e) => {
-      if (e.type !== "typing") return;
-      const p = e.payload as { conversationId: string; fromUserId: string; ts: number };
-      if (p.conversationId === conversationId && p.fromUserId === other.id) {
-        setOtherTyping(p.ts);
-      }
-    });
-  }, [conversationId, other.id]);
-  const typingActive = Date.now() - otherTyping < 2500;
-  useEffect(() => {
-    if (!typingActive) return;
-    const t = setTimeout(() => setOtherTyping(0), 2600);
-    return () => clearTimeout(t);
-  }, [typingActive, otherTyping]);
-
-  // Mark read on view
   useEffect(() => {
     repo.markConversationRead(conversationId, viewer);
   }, [conversationId, viewer, v]);
 
-  // Autoscroll
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length, conversationId]);
 
-  function send() {
-    const body = text.trim();
-    if (!body) return;
-    repo.sendMessage({ fromUserId: me.id, toUserId: other.id, body });
+  useEffect(() => {
+    if (!recording) return;
+    const id = window.setInterval(() => setRecordSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [recording]);
+
+  function sendBody(body: string) {
+    const trimmed = body.trim();
+    if (!trimmed) return;
+    repo.sendMessage({ fromUserId: me.id, toUserId: other.id, body: trimmed });
+  }
+
+  function sendText() {
+    sendBody(text);
     setText("");
   }
 
-  function onType(v: string) {
-    setText(v);
-    repo.sendTyping(conversationId, me.id);
-    if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current);
+  async function handleFile(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      alert("Arquivo muito grande. Limite 5MB.");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      sendBody(dataUrl);
+    } catch (e) {
+      console.error(e);
+      alert("Falha ao ler o arquivo.");
+    }
   }
 
-  // Group by day
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      audioChunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: mime || "audio/webm" });
+        if (blob.size > MAX_ATTACHMENT_BYTES) {
+          alert("Áudio muito longo. Grave um trecho menor.");
+        } else {
+          const dataUrl = await fileToDataUrl(blob);
+          sendBody(dataUrl);
+        }
+        setRecordSeconds(0);
+      };
+      mediaRecorderRef.current = rec;
+      rec.start();
+      setRecording(true);
+    } catch (e) {
+      console.error(e);
+      alert("Não foi possível acessar o microfone.");
+    }
+  }
+
+  function stopRecording() {
+    const rec = mediaRecorderRef.current;
+    if (rec && rec.state !== "inactive") rec.stop();
+    setRecording(false);
+  }
+
+  function cancelRecording() {
+    const rec = mediaRecorderRef.current;
+    if (rec && rec.state !== "inactive") {
+      rec.ondataavailable = null;
+      rec.onstop = null;
+      rec.stop();
+      rec.stream.getTracks().forEach((t) => t.stop());
+    }
+    setRecording(false);
+    setRecordSeconds(0);
+  }
+
   const groups: { day: string; items: Message[] }[] = [];
   for (const m of messages) {
     const day = fmtDay(m.createdAt);
@@ -96,6 +167,8 @@ export function ChatWindow({ me, other, viewer }: Props) {
       : other.type === "motorista"
         ? "bg-[hsl(var(--driver))]"
         : "bg-primary";
+
+  const isAdmin = viewer === "admin";
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -113,9 +186,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
           <div className="font-medium truncate">{other.name}</div>
           <div className="text-xs text-muted-foreground">
             {other.number} ·{" "}
-            {typingActive ? (
-              <span className="text-primary">digitando...</span>
-            ) : otherOnline ? (
+            {otherOnline ? (
               <span className="text-emerald-600">online</span>
             ) : (
               <span>offline</span>
@@ -139,8 +210,16 @@ export function ChatWindow({ me, other, viewer }: Props) {
             </div>
             {g.items.map((m) => {
               const mine = m.fromUserId === me.id;
+              const isImage = m.body.startsWith("data:image/");
+              const isAudio = m.body.startsWith("data:audio/");
               return (
-                <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={m.id}
+                  className={`group flex items-center gap-2 ${mine ? "justify-end" : "justify-start"}`}
+                >
+                  {isAdmin && mine && (
+                    <DeleteMessageButton onConfirm={() => repo.deleteMessage(m.id)} />
+                  )}
                   <div
                     className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
                       mine
@@ -148,13 +227,28 @@ export function ChatWindow({ me, other, viewer }: Props) {
                         : "bg-card border rounded-bl-sm"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                    {isImage ? (
+                      <a href={m.body} target="_blank" rel="noreferrer">
+                        <img
+                          src={m.body}
+                          alt="anexo"
+                          className="max-h-64 rounded-lg object-cover"
+                        />
+                      </a>
+                    ) : isAudio ? (
+                      <audio controls src={m.body} className="max-w-[240px]" />
+                    ) : (
+                      <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                    )}
                     <div
                       className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} text-right`}
                     >
                       {fmtTime(m.createdAt)}
                     </div>
                   </div>
+                  {isAdmin && !mine && (
+                    <DeleteMessageButton onConfirm={() => repo.deleteMessage(m.id)} />
+                  )}
                 </div>
               );
             })}
@@ -163,26 +257,124 @@ export function ChatWindow({ me, other, viewer }: Props) {
       </div>
 
       <form
-        className="border-t bg-card p-3 flex gap-2"
+        className="border-t bg-card p-3 flex gap-2 items-center"
         onSubmit={(e) => {
           e.preventDefault();
-          send();
+          sendText();
         }}
       >
-        <Input
-          value={text}
-          onChange={(e) => onType(e.target.value)}
-          placeholder={
-            other.id === ADMIN_ID
-              ? "Escreva uma mensagem para o Admin..."
-              : `Responder ${other.name}...`
-          }
-          autoComplete="off"
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            void handleFile(e.target.files?.[0]);
+            e.target.value = "";
+          }}
         />
-        <Button type="submit" size="icon" disabled={!text.trim()}>
-          <Send className="h-4 w-4" />
-        </Button>
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => {
+            void handleFile(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+
+        {recording ? (
+          <>
+            <div className="flex-1 flex items-center gap-2 text-sm">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="tabular-nums">
+                Gravando {Math.floor(recordSeconds / 60)}:
+                {String(recordSeconds % 60).padStart(2, "0")}
+              </span>
+            </div>
+            <Button type="button" variant="ghost" size="icon" onClick={cancelRecording}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            <Button type="button" size="icon" onClick={stopRecording}>
+              <Square className="h-4 w-4" />
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => fileInputRef.current?.click()}
+              title="Enviar imagem"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => cameraInputRef.current?.click()}
+              title="Tirar foto"
+            >
+              <Camera className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={startRecording}
+              title="Gravar áudio"
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+            <Input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder={
+                other.id === ADMIN_ID
+                  ? "Escreva uma mensagem para o Admin..."
+                  : `Responder ${other.name}...`
+              }
+              autoComplete="off"
+            />
+            <Button type="submit" size="icon" disabled={!text.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </form>
     </div>
+  );
+}
+
+function DeleteMessageButton({ onConfirm }: { onConfirm: () => void }) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          className="opacity-0 group-hover:opacity-100 transition text-muted-foreground hover:text-destructive p-1"
+          aria-label="Excluir mensagem"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir mensagem?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Essa ação não pode ser desfeita. A mensagem será removida permanentemente e não
+            poderá ser recuperada.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>Excluir</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

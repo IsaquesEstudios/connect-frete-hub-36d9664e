@@ -90,6 +90,24 @@ class LocalRepository implements Repository {
     return msg;
   }
 
+  deleteMessage(id: string): void {
+    const all = readJSON<Message[]>(K_MSGS, []).filter((m) => m.id !== id);
+    writeJSON(K_MSGS, all);
+  }
+
+  deleteConversation(conversationId: string): void {
+    const all = readJSON<Message[]>(K_MSGS, []).filter(
+      (m) => m.conversationId !== conversationId,
+    );
+    writeJSON(K_MSGS, all);
+    writeJSON(
+      K_CONV_TAGS,
+      readJSON<ConversationTag[]>(K_CONV_TAGS, []).filter(
+        (c) => c.conversationId !== conversationId,
+      ),
+    );
+  }
+
   markConversationRead(conversationId: string, viewer: "admin" | "user") {
     const all = readJSON<Message[]>(K_MSGS, []);
     let changed = false;
