@@ -15,6 +15,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Camera, ImagePlus, Mic, Send, Square, Trash2 } from "lucide-react";
+import { AudioMessage } from "./AudioMessage";
+import { isAudioBody, isImageBody } from "@/lib/chat/messagePreview";
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
