@@ -377,3 +377,43 @@ function DeleteMessageButton({ onConfirm }: { onConfirm: () => void }) {
     </AlertDialog>
   );
 }
+
+function ImagePreview({ src }: { src: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="block focus:outline-none"
+      >
+        <img
+          src={src}
+          alt="anexo"
+          className="max-h-64 rounded-xl object-cover cursor-zoom-in"
+        />
+      </button>
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in"
+        >
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Fechar"
+            className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 flex items-center justify-center"
+          >
+            ✕
+          </button>
+          <img
+            src={src}
+            alt="anexo ampliado"
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[92vh] max-w-[92vw] rounded-lg object-contain shadow-2xl"
+          />
+        </div>
+      )}
+    </>
+  );
+}
