@@ -1,11 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Megaphone, Search, Settings2 } from "lucide-react";
+import { ArrowLeft, Megaphone, Search, Settings2, Trash2 } from "lucide-react";
 import { BroadcastDialog } from "@/components/chat/BroadcastDialog";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ConversationTagPicker } from "@/components/chat/ConversationTagPicker";
 import { TagBadges } from "@/components/chat/TagBadges";
 import { TagManagerDialog } from "@/components/chat/TagManagerDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
