@@ -15,6 +15,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Camera, ImagePlus, Mic, Send, Square, Trash2 } from "lucide-react";
+import { AudioMessage } from "./AudioMessage";
+import { isAudioBody, isImageBody } from "@/lib/chat/messagePreview";
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
@@ -210,8 +212,9 @@ export function ChatWindow({ me, other, viewer }: Props) {
             </div>
             {g.items.map((m) => {
               const mine = m.fromUserId === me.id;
-              const isImage = m.body.startsWith("data:image/");
-              const isAudio = m.body.startsWith("data:audio/");
+              const isImage = isImageBody(m.body);
+              const isAudio = isAudioBody(m.body);
+              const isMedia = isImage || isAudio;
               return (
                 <div
                   key={m.id}
@@ -221,27 +224,29 @@ export function ChatWindow({ me, other, viewer }: Props) {
                     <DeleteMessageButton onConfirm={() => repo.deleteMessage(m.id)} />
                   )}
                   <div
-                    className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                    className={`max-w-[75%] rounded-2xl text-sm shadow-sm ${
+                      isImage ? "p-1" : "px-3 py-2"
+                    } ${
                       mine
                         ? "bg-primary text-primary-foreground rounded-br-sm"
                         : "bg-card border rounded-bl-sm"
                     }`}
                   >
                     {isImage ? (
-                      <a href={m.body} target="_blank" rel="noreferrer">
+                      <a href={m.body} target="_blank" rel="noreferrer" className="block">
                         <img
                           src={m.body}
                           alt="anexo"
-                          className="max-h-64 rounded-lg object-cover"
+                          className="max-h-64 rounded-xl object-cover"
                         />
                       </a>
                     ) : isAudio ? (
-                      <audio controls src={m.body} className="max-w-[240px]" />
+                      <AudioMessage src={m.body} mine={mine} />
                     ) : (
                       <div className="whitespace-pre-wrap break-words">{m.body}</div>
                     )}
                     <div
-                      className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} text-right`}
+                      className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} text-right ${isMedia ? "px-2 pb-1" : ""}`}
                     >
                       {fmtTime(m.createdAt)}
                     </div>

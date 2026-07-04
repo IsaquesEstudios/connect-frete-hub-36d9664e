@@ -260,9 +260,16 @@ class SupabaseRepository implements Repository {
           return;
         }
         const real = mapMessage(data as MessageRow);
-        const i = this.messages.findIndex((m) => m.id === tempId);
-        if (i >= 0) this.messages[i] = real;
-        else if (!this.messages.find((m) => m.id === real.id)) this.messages.push(real);
+        const tempIdx = this.messages.findIndex((m) => m.id === tempId);
+        const realIdx = this.messages.findIndex((m) => m.id === real.id);
+        if (realIdx >= 0) {
+          // Realtime já entregou a mensagem — apenas remove o placeholder temp.
+          if (tempIdx >= 0) this.messages.splice(tempIdx, 1);
+        } else if (tempIdx >= 0) {
+          this.messages[tempIdx] = real;
+        } else {
+          this.messages.push(real);
+        }
         this.notify();
       });
     return msg;
