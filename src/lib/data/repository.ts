@@ -19,6 +19,8 @@ export interface Repository {
   // messages
   listMessages(conversationId: string): Message[];
   sendMessage(input: { fromUserId: string; toUserId: string; body: string }): Message;
+  deleteMessage(id: string): void;
+  deleteConversation(conversationId: string): void;
   markConversationRead(conversationId: string, viewer: "admin" | "user"): void;
   unreadCount(conversationId: string, viewer: "admin" | "user"): number;
   // conversations

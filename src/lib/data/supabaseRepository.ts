@@ -268,6 +268,46 @@ class SupabaseRepository implements Repository {
     return msg;
   }
 
+  deleteMessage(id: string): void {
+    const prev = this.messages;
+    this.messages = this.messages.filter((m) => m.id !== id);
+    this.notify();
+    void supabase
+      .from("messages")
+      .delete()
+      .eq("id", id)
+      .then(({ error }) => {
+        if (error) {
+          console.error("deleteMessage failed", error);
+          this.messages = prev;
+          this.notify();
+          alert("Não foi possível excluir a mensagem.");
+        }
+      });
+  }
+
+  deleteConversation(conversationId: string): void {
+    const prevMsgs = this.messages;
+    const prevConv = this.convTags;
+    this.messages = this.messages.filter((m) => m.conversationId !== conversationId);
+    this.convTags = this.convTags.filter((c) => c.conversationId !== conversationId);
+    this.notify();
+    void (async () => {
+      await supabase.from("conversation_tags").delete().eq("conversation_id", conversationId);
+      const { error } = await supabase
+        .from("messages")
+        .delete()
+        .eq("conversation_id", conversationId);
+      if (error) {
+        console.error("deleteConversation failed", error);
+        this.messages = prevMsgs;
+        this.convTags = prevConv;
+        this.notify();
+        alert("Não foi possível excluir a conversa.");
+      }
+    })();
+  }
+
   markConversationRead(conversationId: string, viewer: "admin" | "user") {
     const field = viewer === "admin" ? "read_by_admin" : "read_by_user";
     let changed = false;
