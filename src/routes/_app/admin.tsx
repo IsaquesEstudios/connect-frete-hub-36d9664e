@@ -295,8 +295,38 @@ function AdminPanel() {
                   <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
                 </Button>
               </div>
-              <div className="border-b bg-card px-4 py-2">
-                <ConversationTagPicker conversationId={selectedUser.number} />
+              <div className="border-b bg-card px-4 py-2 flex items-center gap-2">
+                <div className="flex-1 min-w-0">
+                  <ConversationTagPicker conversationId={selectedUser.number} />
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-destructive shrink-0">
+                      <Trash2 className="h-4 w-4 mr-1" /> Excluir conversa
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir conversa inteira?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Todas as mensagens desta conversa serão removidas permanentemente e
+                        não poderão ser recuperadas.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          repo.deleteConversation(selectedUser.number);
+                          setSelected(null);
+                          setMobileChat(false);
+                        }}
+                      >
+                        Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
               <div className="flex-1 min-h-0">
                 <ChatWindow me={user} other={selectedUser} viewer="admin" />
