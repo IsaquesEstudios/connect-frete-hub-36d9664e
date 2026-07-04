@@ -261,7 +261,7 @@ function AdminPanel() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="text-xs text-muted-foreground truncate">
                         <span className="uppercase tracking-wide mr-1">{c.user.number}</span>
-                        {c.lastMessage?.body || "Sem mensagens"}
+                        {c.lastMessage ? messagePreview(c.lastMessage.body) : "Sem mensagens"}
                       </div>
                       {c.unreadForAdmin > 0 && (
                         <span className="ml-auto text-[10px] rounded-full bg-primary text-primary-foreground px-2 py-0.5 shrink-0">
