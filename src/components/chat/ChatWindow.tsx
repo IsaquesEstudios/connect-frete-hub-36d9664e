@@ -233,13 +233,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
                     }`}
                   >
                     {isImage ? (
-                      <a href={m.body} target="_blank" rel="noreferrer" className="block">
-                        <img
-                          src={m.body}
-                          alt="anexo"
-                          className="max-h-64 rounded-xl object-cover"
-                        />
-                      </a>
+                      <ImagePreview src={m.body} />
                     ) : isAudio ? (
                       <AudioMessage src={m.body} mine={mine} />
                     ) : (
