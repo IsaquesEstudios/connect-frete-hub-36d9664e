@@ -256,8 +256,8 @@ type StepProps = {
 
 function StepKind({ data, update }: StepProps) {
   const opts: { value: Kind; label: string; desc: string }[] = [
-    { value: "empresa", label: "Empresa", desc: "Quero contratar fretes" },
-    { value: "motorista", label: "Motorista / Entregador", desc: "Quero receber cargas" },
+    { value: "empresa", label: "Empresa, Agência de carga ou Transportadora", desc: "Quero contratar fretes" },
+    { value: "motorista", label: "Motorista", desc: "Quero receber cargas" },
   ];
   return (
     <div className="space-y-3">
