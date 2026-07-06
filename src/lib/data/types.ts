@@ -7,6 +7,7 @@ export interface BaseUser {
   name: string;
   password: string; // mock only
   createdAt: number;
+  cpf?: string;
 }
 
 export interface EmpresaUser extends BaseUser {
