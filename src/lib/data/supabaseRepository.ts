@@ -364,12 +364,12 @@ class SupabaseRepository implements Repository {
     const tag: Tag = { id, ...input };
     this.tags.push(tag);
     this.notify();
-    const save = supabase
-      .from("tags")
-      .insert({ id, label: input.label, color: input.color })
-      .select("*")
-      .single()
-      .then(({ data, error }) => {
+    const save: Promise<boolean> = (async () => {
+      const { data, error } = await supabase
+        .from("tags")
+        .insert({ id, label: input.label, color: input.color })
+        .select("*")
+        .single();
         if (error) {
           throw error;
         }
@@ -379,8 +379,8 @@ class SupabaseRepository implements Repository {
         else if (!this.tags.some((t) => t.id === saved.id)) this.tags.push(saved);
         this.notify();
         return true;
-      })
-      .catch((error) => {
+      })()
+      .catch((error: unknown) => {
         console.error("createTag failed", error);
         this.tags = this.tags.filter((t) => t.id !== id);
         this.convTags = this.convTags.filter((c) => c.tagId !== id);
@@ -400,18 +400,17 @@ class SupabaseRepository implements Repository {
     const previous = { ...t };
     Object.assign(t, patch);
     this.notify();
-    void supabase
-      .from("tags")
-      .update(patch)
-      .eq("id", id)
-      .select("*")
-      .single()
-      .then(({ data, error }) => {
+    void (async () => {
+      const { data, error } = await supabase
+        .from("tags")
+        .update(patch)
+        .eq("id", id)
+        .select("*")
+        .single();
         if (error) throw error;
         Object.assign(t, data as Tag);
         this.notify();
-      })
-      .catch((error) => {
+      })().catch((error: unknown) => {
         console.error("updateTag failed", error);
         Object.assign(t, previous);
         this.notify();
