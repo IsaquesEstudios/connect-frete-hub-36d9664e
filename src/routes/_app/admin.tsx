@@ -75,8 +75,11 @@ function AdminPanel() {
         for (const id of tagFilter) if (!c.tagIds.includes(id)) return false;
       }
       if (query) {
-        const q = query.toLowerCase();
-        return c.user.name.toLowerCase().includes(q) || c.user.number.toLowerCase().includes(q);
+        const q = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const name = c.user.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const number = c.user.number.toLowerCase();
+        const doc = ((c.user as { cnpj?: string; cpf?: string }).cnpj || (c.user as { cpf?: string }).cpf || "").toLowerCase();
+        return name.includes(q) || number.includes(q) || doc.includes(q);
       }
       return true;
     });
@@ -121,7 +124,7 @@ function AdminPanel() {
             <div className="relative">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nome ou número..."
+                placeholder="Buscar por nome, número, CPF ou CNPJ..."
                 className="pl-8"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

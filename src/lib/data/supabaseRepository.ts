@@ -8,6 +8,7 @@ type ProfileRow = {
   type: UserType;
   name: string;
   cnpj: string | null;
+  cpf: string | null;
   placa: string | null;
   veiculo: string | null;
   last_seen_at?: string | null;
@@ -37,7 +38,7 @@ export function profileToUser(p: ProfileRow): User {
   const base = { id: p.id, number: p.user_number, name: p.name, password: "", createdAt: 0 };
   if (p.type === "empresa") return { ...base, type: "empresa", cnpj: p.cnpj ?? "" };
   if (p.type === "motorista")
-    return { ...base, type: "motorista", placa: p.placa ?? "", veiculo: p.veiculo ?? "" };
+    return { ...base, type: "motorista", placa: p.placa ?? "", veiculo: p.veiculo ?? "", cpf: p.cpf ?? undefined };
   return { ...base, type: "admin" };
 }
 
