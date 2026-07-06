@@ -65,16 +65,6 @@ function AdminPanel() {
     () => Object.fromEntries(allTags.map((t) => [t.id, t] as const)),
     [allTags],
   );
-  const usedTagIds = useMemo(() => {
-    const s = new Set<string>();
-    for (const c of conversations) for (const id of c.tagIds) s.add(id);
-    return s;
-  }, [conversations]);
-  const visibleTags = useMemo(
-    () => allTags.filter((t) => usedTagIds.has(t.id)),
-    [allTags, usedTagIds],
-  );
-
   const filtered = useMemo(() => {
     return conversations.filter((c) => {
       if (tab === "empresas" && c.user.type !== "empresa") return false;
@@ -152,12 +142,12 @@ function AdminPanel() {
 
             <div className="flex items-start gap-2">
               <div className="flex-1 flex flex-wrap gap-1">
-                {visibleTags.length === 0 && (
+                {allTags.length === 0 && (
                   <div className="text-[11px] text-muted-foreground py-1">
-                    Nenhuma tag em uso.
+                    Nenhuma tag cadastrada.
                   </div>
                 )}
-                {visibleTags.map((t) => {
+                {allTags.map((t) => {
                   const on = tagFilter.has(t.id);
                   return (
                     <button

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
-import { Building2, MessageSquare, Truck, MailWarning } from "lucide-react";
+import { Building2, MessageSquare, Truck, MailWarning, Tags } from "lucide-react";
 import { repo } from "@/lib/data";
 import { homeFor } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -21,14 +21,29 @@ function MetricsPage() {
   }, [user, navigate]);
 
   const conversations = useMemo(() => repo.listConversations(), [v]);
+  const tags = useMemo(() => repo.listTags(), [v]);
 
   const stats = useMemo(() => {
     const empresas = conversations.filter((c) => c.user.type === "empresa").length;
     const motoristas = conversations.filter((c) => c.user.type === "motorista").length;
     const active = conversations.filter((c) => c.lastMessage).length;
     const unread = conversations.reduce((n, c) => n + c.unreadForAdmin, 0);
-    return { empresas, motoristas, active, unread };
-  }, [conversations]);
+    return { empresas, motoristas, active, unread, tags: tags.length };
+  }, [conversations, tags]);
+
+  const tagReport = useMemo(
+    () =>
+      tags.map((tag) => {
+        const taggedConversations = conversations.filter((c) => c.tagIds.includes(tag.id));
+        return {
+          tag,
+          total: taggedConversations.length,
+          empresas: taggedConversations.filter((c) => c.user.type === "empresa").length,
+          motoristas: taggedConversations.filter((c) => c.user.type === "motorista").length,
+        };
+      }),
+    [conversations, tags],
+  );
 
   if (!user || user.type !== "admin") return null;
 
@@ -66,7 +81,55 @@ function MetricsPage() {
             accent="bg-primary"
             highlight={stats.unread > 0}
           />
+          <Card
+            label="Tags cadastradas"
+            value={stats.tags}
+            icon={<Tags className="h-5 w-5" />}
+            accent="bg-primary"
+          />
         </div>
+
+        <section className="mt-6 rounded-lg border bg-card shadow-sm">
+          <div className="border-b px-4 py-3">
+            <h2 className="text-base font-semibold">Relatório de tags</h2>
+          </div>
+          {tagReport.length === 0 ? (
+            <div className="p-6 text-sm text-muted-foreground">Nenhuma tag cadastrada.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="px-4 py-3 font-medium">Tag</th>
+                    <th className="px-4 py-3 font-medium">Cor</th>
+                    <th className="px-4 py-3 font-medium">Conversas</th>
+                    <th className="px-4 py-3 font-medium">Empresas</th>
+                    <th className="px-4 py-3 font-medium">Motoristas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tagReport.map(({ tag, total, empresas, motoristas }) => (
+                    <tr key={tag.id} className="border-b last:border-0">
+                      <td className="px-4 py-3 font-medium">{tag.label}</td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                          <span
+                            className="h-4 w-4 rounded-full border"
+                            style={{ backgroundColor: tag.color }}
+                          />
+                          {tag.color}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">{total}</td>
+                      <td className="px-4 py-3">{empresas}</td>
+                      <td className="px-4 py-3">{motoristas}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
