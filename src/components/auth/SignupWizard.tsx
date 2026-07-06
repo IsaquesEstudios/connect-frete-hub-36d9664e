@@ -682,9 +682,9 @@ function StepBasicEmpresa({ data, update }: StepProps) {
 
 function StepDetalhesEmpresa({ data, update }: StepProps) {
   const opts: { value: "transportador" | "embarcador" | "agenciador"; label: string; desc: string }[] = [
-    { value: "transportador", label: "Transportador", desc: "Presta serviço de transporte" },
-    { value: "embarcador", label: "Embarcador", desc: "Precisa mover cargas próprias" },
-    { value: "agenciador", label: "Agenciador", desc: "Intermedia cargas e fretes" },
+    { value: "transportador", label: "Transportadora", desc: "Presta serviço de transporte" },
+    { value: "embarcador", label: "Empresa", desc: "Precisa mover cargas próprias" },
+    { value: "agenciador", label: "Agência de carga", desc: "Intermedia cargas e fretes" },
   ];
   return (
     <div className="space-y-3">
