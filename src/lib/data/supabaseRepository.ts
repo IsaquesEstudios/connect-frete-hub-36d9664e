@@ -78,6 +78,7 @@ class SupabaseRepository implements Repository {
   private lastSeen = new Map<string, number>();
   private heartbeatTimer: number | null = null;
   private presenceChannel: ReturnType<typeof supabase.channel> | null = null;
+  private pendingTagSaves = new Map<string, Promise<boolean>>();
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -103,14 +104,6 @@ class SupabaseRepository implements Repository {
     ]);
     const admin = this.users.find((u) => u.type === "admin");
     this.adminAuthId = admin?.id ?? null;
-
-    // Purge orphan tags (no conversation using them)
-    const usedTagIds = new Set(this.convTags.map((c) => c.tagId));
-    const orphans = this.tags.filter((t) => !usedTagIds.has(t.id)).map((t) => t.id);
-    if (orphans.length > 0) {
-      this.tags = this.tags.filter((t) => usedTagIds.has(t.id));
-      void supabase.from("tags").delete().in("id", orphans);
-    }
 
     this.notify();
     if (!this.realtimeStarted) {
@@ -367,33 +360,63 @@ class SupabaseRepository implements Repository {
     return this.tags;
   }
   createTag(input: { label: string; color: string }): Tag {
-    const tempId = `tmp_${Date.now()}`;
-    const tag: Tag = { id: tempId, ...input };
+    const id = globalThis.crypto?.randomUUID?.() ?? `tag_${Date.now()}`;
+    const tag: Tag = { id, ...input };
     this.tags.push(tag);
     this.notify();
-    void supabase
+    const save = supabase
       .from("tags")
-      .insert({ label: input.label, color: input.color })
+      .insert({ id, label: input.label, color: input.color })
       .select("*")
       .single()
       .then(({ data, error }) => {
         if (error) {
-          this.tags = this.tags.filter((t) => t.id !== tempId);
-          this.notify();
-          return;
+          throw error;
         }
-        const i = this.tags.findIndex((t) => t.id === tempId);
-        if (i >= 0) this.tags[i] = data as Tag;
+        const saved = data as Tag;
+        const i = this.tags.findIndex((t) => t.id === id);
+        if (i >= 0) this.tags[i] = saved;
+        else if (!this.tags.some((t) => t.id === saved.id)) this.tags.push(saved);
         this.notify();
+        return true;
+      })
+      .catch((error) => {
+        console.error("createTag failed", error);
+        this.tags = this.tags.filter((t) => t.id !== id);
+        this.convTags = this.convTags.filter((c) => c.tagId !== id);
+        this.notify();
+        alert("Não foi possível salvar a tag.");
+        return false;
+      })
+      .finally(() => {
+        this.pendingTagSaves.delete(id);
       });
+    this.pendingTagSaves.set(id, save);
     return tag;
   }
   updateTag(id: string, patch: { label?: string; color?: string }): Tag | undefined {
     const t = this.tags.find((x) => x.id === id);
     if (!t) return undefined;
+    const previous = { ...t };
     Object.assign(t, patch);
     this.notify();
-    void supabase.from("tags").update(patch).eq("id", id);
+    void supabase
+      .from("tags")
+      .update(patch)
+      .eq("id", id)
+      .select("*")
+      .single()
+      .then(({ data, error }) => {
+        if (error) throw error;
+        Object.assign(t, data as Tag);
+        this.notify();
+      })
+      .catch((error) => {
+        console.error("updateTag failed", error);
+        Object.assign(t, previous);
+        this.notify();
+        alert("Não foi possível salvar as alterações da tag.");
+      });
     return t;
   }
   deleteTag(id: string): void {
@@ -421,32 +444,39 @@ class SupabaseRepository implements Repository {
     return this.convTags.filter((c) => c.conversationId === conversationId).map((c) => c.tagId);
   }
   setConversationTags(conversationId: string, tagIds: string[]) {
-    const removedTagIds = this.convTags
-      .filter((c) => c.conversationId === conversationId && !tagIds.includes(c.tagId))
-      .map((c) => c.tagId);
+    const uniqueTagIds = Array.from(new Set(tagIds));
+    const prevConv = [...this.convTags];
     this.convTags = this.convTags.filter((c) => c.conversationId !== conversationId);
-    for (const tagId of tagIds) this.convTags.push({ conversationId, tagId });
-
-    // Purge tags that no longer have any conversation using them
-    const orphanTagIds = removedTagIds.filter(
-      (id) => !this.convTags.some((c) => c.tagId === id),
-    );
-    if (orphanTagIds.length > 0) {
-      this.tags = this.tags.filter((t) => !orphanTagIds.includes(t.id));
-    }
+    for (const tagId of uniqueTagIds) this.convTags.push({ conversationId, tagId });
 
     this.notify();
     void (async () => {
-      await supabase.from("conversation_tags").delete().eq("conversation_id", conversationId);
-      if (tagIds.length > 0) {
-        await supabase
+      const pending = uniqueTagIds
+        .map((tagId) => this.pendingTagSaves.get(tagId))
+        .filter((save): save is Promise<boolean> => Boolean(save));
+      if (pending.length > 0) {
+        const saved = await Promise.all(pending);
+        if (saved.some((ok) => !ok)) throw new Error("A tag ainda não foi salva.");
+      }
+
+      const validTagIds = uniqueTagIds.filter((tagId) => this.tags.some((t) => t.id === tagId));
+      const { error: deleteError } = await supabase
+        .from("conversation_tags")
+        .delete()
+        .eq("conversation_id", conversationId);
+      if (deleteError) throw deleteError;
+      if (validTagIds.length > 0) {
+        const { error: insertError } = await supabase
           .from("conversation_tags")
-          .insert(tagIds.map((tag_id) => ({ conversation_id: conversationId, tag_id })));
+          .insert(validTagIds.map((tag_id) => ({ conversation_id: conversationId, tag_id })));
+        if (insertError) throw insertError;
       }
-      if (orphanTagIds.length > 0) {
-        await supabase.from("tags").delete().in("id", orphanTagIds);
-      }
-    })();
+    })().catch((error) => {
+      console.error("setConversationTags failed", error);
+      this.convTags = prevConv;
+      this.notify();
+      alert("Não foi possível salvar as tags desta conversa.");
+    });
   }
 
   // ============ broadcasts ============
