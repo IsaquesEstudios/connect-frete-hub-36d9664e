@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { History, Megaphone, Send } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Camera, History, ImagePlus, Megaphone, Mic, Send, Square, Trash2, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,8 +22,11 @@ import { toast } from "sonner";
 import { repo } from "@/lib/data";
 import type { BroadcastAudience } from "@/lib/data/repository";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
+import { AudioMessage } from "./AudioMessage";
+import { isAudioBody, isImageBody, messagePreview } from "@/lib/chat/messagePreview";
 
 type AudienceKind = "all" | "empresas" | "motoristas" | "tag";
+const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 
 function audienceLabel(kind: AudienceKind, tagLabel?: string) {
   if (kind === "all") return "Todos os usuários";
@@ -40,6 +43,15 @@ function timeAgo(ts: number) {
   const h = Math.floor(m / 60);
   if (h < 24) return `${h}h atrás`;
   return `${Math.floor(h / 24)}d atrás`;
+}
+
+function fileToDataUrl(file: File | Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(file);
+  });
 }
 
 export function BroadcastDialog({
@@ -59,8 +71,22 @@ export function BroadcastDialog({
 
   const [kind, setKind] = useState<AudienceKind>("all");
   const [tagId, setTagId] = useState<string>("");
-  const [body, setBody] = useState("");
+  const [text, setText] = useState("");
+  const [attachment, setAttachment] = useState<string | null>(null); // data URL
   const [tab, setTab] = useState<"compose" | "history">("compose");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [recording, setRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!recording) return;
+    const id = window.setInterval(() => setRecordSeconds((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [recording]);
 
   const audience: BroadcastAudience | null =
     kind === "tag"
@@ -71,21 +97,92 @@ export function BroadcastDialog({
 
   const recipients = audience ? repo.resolveBroadcastRecipients(audience) : [];
 
+  async function handleFile(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      toast.error("Arquivo muito grande. Limite 5MB.");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setAttachment(dataUrl);
+    } catch {
+      toast.error("Falha ao ler o arquivo.");
+    }
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
+      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      audioChunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: mime || "audio/webm" });
+        if (blob.size > MAX_ATTACHMENT_BYTES) {
+          toast.error("Áudio muito longo. Grave um trecho menor.");
+        } else {
+          const dataUrl = await fileToDataUrl(blob);
+          setAttachment(dataUrl);
+        }
+        setRecordSeconds(0);
+      };
+      mediaRecorderRef.current = rec;
+      rec.start();
+      setRecording(true);
+    } catch {
+      toast.error("Não foi possível acessar o microfone.");
+    }
+  }
+
+  function stopRecording() {
+    const rec = mediaRecorderRef.current;
+    if (rec && rec.state !== "inactive") rec.stop();
+    setRecording(false);
+  }
+
+  function cancelRecording() {
+    const rec = mediaRecorderRef.current;
+    if (rec && rec.state !== "inactive") {
+      rec.ondataavailable = null;
+      rec.onstop = null;
+      rec.stop();
+      rec.stream.getTracks().forEach((t) => t.stop());
+    }
+    setRecording(false);
+    setRecordSeconds(0);
+  }
+
   const send = () => {
     if (!audience) {
       toast.error("Selecione uma tag.");
       return;
     }
-    if (!body.trim()) return;
     if (recipients.length === 0) {
       toast.error("Nenhum destinatário para essa seleção.");
       return;
     }
-    repo.sendBroadcast({ body: body.trim(), audience, fromUserId: adminId });
+    const bodies: string[] = [];
+    if (attachment) bodies.push(attachment);
+    if (text.trim()) bodies.push(text.trim());
+    if (bodies.length === 0) return;
+
+    for (const body of bodies) {
+      repo.sendBroadcast({ body, audience, fromUserId: adminId });
+    }
     toast.success(`Broadcast enviado para ${recipients.length} usuário(s).`);
-    setBody("");
+    setText("");
+    setAttachment(null);
     setTab("history");
   };
+
+  const attachIsImage = attachment ? isImageBody(attachment) : false;
+  const attachIsAudio = attachment ? isAudioBody(attachment) : false;
+  const canSend = (!!attachment || !!text.trim()) && recipients.length > 0 && !recording;
 
   return (
     <Dialog>
@@ -166,12 +263,121 @@ export function BroadcastDialog({
             <div className="space-y-1.5">
               <Label className="text-xs">Mensagem</Label>
               <Textarea
-                rows={5}
-                placeholder="Digite a mensagem..."
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
+                rows={4}
+                placeholder="Digite a mensagem (opcional se enviar anexo)..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
               />
             </div>
+
+            {/* Attachment area */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                void handleFile(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => {
+                void handleFile(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+            <input
+              type="file"
+              accept="audio/*"
+              className="hidden"
+              id="broadcast-audio-file"
+              onChange={(e) => {
+                void handleFile(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+
+            {attachment && (
+              <div className="rounded-md border p-2 relative bg-muted/40">
+                <button
+                  type="button"
+                  onClick={() => setAttachment(null)}
+                  className="absolute top-1 right-1 h-6 w-6 rounded-full bg-background/80 hover:bg-background flex items-center justify-center border"
+                  aria-label="Remover anexo"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+                {attachIsImage && (
+                  <img
+                    src={attachment}
+                    alt="prévia"
+                    className="max-h-48 rounded object-contain mx-auto"
+                  />
+                )}
+                {attachIsAudio && <AudioMessage src={attachment} mine={false} />}
+              </div>
+            )}
+
+            {recording ? (
+              <div className="flex items-center gap-2 rounded-md border px-3 py-2">
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-sm tabular-nums flex-1">
+                  Gravando {Math.floor(recordSeconds / 60)}:
+                  {String(recordSeconds % 60).padStart(2, "0")}
+                </span>
+                <Button type="button" variant="ghost" size="icon" onClick={cancelRecording}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button type="button" size="icon" onClick={stopRecording}>
+                  <Square className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={!!attachment}
+                >
+                  <ImagePlus className="h-4 w-4 mr-1" /> Imagem
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => cameraInputRef.current?.click()}
+                  disabled={!!attachment}
+                >
+                  <Camera className="h-4 w-4 mr-1" /> Foto
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById("broadcast-audio-file")?.click()}
+                  disabled={!!attachment}
+                >
+                  <ImagePlus className="h-4 w-4 mr-1" /> Áudio (arquivo)
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={startRecording}
+                  disabled={!!attachment}
+                >
+                  <Mic className="h-4 w-4 mr-1" /> Gravar áudio
+                </Button>
+              </div>
+            )}
 
             <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
               Será enviada para <strong className="text-foreground">{recipients.length}</strong>{" "}
@@ -179,7 +385,7 @@ export function BroadcastDialog({
             </div>
 
             <DialogFooter>
-              <Button onClick={send} disabled={!body.trim() || recipients.length === 0}>
+              <Button onClick={send} disabled={!canSend}>
                 <Send className="h-4 w-4 mr-1" /> Enviar
               </Button>
             </DialogFooter>
@@ -203,7 +409,19 @@ export function BroadcastDialog({
                     </span>
                     <span>{timeAgo(b.sentAt)}</span>
                   </div>
-                  <div className="text-sm mt-1 whitespace-pre-wrap">{b.body}</div>
+                  <div className="text-sm mt-1 whitespace-pre-wrap break-words">
+                    {isImageBody(b.body) ? (
+                      <img
+                        src={b.body}
+                        alt="anexo"
+                        className="max-h-40 rounded object-contain"
+                      />
+                    ) : isAudioBody(b.body) ? (
+                      <AudioMessage src={b.body} mine={false} />
+                    ) : (
+                      messagePreview(b.body)
+                    )}
+                  </div>
                   <div className="text-[10px] text-muted-foreground mt-1">
                     {b.recipientCount} destinatário(s)
                   </div>
