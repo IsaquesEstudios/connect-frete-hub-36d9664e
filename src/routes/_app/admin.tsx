@@ -121,7 +121,7 @@ function AdminPanel() {
             <div className="relative">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nome ou número..."
+                placeholder="Buscar por nome, número, CPF ou CNPJ..."
                 className="pl-8"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
