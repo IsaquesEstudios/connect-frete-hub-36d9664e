@@ -58,6 +58,7 @@ function AdminPanel() {
   const [selected, setSelected] = useState<string | null>(null);
   const [mobileChat, setMobileChat] = useState(false);
   const [tagFilter, setTagFilter] = useState<Set<string>>(new Set());
+  const [unreadOnly, setUnreadOnly] = useState(false);
 
   const conversations = useMemo(() => repo.listConversations(), [v]);
   const allTags = useMemo(() => repo.listTags(), [v]);
@@ -69,8 +70,8 @@ function AdminPanel() {
     return conversations.filter((c) => {
       if (tab === "empresas" && c.user.type !== "empresa") return false;
       if (tab === "motoristas" && c.user.type !== "motorista") return false;
+      if (unreadOnly && !(c.unreadForAdmin > 0)) return false;
       if (tagFilter.size > 0) {
-        // AND: conversa precisa conter TODAS as tags selecionadas
         for (const id of tagFilter) if (!c.tagIds.includes(id)) return false;
       }
       if (query) {
@@ -79,7 +80,7 @@ function AdminPanel() {
       }
       return true;
     });
-  }, [conversations, tab, query, tagFilter]);
+  }, [conversations, tab, query, tagFilter, unreadOnly]);
 
 
 
@@ -142,6 +143,17 @@ function AdminPanel() {
 
             <div className="flex items-start gap-2">
               <div className="flex-1 flex flex-wrap gap-1">
+                <button
+                  onClick={() => setUnreadOnly((v) => !v)}
+                  className={`text-[10px] rounded-full px-2 py-0.5 font-medium border transition ${
+                    unreadOnly
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "text-foreground/70 bg-transparent border-border"
+                  }`}
+                  title="Mostrar somente conversas não lidas"
+                >
+                  Não lidas
+                </button>
                 {allTags.length === 0 && (
                   <div className="text-[11px] text-muted-foreground py-1">
                     Nenhuma tag cadastrada.
