@@ -75,8 +75,11 @@ function AdminPanel() {
         for (const id of tagFilter) if (!c.tagIds.includes(id)) return false;
       }
       if (query) {
-        const q = query.toLowerCase();
-        return c.user.name.toLowerCase().includes(q) || c.user.number.toLowerCase().includes(q);
+        const q = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const name = c.user.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const number = c.user.number.toLowerCase();
+        const doc = ((c.user as { cnpj?: string; cpf?: string }).cnpj || (c.user as { cpf?: string }).cpf || "").toLowerCase();
+        return name.includes(q) || number.includes(q) || doc.includes(q);
       }
       return true;
     });
