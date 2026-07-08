@@ -78,7 +78,22 @@ export function ChatWindow({ me, other, viewer }: Props) {
 
   useEffect(() => {
     repo.markConversationRead(conversationId, viewer);
-  }, [conversationId, viewer, v]);
+  }, [conversationId, viewer, v, messages.length]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") {
+        repo.markConversationRead(conversationId, viewer);
+      }
+    };
+    const onFocus = () => repo.markConversationRead(conversationId, viewer);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [conversationId, viewer]);
 
   useEffect(() => {
     const el = scrollRef.current;

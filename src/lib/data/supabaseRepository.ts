@@ -357,24 +357,30 @@ class SupabaseRepository implements Repository {
 
   markConversationRead(conversationId: string, viewer: "admin" | "user") {
     const field = viewer === "admin" ? "read_by_admin" : "read_by_user";
+    const idsToUpdate: string[] = [];
     let changed = false;
     for (const m of this.messages) {
       if (m.conversationId !== conversationId) continue;
       if (viewer === "admin" && !m.readByAdmin) {
         m.readByAdmin = true;
         changed = true;
+        if (!m.id.startsWith("tmp_")) idsToUpdate.push(m.id);
       }
       if (viewer === "user" && !m.readByUser) {
         m.readByUser = true;
         changed = true;
+        if (!m.id.startsWith("tmp_")) idsToUpdate.push(m.id);
       }
     }
     if (changed) this.notify();
+    if (idsToUpdate.length === 0) return;
     void supabase
       .from("messages")
       .update({ [field]: true })
-      .eq("conversation_id", conversationId)
-      .eq(field, false);
+      .in("id", idsToUpdate)
+      .then(({ error }) => {
+        if (error) console.error("markConversationRead failed", error);
+      });
   }
 
   unreadCount(conversationId: string, viewer: "admin" | "user"): number {
