@@ -12,6 +12,7 @@ type ProfileRow = {
   placa: string | null;
   veiculo: string | null;
   last_seen_at?: string | null;
+  active?: boolean | null;
 };
 
 type MessageRow = {
@@ -35,12 +36,15 @@ type BroadcastRow = {
 };
 
 export function profileToUser(p: ProfileRow): User {
-  const base = { id: p.id, number: p.user_number, name: p.name, password: "", createdAt: 0 };
+  const active = p.active ?? true;
+  const base = { id: p.id, number: p.user_number, name: p.name, password: "", createdAt: 0, active };
   if (p.type === "empresa") return { ...base, type: "empresa", cnpj: p.cnpj ?? "" };
   if (p.type === "motorista")
     return { ...base, type: "motorista", placa: p.placa ?? "", veiculo: p.veiculo ?? "", cpf: p.cpf ?? undefined };
+  if (p.type === "colaborador") return { ...base, type: "colaborador" };
   return { ...base, type: "admin" };
 }
+
 
 function mapMessage(r: MessageRow): Message {
   return {
