@@ -14,7 +14,217 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      broadcast_messages: {
+        Row: {
+          audience: string
+          body: string
+          id: string
+          recipient_count: number
+          sent_at: string
+          tag_id: string | null
+        }
+        Insert: {
+          audience: string
+          body: string
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+          tag_id?: string | null
+        }
+        Update: {
+          audience?: string
+          body?: string
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+          tag_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broadcast_messages_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_tags: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          tag_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          tag_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          from_user_id: string
+          id: string
+          read_by_admin: boolean
+          read_by_user: boolean
+          to_user_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          from_user_id: string
+          id?: string
+          read_by_admin?: boolean
+          read_by_user?: boolean
+          to_user_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          read_by_admin?: boolean
+          read_by_user?: boolean
+          to_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_to_user_id_fkey"
+            columns: ["to_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          active: boolean
+          carroceria: string | null
+          cidade: string | null
+          cnpj: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          estado: string | null
+          foto_url: string | null
+          id: string
+          last_seen_at: string | null
+          name: string
+          nome_fantasia: string | null
+          perfil_empresa: string | null
+          placa: string | null
+          rntrc: string | null
+          site_rede_social: string | null
+          tipo_veiculo: string | null
+          type: Database["public"]["Enums"]["user_type"]
+          updated_at: string
+          user_number: string
+          veiculo: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          active?: boolean
+          carroceria?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id: string
+          last_seen_at?: string | null
+          name: string
+          nome_fantasia?: string | null
+          perfil_empresa?: string | null
+          placa?: string | null
+          rntrc?: string | null
+          site_rede_social?: string | null
+          tipo_veiculo?: string | null
+          type: Database["public"]["Enums"]["user_type"]
+          updated_at?: string
+          user_number: string
+          veiculo?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          active?: boolean
+          carroceria?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          estado?: string | null
+          foto_url?: string | null
+          id?: string
+          last_seen_at?: string | null
+          name?: string
+          nome_fantasia?: string | null
+          perfil_empresa?: string | null
+          placa?: string | null
+          rntrc?: string | null
+          site_rede_social?: string | null
+          tipo_veiculo?: string | null
+          type?: Database["public"]["Enums"]["user_type"]
+          updated_at?: string
+          user_number?: string
+          veiculo?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +233,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_type: "empresa" | "motorista" | "admin" | "colaborador"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +360,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_type: ["empresa", "motorista", "admin", "colaborador"],
+    },
   },
 } as const
