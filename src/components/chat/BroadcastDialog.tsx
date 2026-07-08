@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Camera, History, ImagePlus, Megaphone, Mic, Send, Square, Trash2, X } from "lucide-react";
+import { Camera, FileText, History, ImagePlus, Megaphone, Mic, Paperclip, Send, Square, Trash2, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import { repo } from "@/lib/data";
 import type { BroadcastAudience } from "@/lib/data/repository";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
 import { AudioMessage } from "./AudioMessage";
-import { isAudioBody, isImageBody, messagePreview } from "@/lib/chat/messagePreview";
+import { isAudioBody, isFileBody, isImageBody, messagePreview, parseFileBody } from "@/lib/chat/messagePreview";
 
 type AudienceKind = "all" | "empresas" | "motoristas" | "colaboradores" | "tag";
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
@@ -78,6 +78,7 @@ export function BroadcastDialog({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [recording, setRecording] = useState(false);
@@ -111,6 +112,22 @@ export function BroadcastDialog({
       toast.error("Falha ao ler o arquivo.");
     }
   }
+
+  async function handleDocument(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      toast.error("Arquivo muito grande. Limite 5MB.");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const payload = JSON.stringify({ name: file.name, url: dataUrl, mime: file.type });
+      setAttachment("file:" + payload);
+    } catch {
+      toast.error("Falha ao ler o arquivo.");
+    }
+  }
+
 
   async function startRecording() {
     try {
@@ -183,6 +200,8 @@ export function BroadcastDialog({
 
   const attachIsImage = attachment ? isImageBody(attachment) : false;
   const attachIsAudio = attachment ? isAudioBody(attachment) : false;
+  const attachIsFile = attachment ? isFileBody(attachment) : false;
+  const attachFileInfo = attachment && attachIsFile ? parseFileBody(attachment) : null;
   const canSend = (!!attachment || !!text.trim()) && recipients.length > 0 && !recording;
 
   return (
@@ -304,6 +323,16 @@ export function BroadcastDialog({
                 e.target.value = "";
               }}
             />
+            <input
+              ref={docInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              className="hidden"
+              onChange={(e) => {
+                void handleDocument(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
 
             {attachment && (
               <div className="rounded-md border p-2 relative bg-muted/40">
@@ -323,6 +352,12 @@ export function BroadcastDialog({
                   />
                 )}
                 {attachIsAudio && <AudioMessage src={attachment} mine={false} />}
+                {attachIsFile && attachFileInfo && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <FileText className="h-5 w-5 shrink-0" />
+                    <span className="truncate">{attachFileInfo.name}</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -368,6 +403,15 @@ export function BroadcastDialog({
                   disabled={!!attachment}
                 >
                   <ImagePlus className="h-4 w-4 mr-1" /> Áudio (arquivo)
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => docInputRef.current?.click()}
+                  disabled={!!attachment}
+                >
+                  <Paperclip className="h-4 w-4 mr-1" /> Arquivo
                 </Button>
                 <Button
                   type="button"
@@ -420,6 +464,20 @@ export function BroadcastDialog({
                       />
                     ) : isAudioBody(b.body) ? (
                       <AudioMessage src={b.body} mine={false} />
+                    ) : isFileBody(b.body) ? (
+                      (() => {
+                        const f = parseFileBody(b.body);
+                        return f ? (
+                          <a
+                            href={f.url}
+                            download={f.name}
+                            className="inline-flex items-center gap-2 text-primary underline"
+                          >
+                            <FileText className="h-4 w-4" />
+                            {f.name}
+                          </a>
+                        ) : null;
+                      })()
                     ) : (
                       messagePreview(b.body)
                     )}
