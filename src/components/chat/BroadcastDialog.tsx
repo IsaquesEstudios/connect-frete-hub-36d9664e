@@ -25,13 +25,14 @@ import { useRepoVersion } from "@/lib/hooks/useRepo";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isImageBody, messagePreview } from "@/lib/chat/messagePreview";
 
-type AudienceKind = "all" | "empresas" | "motoristas" | "tag";
+type AudienceKind = "all" | "empresas" | "motoristas" | "colaboradores" | "tag";
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 
 function audienceLabel(kind: AudienceKind, tagLabel?: string) {
   if (kind === "all") return "Todos os usuários";
   if (kind === "empresas") return "Somente Empresas";
   if (kind === "motoristas") return "Somente Motoristas";
+  if (kind === "colaboradores") return "Somente Colaboradores";
   return `Tag: ${tagLabel ?? "—"}`;
 }
 
