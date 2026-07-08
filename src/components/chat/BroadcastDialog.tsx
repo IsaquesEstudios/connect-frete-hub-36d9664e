@@ -230,6 +230,7 @@ export function BroadcastDialog({
                   <SelectItem value="all">Todos os usuários</SelectItem>
                   <SelectItem value="empresas">Somente Empresas</SelectItem>
                   <SelectItem value="motoristas">Somente Motoristas</SelectItem>
+                  <SelectItem value="colaboradores">Somente Colaboradores</SelectItem>
                   <SelectItem value="tag" disabled={tags.length === 0}>
                     Por tag
                   </SelectItem>
