@@ -208,6 +208,7 @@ class LocalRepository implements Repository {
     if (audience.kind === "all") return users;
     if (audience.kind === "empresas") return users.filter((u) => u.type === "empresa");
     if (audience.kind === "motoristas") return users.filter((u) => u.type === "motorista");
+    if (audience.kind === "colaboradores") return users.filter((u) => u.type === "colaborador");
     const convTags = readJSON<ConversationTag[]>(K_CONV_TAGS, []);
     const ids = new Set(
       convTags.filter((c) => c.tagId === audience.tagId).map((c) => c.conversationId),
