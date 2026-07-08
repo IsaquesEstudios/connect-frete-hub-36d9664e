@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/loose-client";
 import type { BroadcastAudience, NewUserInput, Repository } from "./repository";
 import type { BroadcastMessage, Message, Tag, User, UserType } from "./types";
 
