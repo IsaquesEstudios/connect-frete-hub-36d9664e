@@ -17,6 +17,14 @@ import {
 import { Camera, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
@@ -192,28 +200,73 @@ export function ChatWindow({ me, other, viewer }: Props) {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <header className="flex items-center gap-3 border-b bg-card px-4 py-3">
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${otherColor}`}
-        >
-          {other.name
-            .split(" ")
-            .slice(0, 2)
-            .map((s) => s[0])
-            .join("")}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-medium truncate">{other.name}</div>
-          <div className="text-xs text-muted-foreground">
-            {other.number} ·{" "}
-            {otherOnline ? (
-              <span className="text-emerald-600">online</span>
-            ) : (
-              <span>offline</span>
-            )}
+      <Sheet>
+        <SheetTrigger asChild>
+          <button
+            type="button"
+            className="flex items-center gap-3 border-b bg-card px-4 py-3 text-left w-full hover:bg-accent transition-colors"
+            aria-label={`Ver perfil de ${other.name}`}
+          >
+            <div
+              className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${otherColor}`}
+            >
+              {other.name
+                .split(" ")
+                .slice(0, 2)
+                .map((s) => s[0])
+                .join("")}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-medium truncate">{other.name}</div>
+              <div className="text-xs text-muted-foreground">
+                {other.number} ·{" "}
+                {otherOnline ? (
+                  <span className="text-emerald-600">online</span>
+                ) : (
+                  <span>offline</span>
+                )}
+              </div>
+            </div>
+          </button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Perfil</SheetTitle>
+            <SheetDescription>Dados de {other.name}</SheetDescription>
+          </SheetHeader>
+          <div className="mt-6 flex items-center gap-3">
+            <div
+              className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold text-white ${otherColor}`}
+            >
+              {other.name
+                .split(" ")
+                .slice(0, 2)
+                .map((s) => s[0])
+                .join("")}
+            </div>
+            <div className="min-w-0">
+              <div className="font-semibold truncate">{other.name}</div>
+              <div className="text-xs text-muted-foreground">
+                {other.number} · {otherOnline ? "online" : "offline"}
+              </div>
+            </div>
           </div>
-        </div>
-      </header>
+          <div className="mt-6 space-y-3 text-sm">
+            <ProfileField label="Tipo" value={other.type} />
+            {other.type === "empresa" && <ProfileField label="CNPJ" value={other.cnpj} />}
+            {other.type === "motorista" && (
+              <>
+                <ProfileField label="Placa" value={other.placa} />
+                <ProfileField label="Veículo" value={other.veiculo} />
+              </>
+            )}
+            {other.type === "colaborador" && other.email && (
+              <ProfileField label="Email" value={other.email} />
+            )}
+            {other.cpf && <ProfileField label="CPF" value={other.cpf} />}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {groups.length === 0 && (
@@ -486,5 +539,14 @@ function ImagePreview({ src }: { src: string }) {
         </div>
       )}
     </>
+  );
+}
+
+function ProfileField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-medium break-words">{value}</div>
+    </div>
   );
 }
