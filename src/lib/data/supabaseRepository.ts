@@ -489,6 +489,7 @@ class SupabaseRepository implements Repository {
     if (a.kind === "all") return nonAdmins;
     if (a.kind === "empresas") return nonAdmins.filter((u) => u.type === "empresa");
     if (a.kind === "motoristas") return nonAdmins.filter((u) => u.type === "motorista");
+    if (a.kind === "colaboradores") return nonAdmins.filter((u) => u.type === "colaborador");
     const nums = new Set(
       this.convTags.filter((c) => c.tagId === a.tagId).map((c) => c.conversationId),
     );
