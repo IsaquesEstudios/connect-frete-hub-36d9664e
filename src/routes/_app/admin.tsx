@@ -214,7 +214,11 @@ function AdminPanel() {
             {filtered.map((c) => {
               const isActive = selected === c.user.id;
               const color =
-                c.user.type === "empresa" ? "bg-[hsl(var(--company))]" : "bg-[hsl(var(--driver))]";
+                c.user.type === "empresa"
+                  ? "bg-[hsl(var(--company))]"
+                  : c.user.type === "colaborador"
+                  ? "bg-[hsl(var(--collaborator))]"
+                  : "bg-[hsl(var(--driver))]";
               const convTags = c.tagIds
                 .map((id) => tagsById[id])
                 .filter((t): t is NonNullable<typeof t> => !!t);
