@@ -232,7 +232,8 @@ export function ChatWindow({ me, other, viewer }: Props) {
               const mine = m.fromUserId === me.id;
               const isImage = isImageBody(m.body);
               const isAudio = isAudioBody(m.body);
-              const isMedia = isImage || isAudio;
+              const isFile = isFileBody(m.body);
+              const isMedia = isImage || isAudio || isFile;
               return (
                 <div
                   key={m.id}
@@ -254,6 +255,8 @@ export function ChatWindow({ me, other, viewer }: Props) {
                       <ImagePreview src={m.body} />
                     ) : isAudio ? (
                       <AudioMessage src={m.body} mine={mine} />
+                    ) : isFile ? (
+                      <FileAttachment body={m.body} mine={mine} />
                     ) : (
                       <div className="whitespace-pre-wrap break-words">{m.body}</div>
                     )}
