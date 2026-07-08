@@ -62,10 +62,66 @@ export async function login(email: string, password: string): Promise<User> {
   if (!data.user) throw new Error("Login falhou");
   const u = await loadProfile(data.user.id);
   if (!u) throw new Error("Perfil não encontrado. Contate o admin.");
+  if (u.active === false) {
+    await supabase.auth.signOut();
+    throw new Error("Esta conta está desativada. Contate o administrador.");
+  }
   cachedUser = u;
   notify();
   return u;
 }
+
+// ---- Colaboradores (admin only) ----------------------------------
+
+export async function listColaboradores(): Promise<User[]> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("type", "colaborador")
+    .order("user_number", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((r: unknown) => profileToUser(r as Parameters<typeof profileToUser>[0]));
+}
+
+export async function createColaborador(input: { name: string; email: string; password: string }): Promise<void> {
+  const { data, error } = await supabase.auth.signUp({
+    email: input.email.trim().toLowerCase(),
+    password: input.password,
+    options: { emailRedirectTo: window.location.origin },
+  });
+  if (error) throw new Error(error.message);
+  if (!data.user) throw new Error("Não foi possível criar o usuário.");
+
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("user_number")
+    .eq("type", "colaborador");
+  const nums = (existing ?? []).map((r: { user_number: string }) =>
+    parseInt(r.user_number.split("-")[1] || "0", 10),
+  );
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  const user_number = `COL-${String(next).padStart(4, "0")}`;
+
+  const { error: insErr } = await supabase.from("profiles").insert({
+    id: data.user.id,
+    user_number,
+    type: "colaborador",
+    name: input.name,
+    active: true,
+  });
+  if (insErr) throw new Error(`Perfil: ${insErr.message}`);
+}
+
+export async function setColaboradorActive(id: string, active: boolean): Promise<void> {
+  const { error } = await supabase.from("profiles").update({ active }).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteColaborador(id: string): Promise<void> {
+  const { error } = await supabase.from("profiles").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 
 export interface SignupInput {
   email: string;
