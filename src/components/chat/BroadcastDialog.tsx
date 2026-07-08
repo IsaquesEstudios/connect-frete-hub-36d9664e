@@ -352,6 +352,12 @@ export function BroadcastDialog({
                   />
                 )}
                 {attachIsAudio && <AudioMessage src={attachment} mine={false} />}
+                {attachIsFile && attachFileInfo && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <FileText className="h-5 w-5 shrink-0" />
+                    <span className="truncate">{attachFileInfo.name}</span>
+                  </div>
+                )}
               </div>
             )}
 
