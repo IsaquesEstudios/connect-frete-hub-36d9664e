@@ -746,14 +746,6 @@ function StepDetalhesEmpresa({ data, update }: StepProps) {
           );
         })}
       </div>
-      <Field label="Rede social ou site (opcional)">
-        <Input
-          value={data.siteRedeSocial}
-          onChange={(e) => update("siteRedeSocial", e.target.value)}
-          placeholder="https://... ou @perfil"
-          className={fieldInput}
-        />
-      </Field>
     </div>
   );
 }
