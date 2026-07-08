@@ -135,7 +135,7 @@ function AdminPanel() {
               />
             </div>
             <Tabs value={tab} onValueChange={(v) => setTab(v as FilterTab)}>
-              <TabsList className="grid grid-cols-3 w-full h-8">
+              <TabsList className="grid grid-cols-4 w-full h-8">
                 <TabsTrigger value="todos" className="text-xs">
                   Todos
                 </TabsTrigger>
@@ -144,6 +144,9 @@ function AdminPanel() {
                 </TabsTrigger>
                 <TabsTrigger value="motoristas" className="text-xs">
                   Motoristas
+                </TabsTrigger>
+                <TabsTrigger value="colaboradores" className="text-xs">
+                  Colaboradores
                 </TabsTrigger>
               </TabsList>
             </Tabs>
