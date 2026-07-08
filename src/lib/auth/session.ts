@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/loose-client";
 import { repo } from "@/lib/data";
 import { profileToUser } from "@/lib/data/supabaseRepository";
 import type { User, UserType } from "@/lib/data";
