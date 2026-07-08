@@ -48,13 +48,70 @@ function MetricsPage() {
 
   if (!user || user.type !== "admin") return null;
 
+  function csvEscape(v: string | number) {
+    const s = String(v ?? "");
+    return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }
+
+  function downloadReport() {
+    const lines: string[] = [];
+    lines.push("Relatório ConectaFrete");
+    lines.push(`Gerado em;${new Date().toLocaleString()}`);
+    lines.push("");
+    lines.push("Resumo");
+    lines.push("Métrica;Valor");
+    lines.push(`Empresas;${stats.empresas}`);
+    lines.push(`Motoristas;${stats.motoristas}`);
+    lines.push(`Conversas ativas;${stats.active}`);
+    lines.push(`Não lidas;${stats.unread}`);
+    lines.push(`Tags cadastradas;${stats.tags}`);
+    lines.push("");
+    lines.push("Tags");
+    lines.push("Tag;Cor;Conversas;Empresas;Motoristas");
+    for (const r of tagReport) {
+      lines.push(
+        [r.tag.label, r.tag.color, r.total, r.empresas, r.motoristas].map(csvEscape).join(";"),
+      );
+    }
+    lines.push("");
+    lines.push("Conversas");
+    lines.push("Nome;Tipo;Número;Não lidas admin;Última mensagem;Tags");
+    for (const c of conversations) {
+      const tagLabels = c.tagIds.join("|");
+      const last = c.lastMessage ? new Date(c.lastMessage.createdAt).toLocaleString() : "";
+      lines.push(
+        [c.user.name, c.user.type, c.user.number, c.unreadForAdmin, last, tagLabels]
+          .map(csvEscape)
+          .join(";"),
+      );
+    }
+    const csv = "\uFEFF" + lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-semibold tracking-tight">Métricas</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Visão geral das conversas e usuários da plataforma.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Métricas</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Visão geral das conversas e usuários da plataforma.
+            </p>
+          </div>
+          <Button onClick={downloadReport} className="shrink-0">
+            <Download className="h-4 w-4 mr-2" /> Gerar relatório
+          </Button>
+        </div>
+
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card
