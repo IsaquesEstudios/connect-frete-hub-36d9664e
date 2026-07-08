@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_app/admin")({
   component: AdminPanel,
 });
 
-type FilterTab = "todos" | "empresas" | "motoristas";
+type FilterTab = "todos" | "empresas" | "motoristas" | "colaboradores";
 
 function lastSeenLabel(ts: number | null): string {
   if (!ts) return "nunca acessou";
