@@ -200,6 +200,8 @@ export function BroadcastDialog({
 
   const attachIsImage = attachment ? isImageBody(attachment) : false;
   const attachIsAudio = attachment ? isAudioBody(attachment) : false;
+  const attachIsFile = attachment ? isFileBody(attachment) : false;
+  const attachFileInfo = attachment && attachIsFile ? parseFileBody(attachment) : null;
   const canSend = (!!attachment || !!text.trim()) && recipients.length > 0 && !recording;
 
   return (
