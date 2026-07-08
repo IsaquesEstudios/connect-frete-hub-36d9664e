@@ -464,6 +464,20 @@ export function BroadcastDialog({
                       />
                     ) : isAudioBody(b.body) ? (
                       <AudioMessage src={b.body} mine={false} />
+                    ) : isFileBody(b.body) ? (
+                      (() => {
+                        const f = parseFileBody(b.body);
+                        return f ? (
+                          <a
+                            href={f.url}
+                            download={f.name}
+                            className="inline-flex items-center gap-2 text-primary underline"
+                          >
+                            <FileText className="h-4 w-4" />
+                            {f.name}
+                          </a>
+                        ) : null;
+                      })()
                     ) : (
                       messagePreview(b.body)
                     )}
