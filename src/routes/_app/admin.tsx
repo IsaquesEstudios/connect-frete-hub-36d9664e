@@ -250,10 +250,16 @@ function AdminPanel() {
                           className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0 text-white ${
                             c.user.type === "empresa"
                               ? "bg-[hsl(var(--company))]"
+                              : c.user.type === "colaborador"
+                              ? "bg-[hsl(var(--collaborator))]"
                               : "bg-[hsl(var(--driver))]"
                           }`}
                         >
-                          {c.user.type === "empresa" ? "Empresa" : "Motorista"}
+                          {c.user.type === "empresa"
+                            ? "Empresa"
+                            : c.user.type === "colaborador"
+                            ? "Colaborador"
+                            : "Motorista"}
                         </span>
                       </div>
                       {(() => {
