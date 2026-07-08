@@ -84,6 +84,11 @@ export async function listColaboradores(): Promise<User[]> {
 }
 
 export async function createColaborador(input: { name: string; email: string; password: string }): Promise<void> {
+  // Preserve current admin session — signUp replaces it with the new user's session.
+  const { data: currentSession } = await supabase.auth.getSession();
+  const adminSession = currentSession.session;
+  const adminUser = cachedUser;
+
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
     password: input.password,
@@ -109,6 +114,17 @@ export async function createColaborador(input: { name: string; email: string; pa
     name: input.name,
     active: true,
   });
+
+  // Restore admin session so the current user isn't logged out and redirected.
+  if (adminSession) {
+    await supabase.auth.setSession({
+      access_token: adminSession.access_token,
+      refresh_token: adminSession.refresh_token,
+    });
+    cachedUser = adminUser;
+    notify();
+  }
+
   if (insErr) throw new Error(`Perfil: ${insErr.message}`);
 }
 
