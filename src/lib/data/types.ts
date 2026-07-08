@@ -59,7 +59,7 @@ export interface ConversationTag {
 export interface BroadcastMessage {
   id: string;
   body: string;
-  audience: "all" | "empresas" | "motoristas" | "tag";
+  audience: "all" | "empresas" | "motoristas" | "colaboradores" | "tag";
   tagId?: string;
   sentAt: number;
   recipientCount: number;

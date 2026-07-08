@@ -25,13 +25,14 @@ import { useRepoVersion } from "@/lib/hooks/useRepo";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isImageBody, messagePreview } from "@/lib/chat/messagePreview";
 
-type AudienceKind = "all" | "empresas" | "motoristas" | "tag";
+type AudienceKind = "all" | "empresas" | "motoristas" | "colaboradores" | "tag";
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 
 function audienceLabel(kind: AudienceKind, tagLabel?: string) {
   if (kind === "all") return "Todos os usuários";
   if (kind === "empresas") return "Somente Empresas";
   if (kind === "motoristas") return "Somente Motoristas";
+  if (kind === "colaboradores") return "Somente Colaboradores";
   return `Tag: ${tagLabel ?? "—"}`;
 }
 
@@ -229,6 +230,7 @@ export function BroadcastDialog({
                   <SelectItem value="all">Todos os usuários</SelectItem>
                   <SelectItem value="empresas">Somente Empresas</SelectItem>
                   <SelectItem value="motoristas">Somente Motoristas</SelectItem>
+                  <SelectItem value="colaboradores">Somente Colaboradores</SelectItem>
                   <SelectItem value="tag" disabled={tags.length === 0}>
                     Por tag
                   </SelectItem>

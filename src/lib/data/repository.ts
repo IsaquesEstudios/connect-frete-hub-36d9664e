@@ -4,6 +4,7 @@ export type BroadcastAudience =
   | { kind: "all" }
   | { kind: "empresas" }
   | { kind: "motoristas" }
+  | { kind: "colaboradores" }
   | { kind: "tag"; tagId: string };
 
 export type NewUserInput =
