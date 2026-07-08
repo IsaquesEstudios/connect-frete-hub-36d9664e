@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_app/admin")({
   component: AdminPanel,
 });
 
-type FilterTab = "todos" | "empresas" | "motoristas";
+type FilterTab = "todos" | "empresas" | "motoristas" | "colaboradores";
 
 function lastSeenLabel(ts: number | null): string {
   if (!ts) return "nunca acessou";
@@ -71,6 +71,7 @@ function AdminPanel() {
     return conversations.filter((c) => {
       if (tab === "empresas" && c.user.type !== "empresa") return false;
       if (tab === "motoristas" && c.user.type !== "motorista") return false;
+      if (tab === "colaboradores" && c.user.type !== "colaborador") return false;
       if (unreadOnly && !(c.unreadForAdmin > 0)) return false;
       if (tagFilter.size > 0) {
         for (const id of tagFilter) if (!c.tagIds.includes(id)) return false;
@@ -134,7 +135,7 @@ function AdminPanel() {
               />
             </div>
             <Tabs value={tab} onValueChange={(v) => setTab(v as FilterTab)}>
-              <TabsList className="grid grid-cols-3 w-full h-8">
+              <TabsList className="grid grid-cols-4 w-full h-8">
                 <TabsTrigger value="todos" className="text-xs">
                   Todos
                 </TabsTrigger>
@@ -143,6 +144,9 @@ function AdminPanel() {
                 </TabsTrigger>
                 <TabsTrigger value="motoristas" className="text-xs">
                   Motoristas
+                </TabsTrigger>
+                <TabsTrigger value="colaboradores" className="text-xs">
+                  Colaboradores
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -210,7 +214,11 @@ function AdminPanel() {
             {filtered.map((c) => {
               const isActive = selected === c.user.id;
               const color =
-                c.user.type === "empresa" ? "bg-[hsl(var(--company))]" : "bg-[hsl(var(--driver))]";
+                c.user.type === "empresa"
+                  ? "bg-[hsl(var(--company))]"
+                  : c.user.type === "colaborador"
+                  ? "bg-[hsl(var(--collaborator))]"
+                  : "bg-[hsl(var(--driver))]";
               const convTags = c.tagIds
                 .map((id) => tagsById[id])
                 .filter((t): t is NonNullable<typeof t> => !!t);
@@ -242,10 +250,16 @@ function AdminPanel() {
                           className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0 text-white ${
                             c.user.type === "empresa"
                               ? "bg-[hsl(var(--company))]"
+                              : c.user.type === "colaborador"
+                              ? "bg-[hsl(var(--collaborator))]"
                               : "bg-[hsl(var(--driver))]"
                           }`}
                         >
-                          {c.user.type === "empresa" ? "Empresa" : "Motorista"}
+                          {c.user.type === "empresa"
+                            ? "Empresa"
+                            : c.user.type === "colaborador"
+                            ? "Colaborador"
+                            : "Motorista"}
                         </span>
                       </div>
                       {(() => {
