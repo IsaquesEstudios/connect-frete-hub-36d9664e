@@ -251,19 +251,50 @@ export function ChatWindow({ me, other, viewer }: Props) {
               </div>
             </div>
           </div>
-          <div className="mt-6 space-y-3 text-sm">
+          <div className="mt-6 space-y-3 text-sm max-h-[65vh] overflow-y-auto pr-1">
             <ProfileField label="Tipo" value={other.type} />
-            {other.type === "empresa" && <ProfileField label="CNPJ" value={other.cnpj} />}
+            {other.email && <ProfileField label="Email" value={other.email} />}
+            {other.whatsapp && <ProfileField label="WhatsApp" value={other.whatsapp} />}
+            {other.cpf && <ProfileField label="CPF" value={other.cpf} />}
+            {other.type === "empresa" && (
+              <>
+                <ProfileField label="CNPJ" value={other.cnpj} />
+                {other.nomeFantasia && (
+                  <ProfileField label="Nome fantasia" value={other.nomeFantasia} />
+                )}
+                {other.perfilEmpresa && (
+                  <ProfileField label="Perfil da empresa" value={other.perfilEmpresa} />
+                )}
+                {other.siteRedeSocial && (
+                  <ProfileField label="Site / Rede social" value={other.siteRedeSocial} />
+                )}
+              </>
+            )}
             {other.type === "motorista" && (
               <>
                 <ProfileField label="Placa" value={other.placa} />
                 <ProfileField label="Veículo" value={other.veiculo} />
+                {other.tipoVeiculo && (
+                  <ProfileField label="Tipo de veículo" value={other.tipoVeiculo} />
+                )}
+                {other.carroceria && (
+                  <ProfileField label="Carroceria" value={other.carroceria} />
+                )}
+                {other.rntrc && <ProfileField label="RNTRC" value={other.rntrc} />}
               </>
             )}
-            {other.type === "colaborador" && other.email && (
-              <ProfileField label="Email" value={other.email} />
+            {(other.cidade || other.estado) && (
+              <ProfileField
+                label="Localização"
+                value={[other.cidade, other.estado].filter(Boolean).join(" - ")}
+              />
             )}
-            {other.cpf && <ProfileField label="CPF" value={other.cpf} />}
+            {other.createdAt > 0 && (
+              <ProfileField
+                label="Conta criada em"
+                value={new Date(other.createdAt).toLocaleString("pt-BR")}
+              />
+            )}
           </div>
         </SheetContent>
       </Sheet>
