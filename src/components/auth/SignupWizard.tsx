@@ -101,7 +101,7 @@ export function SignupWizard({
   const [loading, setLoading] = useState(false);
 
   const isEmpresa = data.kind === "empresa";
-  const totalSteps = isEmpresa ? 4 : 7;
+  const totalSteps = isEmpresa ? 5 : 8;
 
   const update = <K extends keyof WizardData>(k: K, v: WizardData[K]) =>
     setData((d) => ({ ...d, [k]: v }));
@@ -121,6 +121,7 @@ export function SignupWizard({
       if (step === 2) return true; // foto opcional
       if (step === 3) return !!data.perfilEmpresa;
       if (step === 4) return !!data.estado && !!data.cidade;
+      if (step === 5) return true; // redes sociais opcional
       return true;
     }
 
@@ -139,12 +140,32 @@ export function SignupWizard({
     if (step === 5) return !!data.tipoVeiculo;
     if (step === 6) return data.rntrc.trim().length >= 4;
     if (step === 7) return !!data.carroceria;
+    if (step === 8) return true; // redes sociais opcional
     return true;
   };
 
   const submit = async () => {
     setLoading(true);
     try {
+      const redes: Record<string, string> = {};
+      if (data.instagram.trim()) redes.instagram = data.instagram.trim();
+      if (data.facebook.trim()) redes.facebook = data.facebook.trim();
+      if (data.youtube.trim()) redes.youtube = data.youtube.trim();
+      if (data.tiktok.trim()) redes.tiktok = data.tiktok.trim();
+      if (data.redeOutros.trim()) redes.outros = data.redeOutros.trim();
+      const redesStr = Object.keys(redes).length ? JSON.stringify(redes) : undefined;
+
+      const carroceriaFinal = !isEmpresa && data.carroceria
+        ? data.carroceriaObs.trim()
+          ? `${data.carroceria} | Obs: ${data.carroceriaObs.trim()}`
+          : data.carroceria
+        : undefined;
+      const veiculoFinal = !isEmpresa && data.tipoVeiculo
+        ? data.tipoVeiculoObs.trim()
+          ? `${data.tipoVeiculo} | Obs: ${data.tipoVeiculoObs.trim()}`
+          : data.tipoVeiculo
+        : undefined;
+
       const u = await signup({
         email: data.email,
         password: data.senha,
@@ -158,13 +179,13 @@ export function SignupWizard({
         cidade: data.cidade || undefined,
         estado: data.estado || undefined,
         placa: !isEmpresa ? data.placa : undefined,
-        veiculo: !isEmpresa ? data.tipoVeiculo : undefined,
-        tipoVeiculo: !isEmpresa ? data.tipoVeiculo : undefined,
+        veiculo: veiculoFinal,
+        tipoVeiculo: veiculoFinal,
         rntrc: !isEmpresa ? data.rntrc : undefined,
-        carroceria: !isEmpresa ? data.carroceria : undefined,
+        carroceria: carroceriaFinal,
         nomeFantasia: isEmpresa ? data.nomeFantasia.trim() : undefined,
         perfilEmpresa: isEmpresa && data.perfilEmpresa ? data.perfilEmpresa : undefined,
-        siteRedeSocial: isEmpresa ? data.siteRedeSocial.trim() || undefined : undefined,
+        siteRedeSocial: redesStr,
       });
       toast.success(`Cadastro criado: ${u.number}`);
       onDone(u);
