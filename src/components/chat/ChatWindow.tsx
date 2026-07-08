@@ -390,6 +390,36 @@ export function ChatWindow({ me, other, viewer }: Props) {
   );
 }
 
+function FileAttachment({ body, mine }: { body: string; mine: boolean }) {
+  const f = parseFileBody(body);
+  if (!f) return null;
+  return (
+    <a
+      href={f.url}
+      download={f.name}
+      target="_blank"
+      rel="noreferrer"
+      className={`flex items-center gap-2 min-w-[180px] max-w-[280px] rounded-lg px-2 py-1 ${
+        mine ? "hover:bg-primary-foreground/10" : "hover:bg-accent"
+      }`}
+    >
+      <div
+        className={`flex h-9 w-9 items-center justify-center rounded-md shrink-0 ${
+          mine ? "bg-primary-foreground/20" : "bg-muted"
+        }`}
+      >
+        <FileText className="h-5 w-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-medium">{f.name}</div>
+        <div className={`text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+          Toque para abrir
+        </div>
+      </div>
+    </a>
+  );
+}
+
 function DeleteMessageButton({ onConfirm }: { onConfirm: () => void }) {
   return (
     <AlertDialog>
