@@ -109,6 +109,23 @@ export function ChatWindow({ me, other, viewer }: Props) {
     }
   }
 
+  async function handleDocument(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      alert("Arquivo muito grande. Limite 5MB.");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const payload = JSON.stringify({ name: file.name, url: dataUrl, mime: file.type });
+      sendBody("file:" + payload);
+    } catch (e) {
+      console.error(e);
+      alert("Falha ao ler o arquivo.");
+    }
+  }
+
+
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
