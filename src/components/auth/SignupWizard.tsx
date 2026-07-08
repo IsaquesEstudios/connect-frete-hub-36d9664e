@@ -629,13 +629,23 @@ function GroupedSelect({
 
 function StepTipoVeiculo({ data, update }: StepProps) {
   return (
-    <GroupedSelect
-      label="Tipo de veículo"
-      value={data.tipoVeiculo}
-      onChange={(v) => update("tipoVeiculo", v)}
-      groups={TIPOS_VEICULO}
-      placeholder="Selecione o tipo de veículo"
-    />
+    <div className="space-y-3">
+      <GroupedSelect
+        label="Tipo de veículo"
+        value={data.tipoVeiculo}
+        onChange={(v) => update("tipoVeiculo", v)}
+        groups={TIPOS_VEICULO}
+        placeholder="Selecione o tipo de veículo"
+      />
+      <Field label="Observações adicionais (opcional)">
+        <Input
+          value={data.tipoVeiculoObs}
+          onChange={(e) => update("tipoVeiculoObs", e.target.value)}
+          placeholder="Ex.: 2020, ar-condicionado, rastreador..."
+          className={fieldInput}
+        />
+      </Field>
+    </div>
   );
 }
 
@@ -654,13 +664,71 @@ function StepRntrc({ data, update }: StepProps) {
 
 function StepCarroceria({ data, update }: StepProps) {
   return (
-    <GroupedSelect
-      label="Tipo de carroceria"
-      value={data.carroceria}
-      onChange={(v) => update("carroceria", v)}
-      groups={CARROCERIAS}
-      placeholder="Selecione a carroceria"
-    />
+    <div className="space-y-3">
+      <GroupedSelect
+        label="Tipo de carroceria"
+        value={data.carroceria}
+        onChange={(v) => update("carroceria", v)}
+        groups={CARROCERIAS}
+        placeholder="Selecione a carroceria"
+      />
+      <Field label="Observações adicionais (opcional)">
+        <Input
+          value={data.carroceriaObs}
+          onChange={(e) => update("carroceriaObs", e.target.value)}
+          placeholder="Ex.: capacidade, portas laterais, lonas..."
+          className={fieldInput}
+        />
+      </Field>
+    </div>
+  );
+}
+
+function StepRedesSociais({ data, update }: StepProps) {
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm uppercase tracking-wider text-slate-400">Redes sociais (opcional)</h2>
+      <Field label="Instagram">
+        <Input
+          value={data.instagram}
+          onChange={(e) => update("instagram", e.target.value)}
+          placeholder="@perfil ou link"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Facebook">
+        <Input
+          value={data.facebook}
+          onChange={(e) => update("facebook", e.target.value)}
+          placeholder="facebook.com/perfil"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Youtube">
+        <Input
+          value={data.youtube}
+          onChange={(e) => update("youtube", e.target.value)}
+          placeholder="youtube.com/@canal"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Tiktok">
+        <Input
+          value={data.tiktok}
+          onChange={(e) => update("tiktok", e.target.value)}
+          placeholder="@perfil"
+          className={fieldInput}
+        />
+      </Field>
+      <Field label="Outros">
+        <Input
+          value={data.redeOutros}
+          onChange={(e) => update("redeOutros", e.target.value)}
+          placeholder="Site ou outra rede"
+          className={fieldInput}
+        />
+      </Field>
+    </div>
   );
 }
 
