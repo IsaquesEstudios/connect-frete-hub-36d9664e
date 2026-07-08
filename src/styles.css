@@ -80,6 +80,8 @@
   --company: 0 78% 58%;
   /* Driver (motorista/caminhoneiro) = blue like "SOU CAMINHONEIRO" button */
   --driver: 217 91% 55%;
+  /* Collaborator (staff/support) = purple */
+  --collaborator: 265 70% 55%;
   --chat-bg: oklch(0.97 0 0);
   --secondary: oklch(0.94 0 0);
   --secondary-foreground: oklch(0.2 0 0);
