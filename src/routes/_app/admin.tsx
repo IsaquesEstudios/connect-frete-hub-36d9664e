@@ -102,6 +102,7 @@ function AdminPanel() {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex items-center justify-end gap-2 border-b bg-card px-4 py-2">
+        <CollaboratorsDialog />
         <BroadcastDialog
           adminId={user.id}
           trigger={
@@ -111,6 +112,7 @@ function AdminPanel() {
           }
         />
       </div>
+
 
 
       <div className="flex-1 min-h-0 flex">
