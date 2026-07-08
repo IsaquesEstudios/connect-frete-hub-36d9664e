@@ -230,7 +230,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      [_ in never]: never
     }
     Enums: {
       user_type: "empresa" | "motorista" | "admin" | "colaborador"
