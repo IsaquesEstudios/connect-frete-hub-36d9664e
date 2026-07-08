@@ -45,15 +45,22 @@ interface WizardData {
   fotoUrl: string;
   // Sec 3 (empresa)
   perfilEmpresa: "transportador" | "embarcador" | "agenciador" | "";
-  siteRedeSocial: string;
   // Sec 3/4 – Local
   cidade: string;
   estado: string;
   // Motorista
   placa: string;
   tipoVeiculo: string;
+  tipoVeiculoObs: string;
   rntrc: string;
   carroceria: string;
+  carroceriaObs: string;
+  // Redes sociais
+  instagram: string;
+  facebook: string;
+  youtube: string;
+  tiktok: string;
+  redeOutros: string;
 }
 
 const initial: WizardData = {
@@ -67,13 +74,19 @@ const initial: WizardData = {
   nomeFantasia: "",
   fotoUrl: "",
   perfilEmpresa: "",
-  siteRedeSocial: "",
   cidade: "",
   estado: "",
   placa: "",
   tipoVeiculo: "",
+  tipoVeiculoObs: "",
   rntrc: "",
   carroceria: "",
+  carroceriaObs: "",
+  instagram: "",
+  facebook: "",
+  youtube: "",
+  tiktok: "",
+  redeOutros: "",
 };
 
 export function SignupWizard({
