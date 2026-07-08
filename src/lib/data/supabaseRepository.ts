@@ -11,6 +11,18 @@ type ProfileRow = {
   cpf: string | null;
   placa: string | null;
   veiculo: string | null;
+  email: string | null;
+  whatsapp: string | null;
+  cidade: string | null;
+  estado: string | null;
+  foto_url: string | null;
+  tipo_veiculo: string | null;
+  rntrc: string | null;
+  carroceria: string | null;
+  nome_fantasia: string | null;
+  perfil_empresa: string | null;
+  site_rede_social: string | null;
+  created_at?: string | null;
   last_seen_at?: string | null;
   active?: boolean | null;
 };
@@ -37,10 +49,40 @@ type BroadcastRow = {
 
 export function profileToUser(p: ProfileRow): User {
   const active = p.active ?? true;
-  const base = { id: p.id, number: p.user_number, name: p.name, password: "", createdAt: 0, active };
-  if (p.type === "empresa") return { ...base, type: "empresa", cnpj: p.cnpj ?? "" };
+  const createdAt = p.created_at ? new Date(p.created_at).getTime() : 0;
+  const base = {
+    id: p.id,
+    number: p.user_number,
+    name: p.name,
+    password: "",
+    createdAt,
+    active,
+    email: p.email ?? undefined,
+    whatsapp: p.whatsapp ?? undefined,
+    cidade: p.cidade ?? undefined,
+    estado: p.estado ?? undefined,
+    fotoUrl: p.foto_url ?? undefined,
+    cpf: p.cpf ?? undefined,
+  };
+  if (p.type === "empresa")
+    return {
+      ...base,
+      type: "empresa",
+      cnpj: p.cnpj ?? "",
+      nomeFantasia: p.nome_fantasia ?? undefined,
+      perfilEmpresa: p.perfil_empresa ?? undefined,
+      siteRedeSocial: p.site_rede_social ?? undefined,
+    };
   if (p.type === "motorista")
-    return { ...base, type: "motorista", placa: p.placa ?? "", veiculo: p.veiculo ?? "", cpf: p.cpf ?? undefined };
+    return {
+      ...base,
+      type: "motorista",
+      placa: p.placa ?? "",
+      veiculo: p.veiculo ?? "",
+      tipoVeiculo: p.tipo_veiculo ?? undefined,
+      rntrc: p.rntrc ?? undefined,
+      carroceria: p.carroceria ?? undefined,
+    };
   if (p.type === "colaborador") return { ...base, type: "colaborador" };
   return { ...base, type: "admin" };
 }

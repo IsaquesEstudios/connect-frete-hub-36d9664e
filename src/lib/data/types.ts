@@ -9,17 +9,28 @@ export interface BaseUser {
   createdAt: number;
   cpf?: string;
   active?: boolean;
+  email?: string;
+  whatsapp?: string;
+  cidade?: string;
+  estado?: string;
+  fotoUrl?: string;
 }
 
 export interface EmpresaUser extends BaseUser {
   type: "empresa";
   cnpj: string;
+  nomeFantasia?: string;
+  perfilEmpresa?: string;
+  siteRedeSocial?: string;
 }
 
 export interface MotoristaUser extends BaseUser {
   type: "motorista";
   placa: string;
   veiculo: string;
+  tipoVeiculo?: string;
+  rntrc?: string;
+  carroceria?: string;
 }
 
 export interface AdminUser extends BaseUser {
@@ -28,7 +39,6 @@ export interface AdminUser extends BaseUser {
 
 export interface ColaboradorUser extends BaseUser {
   type: "colaborador";
-  email?: string;
 }
 
 export type User = EmpresaUser | MotoristaUser | AdminUser | ColaboradorUser;
