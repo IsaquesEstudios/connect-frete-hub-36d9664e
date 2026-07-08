@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Camera, History, ImagePlus, Megaphone, Mic, Send, Square, Trash2, X } from "lucide-react";
+import { Camera, FileText, History, ImagePlus, Megaphone, Mic, Paperclip, Send, Square, Trash2, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
