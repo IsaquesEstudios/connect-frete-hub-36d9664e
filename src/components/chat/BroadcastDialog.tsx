@@ -408,6 +408,15 @@ export function BroadcastDialog({
                   type="button"
                   variant="outline"
                   size="sm"
+                  onClick={() => docInputRef.current?.click()}
+                  disabled={!!attachment}
+                >
+                  <Paperclip className="h-4 w-4 mr-1" /> Arquivo
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={startRecording}
                   disabled={!!attachment}
                 >
