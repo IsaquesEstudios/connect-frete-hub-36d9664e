@@ -14,9 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, ImagePlus, Mic, Send, Square, Trash2 } from "lucide-react";
+import { Camera, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
 import { AudioMessage } from "./AudioMessage";
-import { isAudioBody, isImageBody } from "@/lib/chat/messagePreview";
+import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
@@ -56,6 +56,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const [text, setText] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -107,6 +108,23 @@ export function ChatWindow({ me, other, viewer }: Props) {
       alert("Falha ao ler o arquivo.");
     }
   }
+
+  async function handleDocument(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      alert("Arquivo muito grande. Limite 5MB.");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const payload = JSON.stringify({ name: file.name, url: dataUrl, mime: file.type });
+      sendBody("file:" + payload);
+    } catch (e) {
+      console.error(e);
+      alert("Falha ao ler o arquivo.");
+    }
+  }
+
 
   async function startRecording() {
     try {
@@ -214,7 +232,8 @@ export function ChatWindow({ me, other, viewer }: Props) {
               const mine = m.fromUserId === me.id;
               const isImage = isImageBody(m.body);
               const isAudio = isAudioBody(m.body);
-              const isMedia = isImage || isAudio;
+              const isFile = isFileBody(m.body);
+              const isMedia = isImage || isAudio || isFile;
               return (
                 <div
                   key={m.id}
@@ -236,6 +255,8 @@ export function ChatWindow({ me, other, viewer }: Props) {
                       <ImagePreview src={m.body} />
                     ) : isAudio ? (
                       <AudioMessage src={m.body} mine={mine} />
+                    ) : isFile ? (
+                      <FileAttachment body={m.body} mine={mine} />
                     ) : (
                       <div className="whitespace-pre-wrap break-words">{m.body}</div>
                     )}
@@ -283,6 +304,17 @@ export function ChatWindow({ me, other, viewer }: Props) {
             e.target.value = "";
           }}
         />
+        <input
+          ref={docInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          className="hidden"
+          onChange={(e) => {
+            void handleDocument(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+
 
         {recording ? (
           <>
@@ -324,6 +356,15 @@ export function ChatWindow({ me, other, viewer }: Props) {
               type="button"
               variant="ghost"
               size="icon"
+              onClick={() => docInputRef.current?.click()}
+              title="Enviar arquivo (PDF, documento)"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
               onClick={startRecording}
               title="Gravar áudio"
             >
@@ -346,6 +387,36 @@ export function ChatWindow({ me, other, viewer }: Props) {
         )}
       </form>
     </div>
+  );
+}
+
+function FileAttachment({ body, mine }: { body: string; mine: boolean }) {
+  const f = parseFileBody(body);
+  if (!f) return null;
+  return (
+    <a
+      href={f.url}
+      download={f.name}
+      target="_blank"
+      rel="noreferrer"
+      className={`flex items-center gap-2 min-w-[180px] max-w-[280px] rounded-lg px-2 py-1 ${
+        mine ? "hover:bg-primary-foreground/10" : "hover:bg-accent"
+      }`}
+    >
+      <div
+        className={`flex h-9 w-9 items-center justify-center rounded-md shrink-0 ${
+          mine ? "bg-primary-foreground/20" : "bg-muted"
+        }`}
+      >
+        <FileText className="h-5 w-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-medium">{f.name}</div>
+        <div className={`text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+          Toque para abrir
+        </div>
+      </div>
+    </a>
   );
 }
 

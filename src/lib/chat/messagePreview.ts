@@ -6,9 +6,26 @@ export function isAudioBody(body: string) {
   return body.startsWith("data:audio/");
 }
 
+export function isFileBody(body: string) {
+  return body.startsWith("file:{");
+}
+
+export function parseFileBody(body: string): { name: string; url: string; mime?: string } | null {
+  if (!isFileBody(body)) return null;
+  try {
+    return JSON.parse(body.slice(5));
+  } catch {
+    return null;
+  }
+}
+
 /** Texto curto para preview em lista de conversas. */
 export function messagePreview(body: string): string {
   if (isImageBody(body)) return "📷 Imagem";
   if (isAudioBody(body)) return "🎵 Áudio";
+  if (isFileBody(body)) {
+    const f = parseFileBody(body);
+    return `📎 ${f?.name ?? "Arquivo"}`;
+  }
   return body;
 }
