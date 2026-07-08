@@ -71,6 +71,7 @@ function AdminPanel() {
     return conversations.filter((c) => {
       if (tab === "empresas" && c.user.type !== "empresa") return false;
       if (tab === "motoristas" && c.user.type !== "motorista") return false;
+      if (tab === "colaboradores" && c.user.type !== "colaborador") return false;
       if (unreadOnly && !(c.unreadForAdmin > 0)) return false;
       if (tagFilter.size > 0) {
         for (const id of tagFilter) if (!c.tagIds.includes(id)) return false;
