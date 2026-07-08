@@ -90,30 +90,41 @@ export function citiesByUF(all: Municipio[], uf: string): string[] {
 export const TIPOS_VEICULO: { grupo: string; opcoes: string[] }[] = [
   {
     grupo: "Veículos pesados",
-    opcoes: ["Bitrem", "Carreta Comum", "Carreta LS", "Rodotrem", "Vanderléia", "Outros"],
+    opcoes: [
+      "Bitrem 7 eixos",
+      "Bitrem 9 eixos",
+      "Carreta",
+      "Carreta 4º eixo",
+      "Carreta LS",
+      "Rodotrem",
+      "Vanderléia",
+    ],
   },
-  { grupo: "Veículos médios", opcoes: ["Bitruck", "Truck", "Outros"] },
-  { grupo: "Veículos leves", opcoes: ["3/4", "Toco", "VLC", "Outros"] },
+  { grupo: "Veículos médios", opcoes: ["Bitruck", "Truck"] },
+  { grupo: "Veículos leves", opcoes: ["3/4", "Fiorino", "Toco", "VLC"] },
 ];
 
 export const CARROCERIAS: { grupo: string; opcoes: string[] }[] = [
   {
-    grupo: "Carroceria fechada",
-    opcoes: ["Caçamba", "Grade Baixa", "Graneleiro", "Prancha", "Outros"],
+    grupo: "Baús",
+    opcoes: ["Baú Seco", "Baú Container", "Baú Frigorífico", "Baú Refrigerado"],
   },
-  { grupo: "Carroceria aberta", opcoes: ["Baú Comum", "Baú Frigorífico", "Sider", "Outros"] },
   {
-    grupo: "Carroceria especial",
+    grupo: "Abertas",
+    opcoes: ["Sider", "Caçamba", "Grade Baixa", "Graneleiro alto", "Plataforma", "Prancha"],
+  },
+  {
+    grupo: "Especiais",
     opcoes: [
       "Apenas Cavalo",
       "Bug Porta Container",
       "Cavaqueira",
       "Cegonheiro",
       "Gaiola",
-      "Munk",
+      "Hopper",
+      "Munck",
       "Silo",
       "Tanque",
-      "Outros",
     ],
   },
 ];
