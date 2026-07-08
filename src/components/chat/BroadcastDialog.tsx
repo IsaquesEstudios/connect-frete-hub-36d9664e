@@ -323,6 +323,16 @@ export function BroadcastDialog({
                 e.target.value = "";
               }}
             />
+            <input
+              ref={docInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              className="hidden"
+              onChange={(e) => {
+                void handleDocument(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
 
             {attachment && (
               <div className="rounded-md border p-2 relative bg-muted/40">
