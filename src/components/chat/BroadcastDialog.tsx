@@ -23,7 +23,7 @@ import { repo } from "@/lib/data";
 import type { BroadcastAudience } from "@/lib/data/repository";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
 import { AudioMessage } from "./AudioMessage";
-import { isAudioBody, isImageBody, messagePreview } from "@/lib/chat/messagePreview";
+import { isAudioBody, isFileBody, isImageBody, messagePreview, parseFileBody } from "@/lib/chat/messagePreview";
 
 type AudienceKind = "all" | "empresas" | "motoristas" | "colaboradores" | "tag";
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
