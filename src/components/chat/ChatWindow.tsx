@@ -541,3 +541,12 @@ function ImagePreview({ src }: { src: string }) {
     </>
   );
 }
+
+function ProfileField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-medium break-words">{value}</div>
+    </div>
+  );
+}
