@@ -216,6 +216,7 @@ export function SignupWizard({
       {isEmpresa && step === 2 && <StepFoto data={data} update={update} />}
       {isEmpresa && step === 3 && <StepDetalhesEmpresa data={data} update={update} />}
       {isEmpresa && step === 4 && <StepLocalByEstado data={data} update={update} />}
+      {isEmpresa && step === 5 && <StepRedesSociais data={data} update={update} />}
 
       {!isEmpresa && step === 1 && <StepBasic data={data} update={update} />}
       {!isEmpresa && step === 2 && <StepFoto data={data} update={update} />}
@@ -224,6 +225,7 @@ export function SignupWizard({
       {!isEmpresa && step === 5 && <StepTipoVeiculo data={data} update={update} />}
       {!isEmpresa && step === 6 && <StepRntrc data={data} update={update} />}
       {!isEmpresa && step === 7 && <StepCarroceria data={data} update={update} />}
+      {!isEmpresa && step === 8 && <StepRedesSociais data={data} update={update} />}
 
       <div className="flex items-center gap-2 pt-2">
         <Button
