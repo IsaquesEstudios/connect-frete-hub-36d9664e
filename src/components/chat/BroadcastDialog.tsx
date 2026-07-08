@@ -113,6 +113,22 @@ export function BroadcastDialog({
     }
   }
 
+  async function handleDocument(file: File | undefined | null) {
+    if (!file) return;
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      toast.error("Arquivo muito grande. Limite 5MB.");
+      return;
+    }
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const payload = JSON.stringify({ name: file.name, url: dataUrl, mime: file.type });
+      setAttachment("file:" + payload);
+    } catch {
+      toast.error("Falha ao ler o arquivo.");
+    }
+  }
+
+
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
