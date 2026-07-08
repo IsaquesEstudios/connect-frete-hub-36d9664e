@@ -17,6 +17,14 @@ import {
 import { Camera, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
