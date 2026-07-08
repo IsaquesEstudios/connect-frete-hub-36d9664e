@@ -235,15 +235,23 @@ export function ChatWindow({ me, other, viewer }: Props) {
             <SheetDescription>Dados de {other.name}</SheetDescription>
           </SheetHeader>
           <div className="mt-6 flex items-center gap-3">
-            <div
-              className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold text-white ${otherColor}`}
-            >
-              {other.name
-                .split(" ")
-                .slice(0, 2)
-                .map((s) => s[0])
-                .join("")}
-            </div>
+            {other.fotoUrl ? (
+              <img
+                src={other.fotoUrl}
+                alt={other.name}
+                className="h-14 w-14 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-semibold text-white ${otherColor}`}
+              >
+                {other.name
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((s) => s[0])
+                  .join("")}
+              </div>
+            )}
             <div className="min-w-0">
               <div className="font-semibold truncate">{other.name}</div>
               <div className="text-xs text-muted-foreground">
