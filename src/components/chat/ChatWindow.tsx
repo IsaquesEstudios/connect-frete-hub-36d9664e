@@ -356,6 +356,15 @@ export function ChatWindow({ me, other, viewer }: Props) {
               type="button"
               variant="ghost"
               size="icon"
+              onClick={() => docInputRef.current?.click()}
+              title="Enviar arquivo (PDF, documento)"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
               onClick={startRecording}
               title="Gravar áudio"
             >
