@@ -1,4 +1,4 @@
-export type UserType = "empresa" | "motorista" | "admin";
+export type UserType = "empresa" | "motorista" | "admin" | "colaborador";
 
 export interface BaseUser {
   id: string; // same as number, e.g. EMP-0001
@@ -8,6 +8,7 @@ export interface BaseUser {
   password: string; // mock only
   createdAt: number;
   cpf?: string;
+  active?: boolean;
 }
 
 export interface EmpresaUser extends BaseUser {
@@ -25,7 +26,13 @@ export interface AdminUser extends BaseUser {
   type: "admin";
 }
 
-export type User = EmpresaUser | MotoristaUser | AdminUser;
+export interface ColaboradorUser extends BaseUser {
+  type: "colaborador";
+  email?: string;
+}
+
+export type User = EmpresaUser | MotoristaUser | AdminUser | ColaboradorUser;
+
 
 export interface Message {
   id: string;
