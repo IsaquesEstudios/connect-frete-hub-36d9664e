@@ -5,6 +5,7 @@ import type {
   Message,
   Tag,
   User,
+  UserProfilePatch,
   UserType,
 } from "./types";
 import { ADMIN_ID, seedConversationTags, seedMessages, seedTags, seedUsers } from "./seed";
@@ -64,6 +65,16 @@ class LocalRepository implements Repository {
     users.push(user);
     writeJSON(K_USERS, users);
     return user;
+  }
+
+  updateUser(id: string, patch: UserProfilePatch): User | undefined {
+    const users = this.listUsers();
+    const idx = users.findIndex((u) => u.id === id || u.number === id);
+    if (idx < 0) return undefined;
+    const updated = { ...users[idx], ...patch } as User;
+    users[idx] = updated;
+    writeJSON(K_USERS, users);
+    return updated;
   }
 
   listMessages(conversationId: string): Message[] {

@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/loose-client";
 import type { BroadcastAudience, NewUserInput, Repository } from "./repository";
-import type { BroadcastMessage, Message, Tag, User, UserType } from "./types";
+import type { BroadcastMessage, Message, Tag, User, UserProfilePatch, UserType } from "./types";
 
 type ProfileRow = {
   id: string;
@@ -110,6 +110,34 @@ function mapBroadcast(r: BroadcastRow): BroadcastMessage {
     sentAt: new Date(r.sent_at).getTime(),
     recipientCount: r.recipient_count,
   };
+}
+
+function profilePatchToRow(patch: UserProfilePatch): Record<string, string | boolean | null> {
+  const row: Record<string, string | boolean | null> = {};
+  const put = (column: string, value: string | boolean | undefined) => {
+    if (value === undefined) return;
+    row[column] = typeof value === "string" ? value.trim() || null : value;
+  };
+
+  put("name", patch.name);
+  put("email", patch.email);
+  put("whatsapp", patch.whatsapp);
+  put("cpf", patch.cpf);
+  put("cnpj", patch.cnpj);
+  put("cidade", patch.cidade);
+  put("estado", patch.estado);
+  put("foto_url", patch.fotoUrl);
+  put("placa", patch.placa);
+  put("veiculo", patch.veiculo);
+  put("tipo_veiculo", patch.tipoVeiculo);
+  put("rntrc", patch.rntrc);
+  put("carroceria", patch.carroceria);
+  put("nome_fantasia", patch.nomeFantasia);
+  put("perfil_empresa", patch.perfilEmpresa);
+  put("site_rede_social", patch.siteRedeSocial);
+  put("active", patch.active);
+
+  return row;
 }
 
 class SupabaseRepository implements Repository {
@@ -243,6 +271,39 @@ class SupabaseRepository implements Repository {
   }
   createUser(_: NewUserInput): User {
     throw new Error("Use Supabase Auth signUp");
+  }
+
+  updateUser(id: string, patch: UserProfilePatch): User | undefined {
+    const user = this.getUser(id);
+    if (!user) return undefined;
+    const previous = { ...user } as User;
+    Object.assign(user, patch);
+    this.notify();
+
+    const row = profilePatchToRow(patch);
+    if (Object.keys(row).length > 0) {
+      void supabase
+        .from("profiles")
+        .update(row)
+        .eq("id", user.id)
+        .select("*")
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            Object.assign(user, previous);
+            this.notify();
+            console.error("updateUser failed", error);
+            alert("Não foi possível atualizar o perfil.");
+            return;
+          }
+          if (data) {
+            Object.assign(user, profileToUser(data as ProfileRow));
+            this.notify();
+          }
+        });
+    }
+
+    return user;
   }
 
   // ============ messages ============

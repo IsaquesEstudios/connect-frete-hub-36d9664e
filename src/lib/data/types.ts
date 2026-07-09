@@ -43,6 +43,26 @@ export interface ColaboradorUser extends BaseUser {
 
 export type User = EmpresaUser | MotoristaUser | AdminUser | ColaboradorUser;
 
+export type UserProfilePatch = Partial<{
+  name: string;
+  email: string;
+  whatsapp: string;
+  cpf: string;
+  cnpj: string;
+  cidade: string;
+  estado: string;
+  fotoUrl: string;
+  placa: string;
+  veiculo: string;
+  tipoVeiculo: string;
+  rntrc: string;
+  carroceria: string;
+  nomeFantasia: string;
+  perfilEmpresa: string;
+  siteRedeSocial: string;
+  active: boolean;
+}>;
+
 
 export interface Message {
   id: string;
