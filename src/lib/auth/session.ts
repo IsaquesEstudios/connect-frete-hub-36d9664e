@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/loose-client";
 import { repo } from "@/lib/data";
 import { profileToUser } from "@/lib/data/supabaseRepository";
-import type { User, UserType } from "@/lib/data";
+import type { User, UserProfilePatch, UserType } from "@/lib/data";
 
 let cachedUser: User | null = null;
 let initialDone = false;
@@ -43,6 +43,16 @@ if (typeof window !== "undefined") void bootstrap();
 export function currentUser(): User | null {
   return cachedUser;
 }
+
+export async function updateCurrentProfile(patch: UserProfilePatch): Promise<User> {
+  if (!cachedUser) throw new Error("Usuário não autenticado.");
+  const updated = repo.updateUser(cachedUser.id, patch);
+  if (!updated) throw new Error("Perfil não encontrado.");
+  cachedUser = updated;
+  notify();
+  return updated;
+}
+
 export function isBootstrapped(): boolean {
   return initialDone;
 }
@@ -112,6 +122,7 @@ export async function createColaborador(input: { name: string; email: string; pa
     user_number,
     type: "colaborador",
     name: input.name,
+    email: input.email.trim().toLowerCase(),
     active: true,
   });
 
@@ -198,6 +209,7 @@ export async function signup(input: SignupInput): Promise<User> {
     user_number,
     type: input.type,
     name: input.name,
+    email: input.email.trim().toLowerCase(),
     cnpj: input.cnpj ?? null,
     cpf: input.cpf ?? null,
     whatsapp: input.whatsapp ?? null,

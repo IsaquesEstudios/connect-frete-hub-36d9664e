@@ -1,4 +1,4 @@
-import type { BroadcastMessage, Message, Tag, User, UserType } from "./types";
+import type { BroadcastMessage, Message, Tag, User, UserProfilePatch, UserType } from "./types";
 
 export type BroadcastAudience =
   | { kind: "all" }
@@ -17,6 +17,7 @@ export interface Repository {
   listUsers(): User[];
   getUser(id: string): User | undefined;
   createUser(u: NewUserInput): User;
+  updateUser(id: string, patch: UserProfilePatch): User | undefined;
   // messages
   listMessages(conversationId: string): Message[];
   sendMessage(input: { fromUserId: string; toUserId: string; body: string }): Message;
