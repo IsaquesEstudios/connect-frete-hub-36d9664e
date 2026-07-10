@@ -13,6 +13,7 @@ import { getExternalUserEmails } from "@/lib/data/emails.functions";
 import { homeFor } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
+import { formatPhone } from "@/lib/format-phone";
 
 export const Route = createFileRoute("/_app/metricas")({
   head: () => ({ meta: [{ title: "Métricas — ConectaFrete" }] }),
@@ -91,7 +92,7 @@ function MetricsPage() {
       const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join("|");
       const last = c.lastMessage ? new Date(c.lastMessage.createdAt).toLocaleString() : "";
       lines.push(
-        [c.user.name, c.user.number, u.whatsapp || "", email, c.user.type, c.unreadForAdmin, last, tagLabels]
+        [c.user.name, c.user.number, formatPhone(u.whatsapp || ""), email, c.user.type, c.unreadForAdmin, last, tagLabels]
           .map(csvEscape)
           .join(";"),
       );
@@ -159,7 +160,7 @@ function MetricsPage() {
         return [
           clean(c.user.name),
           c.user.number,
-          u.whatsapp || "",
+          formatPhone(u.whatsapp || ""),
           email,
           c.user.type,
           c.unreadForAdmin,

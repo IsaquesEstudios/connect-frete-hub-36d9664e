@@ -11,6 +11,7 @@ import { homeFor, updateCurrentProfile } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserProfilePatch } from "@/lib/data";
 import { formatDoc, docPlaceholder, type DocTipo } from "@/lib/format-doc";
+import { formatPhone, phoneDigits } from "@/lib/format-phone";
 
 
 export const Route = createFileRoute("/_app/perfil")({
@@ -61,7 +62,7 @@ function toProfileForm(user: User): ProfileForm {
     ...emptyForm,
     name: user.name ?? "",
     email: user.email ?? "",
-    whatsapp: user.whatsapp ?? "",
+    whatsapp: formatPhone(user.whatsapp ?? ""),
     cpf: user.cpf ?? "",
     cidade: user.cidade ?? "",
     estado: user.estado ?? "",
@@ -140,7 +141,7 @@ function ProfilePage() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const missingWhats = !form.whatsapp || form.whatsapp.trim().length < 8;
+  const missingWhats = !form.whatsapp || phoneDigits(form.whatsapp).length < 10;
 
   const save = async () => {
     if (missingWhats) {
@@ -199,7 +200,13 @@ function ProfilePage() {
           <div className="grid gap-4 md:grid-cols-2">
             <Editable required label="Nome" value={form.name} onChange={(value) => update("name", value)} />
             <ReadOnly label="Email" value={form.email} />
-            <Editable required label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
+            <Editable
+              required
+              label="Telefone / WhatsApp"
+              value={form.whatsapp}
+              onChange={(value) => update("whatsapp", formatPhone(value))}
+              inputMode="tel"
+            />
 
             <DocumentoField
               tipo={docTipo}
@@ -259,14 +266,26 @@ function ProfilePage() {
   );
 }
 
-function Editable({ label, value, onChange, required }: { label: string; value: string; onChange: (value: string) => void; required?: boolean }) {
+function Editable({
+  label,
+  value,
+  onChange,
+  required,
+  inputMode,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+}) {
   return (
     <div className="space-y-2">
       <Label>
         {label}
         {required && <span className="ml-1 text-destructive">*</span>}
       </Label>
-      <Input value={value} onChange={(event) => onChange(event.target.value)} />
+      <Input value={value} onChange={(event) => onChange(event.target.value)} inputMode={inputMode} />
       {required && <p className="text-[11px] text-destructive">obrigatório</p>}
     </div>
   );

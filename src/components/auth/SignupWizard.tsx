@@ -16,6 +16,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
+import { formatPhone, phoneDigits, phonePlaceholder } from "@/lib/format-phone";
 
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
@@ -118,7 +119,7 @@ export function SignupWizard({
           data.senha.length >= 6 &&
           docDigitsValid(data.documento, data.documentoTipo) &&
           data.nomeFantasia.trim().length > 1 &&
-          data.whatsapp.trim().length >= 8
+          phoneDigits(data.whatsapp).length >= 10
         );
       if (step === 2) return true; // foto opcional
       if (step === 3) return !!data.perfilEmpresa;
@@ -132,7 +133,7 @@ export function SignupWizard({
       return (
         data.nome.trim().length > 1 &&
         docDigitsValid(data.documento, data.documentoTipo) &&
-        data.whatsapp.trim().length >= 8 &&
+        phoneDigits(data.whatsapp).length >= 10 &&
         /\S+@\S+\.\S+/.test(data.email) &&
         data.senha.length >= 6
       );
@@ -399,8 +400,9 @@ function StepBasic({ data, update }: StepProps) {
         <Input
           required
           value={data.whatsapp}
-          onChange={(e) => update("whatsapp", e.target.value)}
-          placeholder="(11) 90000-0000"
+          onChange={(e) => update("whatsapp", formatPhone(e.target.value))}
+          placeholder={phonePlaceholder()}
+          inputMode="tel"
           className={fieldInput}
         />
       </Field>
@@ -814,8 +816,9 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         <Input
           required
           value={data.whatsapp}
-          onChange={(e) => update("whatsapp", e.target.value)}
-          placeholder="(11) 90000-0000"
+          onChange={(e) => update("whatsapp", formatPhone(e.target.value))}
+          placeholder={phonePlaceholder()}
+          inputMode="tel"
           className={fieldInput}
         />
       </Field>

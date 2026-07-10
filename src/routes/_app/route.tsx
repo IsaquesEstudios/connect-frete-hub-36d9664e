@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth/useAuth";
 import { repo } from "@/lib/data";
+import { phoneDigits } from "@/lib/format-phone";
 
 export const Route = createFileRoute("/_app")({
   ssr: false,
@@ -23,7 +24,7 @@ function AppGate() {
   // Força usuários antigos a preencher WhatsApp (obrigatório)
   useEffect(() => {
     if (!user) return;
-    const missingWhats = !user.whatsapp || user.whatsapp.trim().length < 8;
+    const missingWhats = !user.whatsapp || phoneDigits(user.whatsapp).length < 10;
     if (missingWhats && location.pathname !== "/perfil") {
       toast.warning("Complete seu cadastro: informe seu número de WhatsApp para continuar.");
       navigate({ to: "/perfil" });
