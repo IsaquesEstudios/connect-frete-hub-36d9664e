@@ -266,14 +266,26 @@ function ProfilePage() {
   );
 }
 
-function Editable({ label, value, onChange, required }: { label: string; value: string; onChange: (value: string) => void; required?: boolean }) {
+function Editable({
+  label,
+  value,
+  onChange,
+  required,
+  inputMode,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+}) {
   return (
     <div className="space-y-2">
       <Label>
         {label}
         {required && <span className="ml-1 text-destructive">*</span>}
       </Label>
-      <Input value={value} onChange={(event) => onChange(event.target.value)} />
+      <Input value={value} onChange={(event) => onChange(event.target.value)} inputMode={inputMode} />
       {required && <p className="text-[11px] text-destructive">obrigatório</p>}
     </div>
   );
