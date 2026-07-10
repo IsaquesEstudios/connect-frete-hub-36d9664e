@@ -128,7 +128,13 @@ function ProfilePage() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  const missingWhats = !form.whatsapp || form.whatsapp.trim().length < 8;
+
   const save = async () => {
+    if (missingWhats) {
+      toast.error("Informe um número de WhatsApp válido (obrigatório).");
+      return;
+    }
     setSaving(true);
     try {
       await updateCurrentProfile(patchForUser(user, form));
@@ -139,6 +145,7 @@ function ProfilePage() {
       setSaving(false);
     }
   };
+
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-8">
