@@ -115,14 +115,16 @@ export function SignupWizard({
     if (step === 0) return data.kind !== null;
 
     if (isEmpresa) {
-      if (step === 1)
-        return (
+      if (step === 1) {
+        const baseOk =
           /\S+@\S+\.\S+/.test(data.email) &&
           data.senha.length >= 6 &&
           docDigitsValid(data.documento, data.documentoTipo) &&
-          data.nomeFantasia.trim().length > 1 &&
-          phoneDigits(data.whatsapp).length >= 10
-        );
+          phoneDigits(data.whatsapp).length >= 10;
+        // Nome fantasia só é obrigatório para CNPJ
+        if (data.documentoTipo === "cnpj") return baseOk && data.nomeFantasia.trim().length > 1;
+        return baseOk && data.nome.trim().length > 1;
+      }
       if (step === 2) return true; // foto opcional
       if (step === 3) return !!data.perfilEmpresa;
       if (step === 4) return !!data.estado && !!data.cidade;
@@ -141,11 +143,11 @@ export function SignupWizard({
       );
 
     if (step === 2) return true;
-    if (step === 3) return !!data.cidade && !!data.estado;
+    if (step === 3) return !!data.estado && !!data.cidade;
     if (step === 4) return data.placa.trim().length >= 5;
     if (step === 5) return !!data.tipoVeiculo;
-    if (step === 6) return data.rntrc.trim().length >= 4;
-    if (step === 7) return !!data.carroceria;
+    if (step === 6) return true; // RNTRC opcional
+    if (step === 7) return !!data.carroceria && data.peso.replace(/\D/g, "").length > 0;
     if (step === 8) return true; // redes sociais opcional
     return true;
   };
