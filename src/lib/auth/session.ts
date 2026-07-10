@@ -175,7 +175,8 @@ export async function createColaborador(input: { name: string; email: string; pa
     user_number,
     type: "colaborador",
     name: input.name,
-    email: input.email.trim().toLowerCase(),
+    // email vive em auth.users
+
     active: true,
   });
 
