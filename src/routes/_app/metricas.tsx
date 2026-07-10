@@ -13,6 +13,7 @@ import { getExternalUserEmails } from "@/lib/data/emails.functions";
 import { homeFor } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
+import { formatPhone } from "@/lib/format-phone";
 
 export const Route = createFileRoute("/_app/metricas")({
   head: () => ({ meta: [{ title: "Métricas — ConectaFrete" }] }),
