@@ -79,6 +79,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const audioChunksRef = useRef<Blob[]>([]);
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
+  const [editOpen, setEditOpen] = useState(false);
 
   const otherIsStaff = other.type === "admin" || other.type === "colaborador";
   const staffNumber = otherIsStaff ? other.number : me.number;
