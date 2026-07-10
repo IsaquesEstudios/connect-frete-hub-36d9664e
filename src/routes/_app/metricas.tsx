@@ -264,7 +264,7 @@ function MetricsPage() {
       rows: summaryRows.map((r) => new TableRow({ children: [mkCell(r[0], true), mkCell(r[1])] })),
     });
 
-    const userParas: Paragraph[] = [];
+    const userParas: InstanceType<typeof Paragraph>[] = [];
     for (const c of conversations) {
       const u = c.user as { whatsapp?: string; email?: string; estado?: string; cidade?: string };
       const email = u.email || emailMap[c.user.id] || "";
