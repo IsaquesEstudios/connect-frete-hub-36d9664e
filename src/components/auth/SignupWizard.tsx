@@ -116,7 +116,7 @@ export function SignupWizard({
         return (
           /\S+@\S+\.\S+/.test(data.email) &&
           data.senha.length >= 6 &&
-          data.documento.trim().length >= 11 &&
+          docDigitsValid(data.documento, data.documentoTipo) &&
           data.nomeFantasia.trim().length > 1 &&
           data.whatsapp.trim().length >= 8
         );
@@ -131,11 +131,12 @@ export function SignupWizard({
     if (step === 1)
       return (
         data.nome.trim().length > 1 &&
-        data.documento.trim().length >= 11 &&
+        docDigitsValid(data.documento, data.documentoTipo) &&
         data.whatsapp.trim().length >= 8 &&
         /\S+@\S+\.\S+/.test(data.email) &&
         data.senha.length >= 6
       );
+
     if (step === 2) return true;
     if (step === 3) return !!data.cidade && !!data.estado;
     if (step === 4) return data.placa.trim().length >= 5;
