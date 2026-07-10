@@ -104,6 +104,7 @@ export function SignupWizard({
   const [data, setData] = useState<WizardData>(initial);
   const [step, setStep] = useState(0); // 0 = pick kind; 1..N sections
   const [loading, setLoading] = useState(false);
+  const [createdUser, setCreatedUser] = useState<User | null>(null);
 
   const isEmpresa = data.kind === "empresa";
   const totalSteps = isEmpresa ? 5 : 8;
