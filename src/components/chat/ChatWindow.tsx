@@ -373,9 +373,10 @@ export function ChatWindow({ me, other, viewer }: Props) {
                       <div className="whitespace-pre-wrap break-words">{m.body}</div>
                     )}
                     <div
-                      className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} text-right ${isMedia ? "px-2 pb-1" : ""}`}
+                      className={`mt-1 text-[10px] flex items-center gap-1 justify-end ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} ${isMedia ? "px-2 pb-1" : ""}`}
                     >
-                      {fmtTime(m.createdAt)}
+                      <span>{fmtTime(m.createdAt)}</span>
+                      {mine && <MessageTicks message={m} viewer={viewer} />}
                     </div>
                   </div>
                   {isAdmin && !mine && (
