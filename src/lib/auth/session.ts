@@ -22,7 +22,8 @@ async function loadProfile(authId: string, options: { fresh?: boolean } = {}): P
     }
   }
   // Fallback: fetch directly
-  const { data } = await supabase.from("profiles").select("*").eq("id", authId).maybeSingle();
+  const { data, error } = await supabase.from("profiles").select("*").eq("id", authId).maybeSingle();
+  if (error) throw error;
   if (!data) return null;
   return profileToUser(data as Parameters<typeof profileToUser>[0]);
 }
@@ -47,7 +48,12 @@ export async function refreshCurrentUser(): Promise<User | null> {
     return null;
   }
   const profile = await loadProfile(data.session.user.id, { fresh: true });
-  if (!profile) return cachedUser;
+  if (!profile) {
+    await supabase.auth.signOut();
+    cachedUser = null;
+    notify();
+    return null;
+  }
   return applySessionProfile(profile);
 }
 

@@ -18,6 +18,7 @@ export interface Repository {
   getUser(id: string): User | undefined;
   createUser(u: NewUserInput): User;
   updateUser(id: string, patch: UserProfilePatch): User | undefined;
+  applyLocalUserPatch(id: string, patch: UserProfilePatch): User | undefined;
   // messages
   listMessages(conversationId: string): Message[];
   sendMessage(input: { fromUserId: string; toUserId: string; body: string }): Message;
