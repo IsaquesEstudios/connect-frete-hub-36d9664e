@@ -103,6 +103,56 @@ function MetricsPage() {
     URL.revokeObjectURL(url);
   }
 
+  function downloadPDF() {
+    const win = window.open("", "_blank");
+    if (!win) return;
+    const rows = conversations
+      .map(
+        (c) =>
+          `<tr><td>${escapeHtml(c.user.name)}</td><td>${escapeHtml(c.user.number)}</td><td>${escapeHtml((c.user as { email?: string }).email ?? "")}</td><td>${escapeHtml(c.user.type)}</td><td>${c.unreadForAdmin}</td><td>${c.tagIds.map((id) => escapeHtml(id)).join(", ")}</td></tr>`,
+      )
+      .join("");
+    const tagRows = tagReport
+      .map(
+        (r) =>
+          `<tr><td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.tag.color};margin-right:6px"></span>${escapeHtml(r.tag.label)}</td><td>${r.total}</td><td>${r.empresas}</td><td>${r.motoristas}</td></tr>`,
+      )
+      .join("");
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Relatório ConectaFrete</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:32px;color:#111}
+h1{margin:0 0 4px;font-size:22px}
+.sub{color:#666;font-size:12px;margin-bottom:24px}
+h2{font-size:16px;margin:24px 0 8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}
+th{background:#f3f4f6}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.card{border:1px solid #ddd;border-radius:6px;padding:8px}
+.card b{display:block;font-size:20px}.card span{font-size:11px;color:#666;text-transform:uppercase}
+</style></head><body>
+<h1>Relatório ConectaFrete</h1>
+<div class="sub">Gerado em ${new Date().toLocaleString()}</div>
+<div class="cards">
+<div class="card"><span>Empresas</span><b>${stats.empresas}</b></div>
+<div class="card"><span>Motoristas</span><b>${stats.motoristas}</b></div>
+<div class="card"><span>Ativas</span><b>${stats.active}</b></div>
+<div class="card"><span>Não lidas</span><b>${stats.unread}</b></div>
+<div class="card"><span>Tags</span><b>${stats.tags}</b></div>
+</div>
+<h2>Tags</h2>
+<table><thead><tr><th>Tag</th><th>Conversas</th><th>Empresas</th><th>Motoristas</th></tr></thead><tbody>${tagRows || '<tr><td colspan="4">Nenhuma tag.</td></tr>'}</tbody></table>
+<h2>Conversas</h2>
+<table><thead><tr><th>Nome</th><th>Número</th><th>Email</th><th>Tipo</th><th>Não lidas</th><th>Tags</th></tr></thead><tbody>${rows || '<tr><td colspan="6">Nenhuma conversa.</td></tr>'}</tbody></table>
+<script>window.onload=()=>{window.print()}</script>
+</body></html>`);
+    win.document.close();
+  }
+
+  function escapeHtml(s: string) {
+    return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+  }
+
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-5xl">
