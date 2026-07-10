@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
+
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
 import {
