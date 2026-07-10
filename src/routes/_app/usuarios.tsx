@@ -312,6 +312,25 @@ function UsuariosPage() {
         open={!!editing}
         onOpenChange={(v) => !v && setEditing(null)}
       />
+      <AlertDialog open={!!confirmBlock} onOpenChange={(v) => !v && setConfirmBlock(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bloquear {confirmBlock?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O usuário não conseguirá acessar a plataforma até ser desbloqueado por um administrador.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => confirmBlock && toggleActive(confirmBlock, false)}
+            >
+              Bloquear
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
