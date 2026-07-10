@@ -286,8 +286,8 @@ export function SignupWizard({
 function SuccessScreen({ user, onContinue }: { user: User; onContinue: () => void }) {
   const link =
     user.type === "motorista"
-      ? "https://chat.whatsapp.com/"
-      : "https://chat.whatsapp.com/";
+      ? WHATSAPP_MOTORISTAS
+      : WHATSAPP_EMPRESAS;
   const grupoLabel = user.type === "motorista" ? "motoristas" : "empresas";
   return (
     <div className="space-y-5 text-center">
