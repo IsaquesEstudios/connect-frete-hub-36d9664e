@@ -1,0 +1,87 @@
+import { Camera, ImageUp, X } from "lucide-react";
+import { useRef } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+// Converte arquivo para dataURL (~limite 1MB para não estourar payload do banco).
+async function fileToDataUrl(file: File, maxBytes = 1_500_000): Promise<string> {
+  if (file.size > maxBytes) {
+    throw new Error(`Imagem muito grande (${Math.round(file.size / 1024)} KB). Máx.: ${Math.round(maxBytes / 1024)} KB.`);
+  }
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(String(reader.result));
+    reader.onerror = () => rej(reader.error ?? new Error("Falha ao ler imagem."));
+    reader.readAsDataURL(file);
+  });
+}
+
+export function PhotoUploader({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (dataUrl: string) => void;
+}) {
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const cameraRef = useRef<HTMLInputElement | null>(null);
+
+  const handle = async (f: File | undefined | null) => {
+    if (!f) return;
+    try {
+      const dataUrl = await fileToDataUrl(f);
+      onChange(dataUrl);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border bg-muted">
+        {value ? (
+          // eslint-disable-next-line jsx-a11y/img-redundant-alt
+          <img src={value} alt="foto do perfil" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+            sem foto
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => handle(e.target.files?.[0])}
+        />
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="user"
+          className="hidden"
+          onChange={(e) => handle(e.target.files?.[0])}
+        />
+        <Button type="button" size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
+          <ImageUp className="mr-2 h-4 w-4" /> Enviar do dispositivo
+        </Button>
+        <Button type="button" size="sm" variant="outline" onClick={() => cameraRef.current?.click()}>
+          <Camera className="mr-2 h-4 w-4" /> Tirar foto
+        </Button>
+        {value && (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="text-destructive"
+            onClick={() => onChange("")}
+          >
+            <X className="mr-1 h-4 w-4" /> Remover
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}

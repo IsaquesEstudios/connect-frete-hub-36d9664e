@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserProfilePatch } from "@/lib/data";
 import { formatDoc, docPlaceholder, type DocTipo } from "@/lib/format-doc";
 import { formatPhone, phoneDigits } from "@/lib/format-phone";
+import { PhotoUploader } from "@/components/common/PhotoUploader";
 
 
 export const Route = createFileRoute("/_app/perfil")({
@@ -220,7 +221,10 @@ function ProfilePage() {
             />
             <Editable label="Cidade" value={form.cidade} onChange={(value) => update("cidade", value)} />
             <Editable label="Estado" value={form.estado} onChange={(value) => update("estado", value)} />
-            <Editable label="Foto / URL" value={form.fotoUrl} onChange={(value) => update("fotoUrl", value)} />
+            <div className="space-y-2 md:col-span-2">
+              <Label>Foto do perfil</Label>
+              <PhotoUploader value={form.fotoUrl} onChange={(v) => update("fotoUrl", v)} />
+            </div>
           </div>
 
           {user.type === "empresa" && (
