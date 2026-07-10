@@ -268,6 +268,42 @@ function Editable({ label, value, onChange }: { label: string; value: string; on
   );
 }
 
+function DocumentoField({
+  tipo,
+  value,
+  onTipoChange,
+  onValueChange,
+}: {
+  tipo: DocTipo;
+  value: string;
+  onTipoChange: (t: DocTipo) => void;
+  onValueChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-2 md:col-span-2">
+      <Label>Documento</Label>
+      <RadioGroup
+        value={tipo}
+        onValueChange={(v) => onTipoChange(v as DocTipo)}
+        className="flex gap-4"
+      >
+        <label className="flex items-center gap-2 text-sm">
+          <RadioGroupItem value="cpf" /> CPF
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <RadioGroupItem value="cnpj" /> CNPJ
+        </label>
+      </RadioGroup>
+      <Input
+        value={value}
+        onChange={(event) => onValueChange(formatDoc(event.target.value, tipo))}
+        placeholder={docPlaceholder(tipo)}
+        inputMode="numeric"
+      />
+    </div>
+  );
+
+
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
     <div>
