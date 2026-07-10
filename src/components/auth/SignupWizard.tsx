@@ -174,9 +174,10 @@ export function SignupWizard({
         password: data.senha,
         name: isEmpresa ? data.nomeFantasia.trim() : data.nome.trim(),
         type: data.kind as Kind,
-        documentoTipo: isEmpresa ? "cnpj" : data.documentoTipo,
-        cnpj: isEmpresa || data.documentoTipo === "cnpj" ? data.documento : undefined,
-        cpf: !isEmpresa && data.documentoTipo === "cpf" ? data.documento : undefined,
+        documentoTipo: data.documentoTipo,
+        cnpj: data.documentoTipo === "cnpj" ? data.documento : undefined,
+        cpf: data.documentoTipo === "cpf" ? data.documento : undefined,
+
         whatsapp: data.whatsapp,
         fotoUrl: data.fotoUrl || undefined,
         cidade: data.cidade || undefined,
