@@ -721,11 +721,11 @@ function StepTipoVeiculo({ data, update }: StepProps) {
 
 function StepRntrc({ data, update }: StepProps) {
   return (
-    <Field required label="RNTRC do veículo">
+    <Field label="RNTRC do veículo (opcional)">
       <Input
         value={data.rntrc}
         onChange={(e) => update("rntrc", e.target.value)}
-        placeholder="Digite o RNTRC"
+        placeholder="Digite o RNTRC (se tiver)"
         className={fieldInput}
       />
     </Field>
@@ -742,11 +742,23 @@ function StepCarroceria({ data, update }: StepProps) {
         groups={CARROCERIAS}
         placeholder="Selecione a carroceria"
       />
+      <Field required label="Peso (kg)">
+        <Input
+          value={data.peso ? `${Number(data.peso.replace(/\D/g, "")).toLocaleString("pt-BR")} kg` : ""}
+          onChange={(e) => {
+            const digits = e.target.value.replace(/\D/g, "").slice(0, 7);
+            update("peso", digits);
+          }}
+          placeholder="Ex.: 15.000 kg"
+          inputMode="numeric"
+          className={fieldInput}
+        />
+      </Field>
       <Field label="Observações adicionais (opcional)">
         <Input
           value={data.carroceriaObs}
           onChange={(e) => update("carroceriaObs", e.target.value)}
-          placeholder="Ex.: capacidade, portas laterais, lonas..."
+          placeholder="Ex.: portas laterais, lonas..."
           className={fieldInput}
         />
       </Field>
