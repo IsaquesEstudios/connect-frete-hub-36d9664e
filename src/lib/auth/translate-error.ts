@@ -26,7 +26,13 @@ const MAP: { pattern: RegExp; message: string }[] = [
 ].map(([p, m]) => ({ pattern: p as RegExp, message: m as string }));
 
 export function translateAuthError(err: unknown): string {
-  const raw = err instanceof Error ? err.message : String(err ?? "");
+  let raw = "";
+  if (err instanceof Error) raw = err.message;
+  else if (typeof err === "string") raw = err;
+  else if (err && typeof err === "object") {
+    const o = err as { message?: unknown; error_description?: unknown; msg?: unknown; details?: unknown; hint?: unknown; code?: unknown };
+    raw = String(o.message ?? o.error_description ?? o.msg ?? o.details ?? o.hint ?? o.code ?? "");
+  }
   for (const { pattern, message } of MAP) {
     const m = raw.match(pattern);
     if (m) return message.replace(/\$(\d)/g, (_, i) => m[Number(i)] ?? "");
