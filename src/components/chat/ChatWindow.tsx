@@ -333,8 +333,18 @@ export function ChatWindow({ me, other, viewer }: Props) {
               />
             )}
           </div>
+          {viewer === "admin" && other.type !== "admin" && (
+            <div className="mt-4">
+              <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-4 w-4 mr-1" /> Editar dados
+              </Button>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
+      <AdminEditUserDialog user={other} open={editOpen} onOpenChange={setEditOpen} />
+
+
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {groups.length === 0 && (
