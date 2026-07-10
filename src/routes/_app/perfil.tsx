@@ -286,7 +286,10 @@ function DocumentoField({
 }) {
   return (
     <div className="space-y-2 md:col-span-2">
-      <Label>Documento</Label>
+      <Label>
+        Documento<span className="ml-1 text-destructive">*</span>
+      </Label>
+
       <RadioGroup
         value={tipo}
         onValueChange={(v) => onTipoChange(v as DocTipo)}
