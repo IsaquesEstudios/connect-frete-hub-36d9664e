@@ -13,6 +13,7 @@ const MAP: { pattern: RegExp; message: string }[] = [
   [/weak password/i, "Senha muito fraca."],
   [/token has expired|invalid token/i, "Link expirado ou inválido. Solicite um novo."],
   [/same_password|new password should be different/i, "A nova senha deve ser diferente da anterior."],
+  [/user banned|banned/i, "Esta conta está desativada. Contate o administrador."],
 ].map(([p, m]) => ({ pattern: p as RegExp, message: m as string }));
 
 export function translateAuthError(err: unknown): string {
