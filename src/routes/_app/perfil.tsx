@@ -165,7 +165,14 @@ function ProfilePage() {
           </div>
         </div>
 
+        {missingWhats && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            <strong>Complete seu cadastro:</strong> informe seu número de WhatsApp abaixo para continuar usando o sistema.
+          </div>
+        )}
+
         <section className="grid gap-4 rounded-md border bg-card p-4 md:grid-cols-3 md:p-6">
+
           <ReadOnly label="Número" value={user.number} />
           <ReadOnly label="Tipo" value={profileTypeLabel(user.type)} />
           <ReadOnly label="Criado em" value={formatDate(user.createdAt)} />
