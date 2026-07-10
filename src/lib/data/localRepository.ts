@@ -77,6 +77,10 @@ class LocalRepository implements Repository {
     return updated;
   }
 
+  applyLocalUserPatch(id: string, patch: UserProfilePatch): User | undefined {
+    return this.updateUser(id, patch);
+  }
+
   listMessages(conversationId: string): Message[] {
     return readJSON<Message[]>(K_MSGS, [])
       .filter((m) => m.conversationId === conversationId)

@@ -12,29 +12,81 @@ function notify() {
   listeners.forEach((l) => l());
 }
 
-async function loadProfile(authId: string): Promise<User | null> {
+async function loadProfile(authId: string, options: { fresh?: boolean } = {}): Promise<User | null> {
   // First try cache (populated by repo bootstrap)
-  for (let i = 0; i < 30; i++) {
-    const u = repo.getUser(authId);
-    if (u) return u;
-    await new Promise((r) => setTimeout(r, 100));
+  if (!options.fresh) {
+    for (let i = 0; i < 30; i++) {
+      const u = repo.getUser(authId);
+      if (u) return u;
+      await new Promise((r) => setTimeout(r, 100));
+    }
   }
   // Fallback: fetch directly
-  const { data } = await supabase.from("profiles").select("*").eq("id", authId).maybeSingle();
+  const { data, error } = await supabase.from("profiles").select("*").eq("id", authId).maybeSingle();
+  if (error) throw error;
   if (!data) return null;
   return profileToUser(data as Parameters<typeof profileToUser>[0]);
+}
+
+async function applySessionProfile(profile: User | null): Promise<User | null> {
+  if (profile?.active === false) {
+    await supabase.auth.signOut();
+    cachedUser = null;
+    notify();
+    return null;
+  }
+  if (profile) cachedUser = profile;
+  notify();
+  return cachedUser;
+}
+
+export async function refreshCurrentUser(): Promise<User | null> {
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) {
+    cachedUser = null;
+    notify();
+    return null;
+  }
+  let profile: User | null = null;
+  try {
+    profile = await loadProfile(data.session.user.id, { fresh: true });
+  } catch {
+    await supabase.auth.signOut();
+    cachedUser = null;
+    notify();
+    return null;
+  }
+  if (!profile) {
+    await supabase.auth.signOut();
+    cachedUser = null;
+    notify();
+    return null;
+  }
+  return applySessionProfile(profile);
 }
 
 async function bootstrap() {
   const { data } = await supabase.auth.getSession();
   if (data.session) {
-    cachedUser = await loadProfile(data.session.user.id);
+    try {
+      const profile = await loadProfile(data.session.user.id, { fresh: true });
+      await applySessionProfile(profile);
+    } catch {
+      await supabase.auth.signOut();
+      cachedUser = null;
+    }
   }
   initialDone = true;
   notify();
   supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (session) cachedUser = await loadProfile(session.user.id);
-    else cachedUser = null;
+    if (session) {
+      try {
+        await applySessionProfile(await loadProfile(session.user.id, { fresh: true }));
+      } catch {
+        await supabase.auth.signOut();
+        cachedUser = null;
+      }
+    } else cachedUser = null;
     notify();
   });
 }

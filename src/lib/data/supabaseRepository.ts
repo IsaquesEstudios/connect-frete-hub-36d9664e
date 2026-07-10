@@ -306,6 +306,14 @@ class SupabaseRepository implements Repository {
     return user;
   }
 
+  applyLocalUserPatch(id: string, patch: UserProfilePatch): User | undefined {
+    const user = this.getUser(id);
+    if (!user) return undefined;
+    Object.assign(user, patch);
+    this.notify();
+    return user;
+  }
+
   // ============ messages ============
   listMessages(conversationId: string) {
     return this.messages

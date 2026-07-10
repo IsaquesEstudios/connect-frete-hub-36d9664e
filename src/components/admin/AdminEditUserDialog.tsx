@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { PhotoUploader } from "@/components/common/PhotoUploader";
 import { repo } from "@/lib/data";
+import { setExternalUserActive } from "@/lib/data/admin-users.functions";
 import { translateAuthError } from "@/lib/auth/translate-error";
 import { formatPhone } from "@/lib/format-phone";
 import { formatDoc } from "@/lib/format-doc";
@@ -79,7 +80,6 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
         cidade: form.cidade,
         estado: form.estado,
         fotoUrl: form.fotoUrl,
-        active,
       };
       if (user.type === "empresa") {
         patch.cnpj = form.cnpj;
@@ -96,7 +96,11 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
         patch.rntrc = form.rntrc;
         patch.carroceria = form.carroceria;
       }
-      await repo.updateUser(user.id, patch);
+      repo.updateUser(user.id, patch);
+      if (active !== (user.active !== false)) {
+        await setExternalUserActive({ data: { userId: user.id, active } });
+        repo.applyLocalUserPatch(user.id, { active });
+      }
       toast.success("Dados atualizados.");
       onSaved?.();
       onOpenChange(false);
