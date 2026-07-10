@@ -199,6 +199,118 @@ function MetricsPage() {
     doc.save(`relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
 
+  async function downloadTXT() {
+    const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
+    const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
+    const L: string[] = [];
+    L.push("RELATÓRIO CONECTAFRETE");
+    L.push(`Gerado em: ${new Date().toLocaleString()}`);
+    L.push(`Filtros: UF=${filterUf}  Tag=${filterTag === "todos" ? "todas" : tagsById[filterTag] || filterTag}`);
+    L.push("");
+    L.push("RESUMO");
+    L.push(`- Empresas: ${stats.empresas}`);
+    L.push(`- Motoristas: ${stats.motoristas}`);
+    L.push(`- Conversas ativas: ${stats.active}`);
+    L.push(`- Não lidas: ${stats.unread}`);
+    L.push(`- Tags: ${stats.tags}`);
+    L.push("");
+    L.push("USUÁRIOS");
+    for (const c of conversations) {
+      const u = c.user as { whatsapp?: string; email?: string; estado?: string; cidade?: string };
+      const email = u.email || emailMap[c.user.id] || "";
+      const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join(", ");
+      L.push(`• ${c.user.name} [${c.user.type}]`);
+      L.push(`  Código: ${c.user.number}`);
+      if (u.whatsapp) L.push(`  WhatsApp: ${formatPhone(u.whatsapp)}`);
+      if (email) L.push(`  Email: ${email}`);
+      if (u.cidade || u.estado) L.push(`  Local: ${[u.cidade, u.estado].filter(Boolean).join(" / ")}`);
+      if (tagLabels) L.push(`  Tags: ${tagLabels}`);
+      L.push(`  Não lidas: ${c.unreadForAdmin}`);
+      L.push("");
+    }
+    const blob = new Blob([L.join("\n")], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async function downloadWord() {
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType } = await import("docx");
+    const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
+    const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
+
+    const summaryRows = [
+      ["Empresas", String(stats.empresas)],
+      ["Motoristas", String(stats.motoristas)],
+      ["Conversas ativas", String(stats.active)],
+      ["Não lidas", String(stats.unread)],
+      ["Tags", String(stats.tags)],
+    ];
+
+    const mkCell = (text: string, bold = false) =>
+      new TableCell({
+        width: { size: 4500, type: WidthType.DXA },
+        children: [new Paragraph({ children: [new TextRun({ text, bold })] })],
+      });
+
+    const summaryTable = new Table({
+      width: { size: 9000, type: WidthType.DXA },
+      columnWidths: [4500, 4500],
+      rows: summaryRows.map((r) => new TableRow({ children: [mkCell(r[0], true), mkCell(r[1])] })),
+    });
+
+    const userParas: Paragraph[] = [];
+    for (const c of conversations) {
+      const u = c.user as { whatsapp?: string; email?: string; estado?: string; cidade?: string };
+      const email = u.email || emailMap[c.user.id] || "";
+      const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join(", ");
+      userParas.push(
+        new Paragraph({ children: [new TextRun({ text: `${c.user.name} `, bold: true }), new TextRun({ text: `[${c.user.type}]` })] }),
+        new Paragraph(`  Código: ${c.user.number}`),
+        new Paragraph(`  WhatsApp: ${u.whatsapp ? formatPhone(u.whatsapp) : "—"}`),
+        new Paragraph(`  Email: ${email || "—"}`),
+        new Paragraph(`  Local: ${[u.cidade, u.estado].filter(Boolean).join(" / ") || "—"}`),
+        new Paragraph(`  Tags: ${tagLabels || "—"}`),
+        new Paragraph(`  Não lidas admin: ${c.unreadForAdmin}`),
+        new Paragraph(""),
+      );
+    }
+
+    const wordDoc = new Document({
+      sections: [{
+        properties: {},
+        children: [
+          new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Relatório ConectaFrete")] }),
+          new Paragraph(`Gerado em ${new Date().toLocaleString()}`),
+          new Paragraph(`Filtros: UF=${filterUf}  Tag=${filterTag === "todos" ? "todas" : tagsById[filterTag] || filterTag}`),
+          new Paragraph(""),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("Resumo")] }),
+          summaryTable,
+          new Paragraph(""),
+          new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("Usuários")] }),
+          ...userParas,
+        ],
+      }],
+    });
+
+    const blob = await Packer.toBlob(wordDoc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+
+
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -223,8 +335,41 @@ function MetricsPage() {
               <DropdownMenuItem onClick={downloadPDF}>
                 <FileText className="h-4 w-4 mr-2" /> PDF
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={downloadWord}>
+                <FileType className="h-4 w-4 mr-2" /> Word (.docx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={downloadTXT}>
+                <FileCode className="h-4 w-4 mr-2" /> Bloco de notas (.txt)
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Estado:</span>
+            <Select value={filterUf} onValueChange={setFilterUf}>
+              <SelectTrigger className="h-8 w-[130px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                {ufOptions.map((uf) => (
+                  <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Tag:</span>
+            <Select value={filterTag} onValueChange={setFilterTag}>
+              <SelectTrigger className="h-8 w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas</SelectItem>
+                {tags.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>{t.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
 
