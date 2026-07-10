@@ -1,6 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Pencil, Search, Users } from "lucide-react";
+import { toast } from "sonner";
+import { Lock, LockOpen, Pencil, Search, Users } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { translateAuthError } from "@/lib/auth/translate-error";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -69,6 +81,18 @@ function UsuariosPage() {
   const [query, setQuery] = useState("");
   const [emails, setEmails] = useState<Record<string, string>>({});
   const [editing, setEditing] = useState<User | null>(null);
+  const [confirmBlock, setConfirmBlock] = useState<User | null>(null);
+
+  const toggleActive = async (u: User, next: boolean) => {
+    try {
+      await repo.updateUser(u.id, { active: next });
+      toast.success(next ? "Usuário desbloqueado." : "Usuário bloqueado.");
+    } catch (e) {
+      toast.error(translateAuthError(e));
+    } finally {
+      setConfirmBlock(null);
+    }
+  };
 
   useEffect(() => {
     if (user && user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
@@ -232,7 +256,12 @@ function UsuariosPage() {
                       <td className="px-4 py-3">{doc}</td>
                       <td className="px-4 py-3">{cidade}</td>
                       <td className="px-4 py-3">
-                        {online ? (
+                        {u.active === false ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600">
+                            <Lock className="h-3 w-3" />
+                            bloqueado
+                          </span>
+                        ) : online ? (
                           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
                             <span className="h-2 w-2 rounded-full bg-emerald-500" />
                             online
@@ -243,11 +272,33 @@ function UsuariosPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" onClick={() => setEditing(u)}>
                           <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
                         </Button>
+                        {u.type !== "admin" && (
+                          u.active === false ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-emerald-600 hover:text-emerald-700"
+                              onClick={() => toggleActive(u, true)}
+                            >
+                              <LockOpen className="mr-1 h-3.5 w-3.5" /> Desbloquear
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => setConfirmBlock(u)}
+                            >
+                              <Lock className="mr-1 h-3.5 w-3.5" /> Bloquear
+                            </Button>
+                          )
+                        )}
                       </td>
+
                     </tr>
                   );
                 })}
@@ -261,6 +312,25 @@ function UsuariosPage() {
         open={!!editing}
         onOpenChange={(v) => !v && setEditing(null)}
       />
+      <AlertDialog open={!!confirmBlock} onOpenChange={(v) => !v && setConfirmBlock(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bloquear {confirmBlock?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O usuário não conseguirá acessar a plataforma até ser desbloqueado por um administrador.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => confirmBlock && toggleActive(confirmBlock, false)}
+            >
+              Bloquear
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
