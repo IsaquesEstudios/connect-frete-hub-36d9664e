@@ -765,14 +765,36 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="CNPJ">
+      <div className={fieldWrap}>
+        <div className={fieldLabel}>Tipo de documento</div>
+        <RadioGroup
+          value={data.documentoTipo}
+          onValueChange={(v) => {
+            update("documentoTipo", v as "cnpj" | "cpf");
+            update("documento", "");
+          }}
+          className="mt-1 flex gap-4"
+        >
+          <label className="flex items-center gap-2 text-sm text-white">
+            <RadioGroupItem value="cnpj" className="border-white/40 text-sky-300" />
+            CNPJ
+          </label>
+          <label className="flex items-center gap-2 text-sm text-white">
+            <RadioGroupItem value="cpf" className="border-white/40 text-sky-300" />
+            CPF
+          </label>
+        </RadioGroup>
+      </div>
+      <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
-          onChange={(e) => update("documento", e.target.value)}
-          placeholder="00.000.000/0001-00"
+          onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
+          placeholder={docPlaceholder(data.documentoTipo)}
+          inputMode="numeric"
           className={fieldInput}
         />
       </Field>
+
       <Field label="Nome fantasia">
         <Input
           value={data.nomeFantasia}
