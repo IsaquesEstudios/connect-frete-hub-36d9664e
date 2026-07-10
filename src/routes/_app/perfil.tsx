@@ -319,9 +319,9 @@ function DocumentoField({
 
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
-      <div className="mt-1 text-sm font-semibold text-foreground">{value || "Não informado"}</div>
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Input value={value || "Não informado"} disabled className="bg-muted text-muted-foreground" />
     </div>
   );
 }
