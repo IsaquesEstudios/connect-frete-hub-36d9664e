@@ -58,6 +58,7 @@ interface WizardData {
   rntrc: string;
   carroceria: string;
   carroceriaObs: string;
+  peso: string; // dígitos apenas
   // Redes sociais
   instagram: string;
   facebook: string;
@@ -85,6 +86,7 @@ const initial: WizardData = {
   rntrc: "",
   carroceria: "",
   carroceriaObs: "",
+  peso: "",
   instagram: "",
   facebook: "",
   youtube: "",
