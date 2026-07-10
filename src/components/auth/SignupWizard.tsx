@@ -119,7 +119,7 @@ export function SignupWizard({
           data.senha.length >= 6 &&
           docDigitsValid(data.documento, data.documentoTipo) &&
           data.nomeFantasia.trim().length > 1 &&
-          data.whatsapp.trim().length >= 8
+          phoneDigits(data.whatsapp).length >= 10
         );
       if (step === 2) return true; // foto opcional
       if (step === 3) return !!data.perfilEmpresa;
