@@ -89,7 +89,6 @@ function toProfileForm(user: User): ProfileForm {
 function patchForUser(user: User, form: ProfileForm): UserProfilePatch {
   const patch: UserProfilePatch = {
     name: form.name,
-    email: form.email,
     whatsapp: form.whatsapp,
     cpf: form.cpf,
     cidade: form.cidade,
@@ -199,7 +198,7 @@ function ProfilePage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <Editable required label="Nome" value={form.name} onChange={(value) => update("name", value)} />
-            <Editable required label="Email" value={form.email} onChange={(value) => update("email", value)} />
+            <ReadOnly label="Email" value={form.email} />
             <Editable required label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
 
             <DocumentoField
