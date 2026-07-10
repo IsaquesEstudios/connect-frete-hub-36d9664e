@@ -365,7 +365,7 @@ function StepBasic({ data, update }: StepProps) {
         <div className={fieldLabel}>Tipo de documento</div>
         <RadioGroup
           value={data.documentoTipo}
-          onValueChange={(v) => update("documentoTipo", v as "cnpj" | "cpf")}
+          onValueChange={(v) => { update("documentoTipo", v as "cnpj" | "cpf"); update("documento", ""); }}
           className="mt-1 flex gap-4"
         >
           <label className="flex items-center gap-2 text-sm text-white">
