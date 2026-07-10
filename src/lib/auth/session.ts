@@ -262,7 +262,8 @@ export async function signup(input: SignupInput): Promise<User> {
     user_number,
     type: input.type,
     name: input.name,
-    email: input.email.trim().toLowerCase(),
+    // email vive em auth.users; não replicar em profiles
+
     cnpj: input.cnpj ?? null,
     cpf: input.cpf ?? null,
     whatsapp: input.whatsapp ?? null,
