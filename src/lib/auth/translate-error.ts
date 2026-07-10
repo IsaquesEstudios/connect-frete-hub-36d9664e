@@ -14,6 +14,15 @@ const MAP: { pattern: RegExp; message: string }[] = [
   [/token has expired|invalid token/i, "Link expirado ou inválido. Solicite um novo."],
   [/same_password|new password should be different/i, "A nova senha deve ser diferente da anterior."],
   [/user banned|banned/i, "Esta conta está desativada. Contate o administrador."],
+  [/unable to validate email address.*invalid format/i, "Email inválido. Verifique o formato (ex: nome@dominio.com)."],
+  [/email address .* is invalid/i, "Email inválido. Verifique o formato (ex: nome@dominio.com)."],
+  [/email address .* cannot be used/i, "Este email não pode ser usado. Tente outro."],
+  [/duplicate key value|already exists/i, "Este registro já existe."],
+  [/permission denied|not authorized|forbidden/i, "Sem permissão para executar esta ação."],
+  [/violates row-level security/i, "Sem permissão para executar esta ação."],
+  [/violates.*not-null|null value in column/i, "Preencha todos os campos obrigatórios."],
+  [/violates unique constraint/i, "Este valor já está em uso."],
+  [/jwt|token/i, "Sessão expirada. Faça login novamente."],
 ].map(([p, m]) => ({ pattern: p as RegExp, message: m as string }));
 
 export function translateAuthError(err: unknown): string {
