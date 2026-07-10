@@ -278,7 +278,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
           <div className="mt-6 space-y-3 text-sm max-h-[65vh] overflow-y-auto pr-1">
             <ProfileField label="Tipo" value={other.type} />
             {other.email && <ProfileField label="Email" value={other.email} />}
-            {other.whatsapp && <ProfileField label="WhatsApp" value={other.whatsapp} />}
+            {other.whatsapp && <ProfileField label="WhatsApp" value={formatPhone(other.whatsapp)} />}
             {other.cpf && <ProfileField label="CPF" value={other.cpf} />}
             {other.type === "empresa" && (
               <>
