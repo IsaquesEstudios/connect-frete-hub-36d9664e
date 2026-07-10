@@ -198,9 +198,10 @@ function ProfilePage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Editable label="Nome" value={form.name} onChange={(value) => update("name", value)} />
-            <Editable label="Email" value={form.email} onChange={(value) => update("email", value)} />
-            <Editable label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
+            <Editable required label="Nome" value={form.name} onChange={(value) => update("name", value)} />
+            <Editable required label="Email" value={form.email} onChange={(value) => update("email", value)} />
+            <Editable required label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
+
             <DocumentoField
               tipo={docTipo}
               value={docTipo === "cpf" ? form.cpf : form.cnpj}
@@ -259,14 +260,19 @@ function ProfilePage() {
   );
 }
 
-function Editable({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function Editable({ label, value, onChange, required }: { label: string; value: string; onChange: (value: string) => void; required?: boolean }) {
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        {required && <span className="ml-1 text-destructive">*</span>}
+      </Label>
       <Input value={value} onChange={(event) => onChange(event.target.value)} />
+      {required && <p className="text-[11px] text-destructive">obrigatório</p>}
     </div>
   );
 }
+
 
 function DocumentoField({
   tipo,
@@ -281,7 +287,10 @@ function DocumentoField({
 }) {
   return (
     <div className="space-y-2 md:col-span-2">
-      <Label>Documento</Label>
+      <Label>
+        Documento<span className="ml-1 text-destructive">*</span>
+      </Label>
+
       <RadioGroup
         value={tipo}
         onValueChange={(v) => onTipoChange(v as DocTipo)}
@@ -300,7 +309,9 @@ function DocumentoField({
         placeholder={docPlaceholder(tipo)}
         inputMode="numeric"
       />
+      <p className="text-[11px] text-destructive">obrigatório</p>
     </div>
+
   );
 }
 

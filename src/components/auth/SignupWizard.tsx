@@ -338,22 +338,29 @@ const fieldInput =
 function Field({
   label,
   children,
+  required,
 }: {
   label: string;
   children: React.ReactNode;
+  required?: boolean;
 }) {
   return (
     <div className={fieldWrap}>
-      <div className={fieldLabel}>{label}</div>
+      <div className={fieldLabel}>
+        {label}
+        {required && <span className="ml-1 text-red-500">*</span>}
+      </div>
       {children}
+      {required && <div className="text-[10px] text-red-500 mt-0.5">obrigatório</div>}
     </div>
   );
 }
 
+
 function StepBasic({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
-      <Field label="Nome completo">
+      <Field required label="Nome completo">
         <Input
           value={data.nome}
           onChange={(e) => update("nome", e.target.value)}
@@ -362,7 +369,7 @@ function StepBasic({ data, update }: StepProps) {
         />
       </Field>
       <div className={fieldWrap}>
-        <div className={fieldLabel}>Tipo de documento</div>
+        <div className={fieldLabel}>Tipo de documento<span className="ml-1 text-red-500">*</span></div>
         <RadioGroup
           value={data.documentoTipo}
           onValueChange={(v) => { update("documentoTipo", v as "cnpj" | "cpf"); update("documento", ""); }}
@@ -378,7 +385,7 @@ function StepBasic({ data, update }: StepProps) {
           </label>
         </RadioGroup>
       </div>
-      <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
+      <Field required label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
           onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
@@ -388,7 +395,7 @@ function StepBasic({ data, update }: StepProps) {
         />
       </Field>
 
-      <Field label="Whatsapp *">
+      <Field required label="Whatsapp">
         <Input
           required
           value={data.whatsapp}
@@ -397,7 +404,7 @@ function StepBasic({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Email *">
+      <Field required label="Email">
         <Input
           required
           type="email"
@@ -407,7 +414,7 @@ function StepBasic({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Senha (mín. 6)">
+      <Field required label="Senha (mín. 6)">
         <Input
           type="password"
           minLength={6}
@@ -561,7 +568,7 @@ function StepLocal({ data, update }: StepProps) {
       </div>
 
       <div className={cn(fieldWrap, !data.cidade && "opacity-50")}>
-        <Label className={fieldLabel}>Estado</Label>
+        <Label className={fieldLabel}>Estado<span className="ml-1 text-red-500">*</span></Label>
         <Select
           value={data.estado}
           onValueChange={(v) => update("estado", v)}
@@ -586,7 +593,7 @@ function StepLocal({ data, update }: StepProps) {
 function StepPlaca({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
-      <Field label="Placa do veículo">
+      <Field required label="Placa do veículo">
         <Input
           value={data.placa}
           onChange={(e) => update("placa", e.target.value.toUpperCase())}
@@ -659,7 +666,7 @@ function StepTipoVeiculo({ data, update }: StepProps) {
 
 function StepRntrc({ data, update }: StepProps) {
   return (
-    <Field label="RNTRC do veículo">
+    <Field required label="RNTRC do veículo">
       <Input
         value={data.rntrc}
         onChange={(e) => update("rntrc", e.target.value)}
@@ -745,7 +752,7 @@ function StepRedesSociais({ data, update }: StepProps) {
 function StepBasicEmpresa({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
-      <Field label="Email *">
+      <Field required label="Email">
         <Input
           required
           type="email"
@@ -755,7 +762,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Senha (mín. 6)">
+      <Field required label="Senha (mín. 6)">
         <Input
           type="password"
           minLength={6}
@@ -766,7 +773,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
       <div className={fieldWrap}>
-        <div className={fieldLabel}>Tipo de documento</div>
+        <div className={fieldLabel}>Tipo de documento<span className="ml-1 text-red-500">*</span></div>
         <RadioGroup
           value={data.documentoTipo}
           onValueChange={(v) => {
@@ -785,7 +792,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           </label>
         </RadioGroup>
       </div>
-      <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
+      <Field required label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
           onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
@@ -795,7 +802,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
 
-      <Field label="Nome fantasia">
+      <Field required label="Nome fantasia">
         <Input
           value={data.nomeFantasia}
           onChange={(e) => update("nomeFantasia", e.target.value)}
@@ -803,7 +810,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Whatsapp *">
+      <Field required label="Whatsapp">
         <Input
           required
           value={data.whatsapp}
@@ -868,7 +875,7 @@ function StepLocalByEstado({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
       <div className={fieldWrap}>
-        <Label className={fieldLabel}>Estado</Label>
+        <Label className={fieldLabel}>Estado<span className="ml-1 text-red-500">*</span></Label>
         <Select
           value={data.estado}
           onValueChange={(v) => {
@@ -891,7 +898,7 @@ function StepLocalByEstado({ data, update }: StepProps) {
       </div>
 
       <div className={cn(fieldWrap, !data.estado && "opacity-50")}>
-        <Label className={fieldLabel}>Cidade</Label>
+        <Label className={fieldLabel}>Cidade<span className="ml-1 text-red-500">*</span></Label>
         <Select
           value={data.cidade}
           onValueChange={(v) => update("cidade", v)}
