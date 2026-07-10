@@ -27,6 +27,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+function MessageTicks({ message, viewer }: { message: Message; viewer: "admin" | "user" }) {
+  if (message.id.startsWith("tmp_")) return <Clock className="h-3 w-3 opacity-80" aria-label="Enviando" />;
+  const read = viewer === "admin" ? message.readByUser : message.readByAdmin;
+  if (read) return <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label="Lida" />;
+  return <CheckCheck className="h-3.5 w-3.5 opacity-80" aria-label="Entregue" />;
+}
+
 function fmtTime(ts: number) {
   const d = new Date(ts);
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
