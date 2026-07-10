@@ -132,9 +132,17 @@ function MetricsPage() {
       headStyles: { fillColor: [30, 64, 175] },
     });
 
+    // jsPDF standard fonts don't support emoji/non-latin1 — strip to avoid "Ø=ÜÍ" garbage.
+    const clean = (s: string) =>
+      (s ?? "")
+        // eslint-disable-next-line no-control-regex
+        .replace(/[^\x00-\xFF]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
     autoTable(doc, {
       head: [["Tag", "Conversas", "Empresas", "Motoristas"]],
-      body: tagReport.map((r) => [r.tag.label, r.total, r.empresas, r.motoristas]),
+      body: tagReport.map((r) => [clean(r.tag.label), r.total, r.empresas, r.motoristas]),
       styles: { fontSize: 9 },
       headStyles: { fillColor: [30, 64, 175] },
     });
@@ -144,12 +152,12 @@ function MetricsPage() {
       body: conversations.map((c) => {
         const u = c.user as { whatsapp?: string; email?: string };
         return [
-          c.user.name,
-          u.whatsapp || c.user.number,
+          clean(c.user.name),
+          u.whatsapp || "",
           u.email || "",
           c.user.type,
           c.unreadForAdmin,
-          c.tagIds.map((id) => tagsById[id] || id).join(", "),
+          clean(c.tagIds.map((id) => tagsById[id] || id).join(", ")),
         ];
       }),
       styles: { fontSize: 8 },
