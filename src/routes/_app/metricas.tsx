@@ -87,7 +87,6 @@ function MetricsPage() {
     lines.push("Nome;Código;Telefone;Email;Tipo;Não lidas admin;Última mensagem;Tags");
     const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
     for (const c of conversations) {
-      const umber of conversations) {
       const u = c.user as { whatsapp?: string; email?: string };
       const email = u.email || emailMap[c.user.id] || "";
       const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join("|");
