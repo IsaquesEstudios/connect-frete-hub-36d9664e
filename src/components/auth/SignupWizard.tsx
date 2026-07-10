@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
 import { formatPhone, phoneDigits, phonePlaceholder } from "@/lib/format-phone";
+import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
@@ -286,8 +287,8 @@ export function SignupWizard({
 function SuccessScreen({ user, onContinue }: { user: User; onContinue: () => void }) {
   const link =
     user.type === "motorista"
-      ? "https://chat.whatsapp.com/"
-      : "https://chat.whatsapp.com/";
+      ? WHATSAPP_MOTORISTAS
+      : WHATSAPP_EMPRESAS;
   const grupoLabel = user.type === "motorista" ? "motoristas" : "empresas";
   return (
     <div className="space-y-5 text-center">
