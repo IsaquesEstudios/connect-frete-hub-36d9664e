@@ -88,7 +88,12 @@ class LocalRepository implements Repository {
   }
 
   sendMessage(input: { fromUserId: string; toUserId: string; body: string }): Message {
-    const conversationId = input.fromUserId === ADMIN_ID ? input.toUserId : input.fromUserId;
+    const isStaff = (id: string) => {
+      const u = this.getUser(id);
+      return u?.type === "admin" || u?.type === "colaborador";
+    };
+    const fromStaff = isStaff(input.fromUserId);
+    const conversationId = fromStaff ? input.toUserId : input.fromUserId;
     const msg: Message = {
       id: `m_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       conversationId,
@@ -96,8 +101,8 @@ class LocalRepository implements Repository {
       toUserId: input.toUserId,
       body: input.body,
       createdAt: Date.now(),
-      readByAdmin: input.fromUserId === ADMIN_ID,
-      readByUser: input.fromUserId !== ADMIN_ID,
+      readByAdmin: fromStaff,
+      readByUser: !fromStaff,
     };
     const all = readJSON<Message[]>(K_MSGS, []);
     all.push(msg);
