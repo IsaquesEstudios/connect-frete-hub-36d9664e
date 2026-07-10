@@ -1,5 +1,6 @@
-import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Outlet, createFileRoute, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { toast } from "sonner";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -13,10 +14,21 @@ export const Route = createFileRoute("/_app")({
 function AppGate() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
+
+  // Força usuários antigos a preencher WhatsApp (obrigatório)
+  useEffect(() => {
+    if (!user) return;
+    const missingWhats = !user.whatsapp || user.whatsapp.trim().length < 8;
+    if (missingWhats && location.pathname !== "/perfil") {
+      toast.warning("Complete seu cadastro: informe seu número de WhatsApp para continuar.");
+      navigate({ to: "/perfil" });
+    }
+  }, [user, location.pathname, navigate]);
 
   // Presence: keep this user marked online while mounted
   useEffect(() => {
@@ -45,3 +57,4 @@ function AppGate() {
     </SidebarProvider>
   );
 }
+

@@ -128,7 +128,13 @@ function ProfilePage() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  const missingWhats = !form.whatsapp || form.whatsapp.trim().length < 8;
+
   const save = async () => {
+    if (missingWhats) {
+      toast.error("Informe um número de WhatsApp válido (obrigatório).");
+      return;
+    }
     setSaving(true);
     try {
       await updateCurrentProfile(patchForUser(user, form));
@@ -139,6 +145,7 @@ function ProfilePage() {
       setSaving(false);
     }
   };
+
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-8">
@@ -158,7 +165,14 @@ function ProfilePage() {
           </div>
         </div>
 
+        {missingWhats && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            <strong>Complete seu cadastro:</strong> informe seu número de WhatsApp abaixo para continuar usando o sistema.
+          </div>
+        )}
+
         <section className="grid gap-4 rounded-md border bg-card p-4 md:grid-cols-3 md:p-6">
+
           <ReadOnly label="Número" value={user.number} />
           <ReadOnly label="Tipo" value={profileTypeLabel(user.type)} />
           <ReadOnly label="Criado em" value={formatDate(user.createdAt)} />
