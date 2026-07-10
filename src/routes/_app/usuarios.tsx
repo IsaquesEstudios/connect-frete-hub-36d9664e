@@ -272,32 +272,42 @@ function UsuariosPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <Button size="sm" variant="ghost" onClick={() => setEditing(u)}>
-                          <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
-                        </Button>
-                        {u.type !== "admin" && (
-                          u.active === false ? (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-emerald-600 hover:text-emerald-700"
-                              onClick={() => toggleActive(u, true)}
-                            >
-                              <LockOpen className="mr-1 h-3.5 w-3.5" /> Desbloquear
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-red-600 hover:text-red-700"
-                              onClick={() => setConfirmBlock(u)}
-                            >
-                              <Lock className="mr-1 h-3.5 w-3.5" /> Bloquear
-                            </Button>
-                          )
-                        )}
+                      <td className="px-2 py-3 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Editar"
+                            onClick={() => setEditing(u)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          {u.type !== "admin" && (
+                            u.active === false ? (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                title="Desbloquear usuário"
+                                className="text-emerald-600 hover:text-emerald-700"
+                                onClick={() => toggleActive(u, true)}
+                              >
+                                <LockOpen className="h-4 w-4" />
+                              </Button>
+                            ) : (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                title="Bloquear usuário"
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => setConfirmBlock(u)}
+                              >
+                                <Lock className="h-4 w-4" />
+                              </Button>
+                            )
+                          )}
+                        </div>
                       </td>
+
 
                     </tr>
                   );
