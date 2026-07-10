@@ -200,7 +200,13 @@ function ProfilePage() {
           <div className="grid gap-4 md:grid-cols-2">
             <Editable required label="Nome" value={form.name} onChange={(value) => update("name", value)} />
             <ReadOnly label="Email" value={form.email} />
-            <Editable required label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
+            <Editable
+              required
+              label="Telefone / WhatsApp"
+              value={form.whatsapp}
+              onChange={(value) => update("whatsapp", formatPhone(value))}
+              inputMode="tel"
+            />
 
             <DocumentoField
               tipo={docTipo}
