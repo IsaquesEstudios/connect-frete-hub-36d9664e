@@ -208,15 +208,6 @@ function ProfilePage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <Editable label="Nome fantasia" value={form.nomeFantasia} onChange={(value) => update("nomeFantasia", value)} />
                 <Editable label="Perfil" value={form.perfilEmpresa} onChange={(value) => update("perfilEmpresa", value)} />
-
-
-          {user.type === "empresa" && (
-            <div className="space-y-4 border-t pt-5">
-              <h2 className="text-lg font-semibold text-foreground">Dados da empresa</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                <Editable label="Nome fantasia" value={form.nomeFantasia} onChange={(value) => update("nomeFantasia", value)} />
-                <Editable label="CNPJ" value={form.cnpj} onChange={(value) => update("cnpj", value)} />
-                <Editable label="Perfil" value={form.perfilEmpresa} onChange={(value) => update("perfilEmpresa", value)} />
                 <div className="space-y-2 md:col-span-2">
                   <Label>Site / Redes sociais</Label>
                   <Textarea
@@ -228,6 +219,7 @@ function ProfilePage() {
               </div>
             </div>
           )}
+
 
           {user.type === "motorista" && (
             <div className="space-y-4 border-t pt-5">
