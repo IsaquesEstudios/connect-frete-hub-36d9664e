@@ -163,9 +163,21 @@ th{background:#f3f4f6}
               Visão geral das conversas e usuários da plataforma.
             </p>
           </div>
-          <Button onClick={downloadReport} className="shrink-0">
-            <Download className="h-4 w-4 mr-2" /> Gerar relatório
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="shrink-0">
+                <Download className="h-4 w-4 mr-2" /> Gerar relatório
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={downloadReport}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" /> Excel (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={downloadPDF}>
+                <FileText className="h-4 w-4 mr-2" /> PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
 
