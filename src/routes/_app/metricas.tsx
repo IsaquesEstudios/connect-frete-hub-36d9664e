@@ -81,12 +81,14 @@ function MetricsPage() {
     }
     lines.push("");
     lines.push("Conversas");
-    lines.push("Nome;Tipo;Número;Não lidas admin;Última mensagem;Tags");
+    lines.push("Nome;Telefone;Email;Tipo;Código;Não lidas admin;Última mensagem;Tags");
+    const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
     for (const c of conversations) {
-      const tagLabels = c.tagIds.join("|");
+      const u = c.user as { whatsapp?: string; email?: string };
+      const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join("|");
       const last = c.lastMessage ? new Date(c.lastMessage.createdAt).toLocaleString() : "";
       lines.push(
-        [c.user.name, c.user.type, c.user.number, c.unreadForAdmin, last, tagLabels]
+        [c.user.name, u.whatsapp || "", u.email || "", c.user.type, c.user.number, c.unreadForAdmin, last, tagLabels]
           .map(csvEscape)
           .join(";"),
       );
