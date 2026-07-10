@@ -124,8 +124,14 @@ function ProfilePage() {
 
 
   useEffect(() => {
-    if (user) setForm(toProfileForm(user));
+    if (user) {
+      setForm(toProfileForm(user));
+      if (user.cnpj) setDocTipo("cnpj");
+      else if (user.cpf) setDocTipo("cpf");
+      else setDocTipo(user.type === "empresa" ? "cnpj" : "cpf");
+    }
   }, [user]);
+
 
   if (!user) return null;
 
