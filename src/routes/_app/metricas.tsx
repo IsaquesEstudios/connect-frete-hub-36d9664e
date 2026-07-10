@@ -65,19 +65,18 @@ function MetricsPage() {
     return { empresas, motoristas, active, unread, tags: tags.length };
   }, [conversations, tags]);
 
-  const tagReport = useMemo(
-    () =>
-      tags.map((tag) => {
-        const taggedConversations = conversations.filter((c) => c.tagIds.includes(tag.id));
-        return {
-          tag,
-          total: taggedConversations.length,
-          empresas: taggedConversations.filter((c) => c.user.type === "empresa").length,
-          motoristas: taggedConversations.filter((c) => c.user.type === "motorista").length,
-        };
-      }),
-    [conversations, tags],
-  );
+  const tagReport = useMemo(() => {
+    const source = filterTag === "todos" ? tags : tags.filter((t) => t.id === filterTag);
+    return source.map((tag) => {
+      const taggedConversations = conversations.filter((c) => c.tagIds.includes(tag.id));
+      return {
+        tag,
+        total: taggedConversations.length,
+        empresas: taggedConversations.filter((c) => c.user.type === "empresa").length,
+        motoristas: taggedConversations.filter((c) => c.user.type === "motorista").length,
+      };
+    });
+  }, [conversations, tags, filterTag]);
 
   if (!user || user.type !== "admin") return null;
 
