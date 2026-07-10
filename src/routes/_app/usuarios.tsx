@@ -204,7 +204,7 @@ function UsuariosPage() {
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[1120px] text-sm">
               <thead>
                 <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-4 py-3 font-medium">Nome</th>
@@ -215,7 +215,7 @@ function UsuariosPage() {
                   <th className="px-4 py-3 font-medium">CPF/CNPJ</th>
                   <th className="px-4 py-3 font-medium">Cidade/UF</th>
                   <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium text-right">Ações</th>
+                  <th className="sticky right-0 z-10 bg-card px-4 py-3 font-medium text-right shadow-[-12px_0_16px_-16px_hsl(var(--foreground))]">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -256,10 +256,10 @@ function UsuariosPage() {
                       <td className="px-4 py-3">
                         {u.whatsapp ? formatPhone(u.whatsapp) : "—"}
                       </td>
-                      <td className="px-4 py-3">{email}</td>
-                      <td className="px-4 py-3">{doc}</td>
-                      <td className="px-4 py-3">{cidade}</td>
-                      <td className="px-4 py-3">
+                      <td className="max-w-[220px] truncate px-4 py-3" title={email}>{email}</td>
+                      <td className="max-w-[150px] truncate px-4 py-3" title={doc}>{doc}</td>
+                      <td className="max-w-[150px] truncate px-4 py-3" title={cidade}>{cidade}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {u.active === false ? (
                           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600">
                             <Lock className="h-3 w-3" />
@@ -276,7 +276,7 @@ function UsuariosPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-2 py-3 text-right whitespace-nowrap">
+                      <td className="sticky right-0 z-10 bg-card px-2 py-3 text-right whitespace-nowrap shadow-[-12px_0_16px_-16px_hsl(var(--foreground))]">
                         <div className="flex items-center justify-end gap-1">
                           <Button
                             size="icon"
