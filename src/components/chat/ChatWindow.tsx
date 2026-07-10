@@ -14,7 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, CheckCheck, Clock, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
+import { Camera, CheckCheck, Clock, FileText, ImagePlus, Mic, Paperclip, Pencil, Send, Square, Trash2 } from "lucide-react";
+import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
 import { formatPhone } from "@/lib/format-phone";
