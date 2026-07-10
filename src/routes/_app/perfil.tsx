@@ -259,14 +259,19 @@ function ProfilePage() {
   );
 }
 
-function Editable({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function Editable({ label, value, onChange, required }: { label: string; value: string; onChange: (value: string) => void; required?: boolean }) {
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        {required && <span className="ml-1 text-destructive">*</span>}
+      </Label>
       <Input value={value} onChange={(event) => onChange(event.target.value)} />
+      {required && <p className="text-[11px] text-destructive">obrigatório</p>}
     </div>
   );
 }
+
 
 function DocumentoField({
   tipo,
