@@ -360,7 +360,7 @@ function Field({
 function StepBasic({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
-      <Field label="Nome completo">
+      <Field required label="Nome completo">
         <Input
           value={data.nome}
           onChange={(e) => update("nome", e.target.value)}
@@ -385,7 +385,7 @@ function StepBasic({ data, update }: StepProps) {
           </label>
         </RadioGroup>
       </div>
-      <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
+      <Field required label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
           onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
@@ -395,7 +395,7 @@ function StepBasic({ data, update }: StepProps) {
         />
       </Field>
 
-      <Field label="Whatsapp *">
+      <Field required label="Whatsapp">
         <Input
           required
           value={data.whatsapp}
@@ -404,7 +404,7 @@ function StepBasic({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Email *">
+      <Field required label="Email">
         <Input
           required
           type="email"
@@ -414,7 +414,7 @@ function StepBasic({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Senha (mín. 6)">
+      <Field required label="Senha (mín. 6)">
         <Input
           type="password"
           minLength={6}
@@ -593,7 +593,7 @@ function StepLocal({ data, update }: StepProps) {
 function StepPlaca({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
-      <Field label="Placa do veículo">
+      <Field required label="Placa do veículo">
         <Input
           value={data.placa}
           onChange={(e) => update("placa", e.target.value.toUpperCase())}
@@ -666,7 +666,7 @@ function StepTipoVeiculo({ data, update }: StepProps) {
 
 function StepRntrc({ data, update }: StepProps) {
   return (
-    <Field label="RNTRC do veículo">
+    <Field required label="RNTRC do veículo">
       <Input
         value={data.rntrc}
         onChange={(e) => update("rntrc", e.target.value)}
@@ -752,7 +752,7 @@ function StepRedesSociais({ data, update }: StepProps) {
 function StepBasicEmpresa({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
-      <Field label="Email *">
+      <Field required label="Email">
         <Input
           required
           type="email"
@@ -762,7 +762,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Senha (mín. 6)">
+      <Field required label="Senha (mín. 6)">
         <Input
           type="password"
           minLength={6}
@@ -792,7 +792,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           </label>
         </RadioGroup>
       </div>
-      <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
+      <Field required label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
           onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
@@ -802,7 +802,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
 
-      <Field label="Nome fantasia">
+      <Field required label="Nome fantasia">
         <Input
           value={data.nomeFantasia}
           onChange={(e) => update("nomeFantasia", e.target.value)}
@@ -810,7 +810,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Whatsapp *">
+      <Field required label="Whatsapp">
         <Input
           required
           value={data.whatsapp}
