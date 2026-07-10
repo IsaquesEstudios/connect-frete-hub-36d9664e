@@ -17,6 +17,7 @@ import {
 import { Camera, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
+import { formatPhone } from "@/lib/format-phone";
 import {
   Sheet,
   SheetContent,
