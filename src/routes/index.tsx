@@ -4,9 +4,8 @@ import { ArrowRight, MessageCircle, Radio, ShieldCheck, Truck } from "lucide-rea
 import { useAuth } from "@/lib/auth/useAuth";
 import { homeFor } from "@/lib/auth/session";
 
-// TODO: substituir pelos links reais das comunidades no WhatsApp
-export const WHATSAPP_MOTORISTAS = "https://chat.whatsapp.com/";
-export const WHATSAPP_EMPRESAS = "https://chat.whatsapp.com/";
+export { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
+import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 
 export const Route = createFileRoute("/")({
   ssr: false,
