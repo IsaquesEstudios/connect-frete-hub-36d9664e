@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
+
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
 import {
@@ -114,7 +116,7 @@ export function SignupWizard({
         return (
           /\S+@\S+\.\S+/.test(data.email) &&
           data.senha.length >= 6 &&
-          data.documento.trim().length >= 11 &&
+          docDigitsValid(data.documento, data.documentoTipo) &&
           data.nomeFantasia.trim().length > 1 &&
           data.whatsapp.trim().length >= 8
         );
@@ -129,11 +131,12 @@ export function SignupWizard({
     if (step === 1)
       return (
         data.nome.trim().length > 1 &&
-        data.documento.trim().length >= 11 &&
+        docDigitsValid(data.documento, data.documentoTipo) &&
         data.whatsapp.trim().length >= 8 &&
         /\S+@\S+\.\S+/.test(data.email) &&
         data.senha.length >= 6
       );
+
     if (step === 2) return true;
     if (step === 3) return !!data.cidade && !!data.estado;
     if (step === 4) return data.placa.trim().length >= 5;
@@ -171,9 +174,10 @@ export function SignupWizard({
         password: data.senha,
         name: isEmpresa ? data.nomeFantasia.trim() : data.nome.trim(),
         type: data.kind as Kind,
-        documentoTipo: isEmpresa ? "cnpj" : data.documentoTipo,
-        cnpj: isEmpresa || data.documentoTipo === "cnpj" ? data.documento : undefined,
-        cpf: !isEmpresa && data.documentoTipo === "cpf" ? data.documento : undefined,
+        documentoTipo: data.documentoTipo,
+        cnpj: data.documentoTipo === "cnpj" ? data.documento : undefined,
+        cpf: data.documentoTipo === "cpf" ? data.documento : undefined,
+
         whatsapp: data.whatsapp,
         fotoUrl: data.fotoUrl || undefined,
         cidade: data.cidade || undefined,
@@ -361,7 +365,7 @@ function StepBasic({ data, update }: StepProps) {
         <div className={fieldLabel}>Tipo de documento</div>
         <RadioGroup
           value={data.documentoTipo}
-          onValueChange={(v) => update("documentoTipo", v as "cnpj" | "cpf")}
+          onValueChange={(v) => { update("documentoTipo", v as "cnpj" | "cpf"); update("documento", ""); }}
           className="mt-1 flex gap-4"
         >
           <label className="flex items-center gap-2 text-sm text-white">
@@ -377,11 +381,13 @@ function StepBasic({ data, update }: StepProps) {
       <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
-          onChange={(e) => update("documento", e.target.value)}
-          placeholder={data.documentoTipo === "cnpj" ? "00.000.000/0001-00" : "000.000.000-00"}
+          onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
+          placeholder={docPlaceholder(data.documentoTipo)}
+          inputMode="numeric"
           className={fieldInput}
         />
       </Field>
+
       <Field label="Whatsapp *">
         <Input
           required
@@ -759,14 +765,36 @@ function StepBasicEmpresa({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="CNPJ">
+      <div className={fieldWrap}>
+        <div className={fieldLabel}>Tipo de documento</div>
+        <RadioGroup
+          value={data.documentoTipo}
+          onValueChange={(v) => {
+            update("documentoTipo", v as "cnpj" | "cpf");
+            update("documento", "");
+          }}
+          className="mt-1 flex gap-4"
+        >
+          <label className="flex items-center gap-2 text-sm text-white">
+            <RadioGroupItem value="cnpj" className="border-white/40 text-sky-300" />
+            CNPJ
+          </label>
+          <label className="flex items-center gap-2 text-sm text-white">
+            <RadioGroupItem value="cpf" className="border-white/40 text-sky-300" />
+            CPF
+          </label>
+        </RadioGroup>
+      </div>
+      <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
-          onChange={(e) => update("documento", e.target.value)}
-          placeholder="00.000.000/0001-00"
+          onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
+          placeholder={docPlaceholder(data.documentoTipo)}
+          inputMode="numeric"
           className={fieldInput}
         />
       </Field>
+
       <Field label="Nome fantasia">
         <Input
           value={data.nomeFantasia}

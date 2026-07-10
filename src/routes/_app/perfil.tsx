@@ -5,10 +5,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { homeFor, updateCurrentProfile } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserProfilePatch } from "@/lib/data";
+import { formatDoc, docPlaceholder, type DocTipo } from "@/lib/format-doc";
+
 
 export const Route = createFileRoute("/_app/perfil")({
   head: () => ({ meta: [{ title: "Perfil — ConectaFrete" }] }),
@@ -117,10 +120,20 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [docTipo, setDocTipo] = useState<DocTipo>(user?.type === "empresa" ? "cnpj" : "cpf");
+
 
   useEffect(() => {
-    if (user) setForm(toProfileForm(user));
+    if (user) {
+      setForm(toProfileForm(user));
+      const u = user as User & { cnpj?: string; cpf?: string };
+      if (u.cnpj) setDocTipo("cnpj");
+      else if (u.cpf) setDocTipo("cpf");
+      else setDocTipo(user.type === "empresa" ? "cnpj" : "cpf");
+    }
   }, [user]);
+
+
 
   if (!user) return null;
 
@@ -188,7 +201,15 @@ function ProfilePage() {
             <Editable label="Nome" value={form.name} onChange={(value) => update("name", value)} />
             <Editable label="Email" value={form.email} onChange={(value) => update("email", value)} />
             <Editable label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
-            <Editable label="CPF" value={form.cpf} onChange={(value) => update("cpf", value)} />
+            <DocumentoField
+              tipo={docTipo}
+              value={docTipo === "cpf" ? form.cpf : form.cnpj}
+              onTipoChange={(t) => {
+                setDocTipo(t);
+                if (t === "cpf") { update("cnpj", ""); } else { update("cpf", ""); }
+              }}
+              onValueChange={(v) => update(docTipo === "cpf" ? "cpf" : "cnpj", v)}
+            />
             <Editable label="Cidade" value={form.cidade} onChange={(value) => update("cidade", value)} />
             <Editable label="Estado" value={form.estado} onChange={(value) => update("estado", value)} />
             <Editable label="Foto / URL" value={form.fotoUrl} onChange={(value) => update("fotoUrl", value)} />
@@ -199,7 +220,6 @@ function ProfilePage() {
               <h2 className="text-lg font-semibold text-foreground">Dados da empresa</h2>
               <div className="grid gap-4 md:grid-cols-2">
                 <Editable label="Nome fantasia" value={form.nomeFantasia} onChange={(value) => update("nomeFantasia", value)} />
-                <Editable label="CNPJ" value={form.cnpj} onChange={(value) => update("cnpj", value)} />
                 <Editable label="Perfil" value={form.perfilEmpresa} onChange={(value) => update("perfilEmpresa", value)} />
                 <div className="space-y-2 md:col-span-2">
                   <Label>Site / Redes sociais</Label>
@@ -212,6 +232,7 @@ function ProfilePage() {
               </div>
             </div>
           )}
+
 
           {user.type === "motorista" && (
             <div className="space-y-4 border-t pt-5">
@@ -246,6 +267,45 @@ function Editable({ label, value, onChange }: { label: string; value: string; on
     </div>
   );
 }
+
+function DocumentoField({
+  tipo,
+  value,
+  onTipoChange,
+  onValueChange,
+}: {
+  tipo: DocTipo;
+  value: string;
+  onTipoChange: (t: DocTipo) => void;
+  onValueChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-2 md:col-span-2">
+      <Label>Documento</Label>
+      <RadioGroup
+        value={tipo}
+        onValueChange={(v) => onTipoChange(v as DocTipo)}
+        className="flex gap-4"
+      >
+        <label className="flex items-center gap-2 text-sm">
+          <RadioGroupItem value="cpf" /> CPF
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <RadioGroupItem value="cnpj" /> CNPJ
+        </label>
+      </RadioGroup>
+      <Input
+        value={value}
+        onChange={(event) => onValueChange(formatDoc(event.target.value, tipo))}
+        placeholder={docPlaceholder(tipo)}
+        inputMode="numeric"
+      />
+    </div>
+  );
+}
+
+
+
 
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
