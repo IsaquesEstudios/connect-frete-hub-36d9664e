@@ -164,11 +164,12 @@ export function SignupWizard({
       if (data.redeOutros.trim()) redes.outros = data.redeOutros.trim();
       const redesStr = Object.keys(redes).length ? JSON.stringify(redes) : undefined;
 
-      const carroceriaFinal = !isEmpresa && data.carroceria
-        ? data.carroceriaObs.trim()
-          ? `${data.carroceria} | Obs: ${data.carroceriaObs.trim()}`
-          : data.carroceria
-        : undefined;
+      const pesoDigits = data.peso.replace(/\D/g, "");
+      const pesoStr = pesoDigits ? `${Number(pesoDigits).toLocaleString("pt-BR")} kg` : "";
+      const carroceriaParts = !isEmpresa && data.carroceria
+        ? [data.carroceria, pesoStr ? `Peso: ${pesoStr}` : "", data.carroceriaObs.trim() ? `Obs: ${data.carroceriaObs.trim()}` : ""].filter(Boolean)
+        : [];
+      const carroceriaFinal = carroceriaParts.length ? carroceriaParts.join(" | ") : undefined;
       const veiculoFinal = !isEmpresa && data.tipoVeiculo
         ? data.tipoVeiculoObs.trim()
           ? `${data.tipoVeiculo} | Obs: ${data.tipoVeiculoObs.trim()}`
@@ -178,7 +179,7 @@ export function SignupWizard({
       const u = await signup({
         email: data.email,
         password: data.senha,
-        name: isEmpresa ? data.nomeFantasia.trim() : data.nome.trim(),
+        name: isEmpresa && data.documentoTipo === "cnpj" ? data.nomeFantasia.trim() : data.nome.trim(),
         type: data.kind as Kind,
         documentoTipo: data.documentoTipo,
         cnpj: data.documentoTipo === "cnpj" ? data.documento : undefined,
@@ -191,14 +192,14 @@ export function SignupWizard({
         placa: !isEmpresa ? data.placa : undefined,
         veiculo: veiculoFinal,
         tipoVeiculo: veiculoFinal,
-        rntrc: !isEmpresa ? data.rntrc : undefined,
+        rntrc: !isEmpresa && data.rntrc.trim() ? data.rntrc.trim() : undefined,
         carroceria: carroceriaFinal,
-        nomeFantasia: isEmpresa ? data.nomeFantasia.trim() : undefined,
+        nomeFantasia: isEmpresa && data.documentoTipo === "cnpj" ? data.nomeFantasia.trim() : undefined,
         perfilEmpresa: isEmpresa && data.perfilEmpresa ? data.perfilEmpresa : undefined,
         siteRedeSocial: redesStr,
       });
       toast.success(`Cadastro criado: ${u.number}`);
-      onDone(u);
+      setCreatedUser(u);
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
