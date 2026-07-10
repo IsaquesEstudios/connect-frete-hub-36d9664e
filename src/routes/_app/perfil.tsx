@@ -89,7 +89,6 @@ function toProfileForm(user: User): ProfileForm {
 function patchForUser(user: User, form: ProfileForm): UserProfilePatch {
   const patch: UserProfilePatch = {
     name: form.name,
-    email: form.email,
     whatsapp: form.whatsapp,
     cpf: form.cpf,
     cidade: form.cidade,
