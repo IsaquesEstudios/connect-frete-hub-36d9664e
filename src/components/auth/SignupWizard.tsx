@@ -369,7 +369,7 @@ function StepBasic({ data, update }: StepProps) {
         />
       </Field>
       <div className={fieldWrap}>
-        <div className={fieldLabel}>Tipo de documento</div>
+        <div className={fieldLabel}>Tipo de documento<span className="ml-1 text-red-500">*</span></div>
         <RadioGroup
           value={data.documentoTipo}
           onValueChange={(v) => { update("documentoTipo", v as "cnpj" | "cpf"); update("documento", ""); }}
@@ -568,7 +568,7 @@ function StepLocal({ data, update }: StepProps) {
       </div>
 
       <div className={cn(fieldWrap, !data.cidade && "opacity-50")}>
-        <Label className={fieldLabel}>Estado</Label>
+        <Label className={fieldLabel}>Estado<span className="ml-1 text-red-500">*</span></Label>
         <Select
           value={data.estado}
           onValueChange={(v) => update("estado", v)}
@@ -773,7 +773,7 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
       <div className={fieldWrap}>
-        <div className={fieldLabel}>Tipo de documento</div>
+        <div className={fieldLabel}>Tipo de documento<span className="ml-1 text-red-500">*</span></div>
         <RadioGroup
           value={data.documentoTipo}
           onValueChange={(v) => {
@@ -875,7 +875,7 @@ function StepLocalByEstado({ data, update }: StepProps) {
   return (
     <div className="space-y-3">
       <div className={fieldWrap}>
-        <Label className={fieldLabel}>Estado</Label>
+        <Label className={fieldLabel}>Estado<span className="ml-1 text-red-500">*</span></Label>
         <Select
           value={data.estado}
           onValueChange={(v) => {
@@ -898,7 +898,7 @@ function StepLocalByEstado({ data, update }: StepProps) {
       </div>
 
       <div className={cn(fieldWrap, !data.estado && "opacity-50")}>
-        <Label className={fieldLabel}>Cidade</Label>
+        <Label className={fieldLabel}>Cidade<span className="ml-1 text-red-500">*</span></Label>
         <Select
           value={data.cidade}
           onValueChange={(v) => update("cidade", v)}
