@@ -381,11 +381,13 @@ function StepBasic({ data, update }: StepProps) {
       <Field label={data.documentoTipo === "cnpj" ? "CNPJ" : "CPF"}>
         <Input
           value={data.documento}
-          onChange={(e) => update("documento", e.target.value)}
-          placeholder={data.documentoTipo === "cnpj" ? "00.000.000/0001-00" : "000.000.000-00"}
+          onChange={(e) => update("documento", formatDoc(e.target.value, data.documentoTipo))}
+          placeholder={docPlaceholder(data.documentoTipo)}
+          inputMode="numeric"
           className={fieldInput}
         />
       </Field>
+
       <Field label="Whatsapp *">
         <Input
           required
