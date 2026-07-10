@@ -256,7 +256,12 @@ function UsuariosPage() {
                       <td className="px-4 py-3">{doc}</td>
                       <td className="px-4 py-3">{cidade}</td>
                       <td className="px-4 py-3">
-                        {online ? (
+                        {u.active === false ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600">
+                            <Lock className="h-3 w-3" />
+                            bloqueado
+                          </span>
+                        ) : online ? (
                           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
                             <span className="h-2 w-2 rounded-full bg-emerald-500" />
                             online
@@ -267,11 +272,33 @@ function UsuariosPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" onClick={() => setEditing(u)}>
                           <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
                         </Button>
+                        {u.type !== "admin" && (
+                          u.active === false ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-emerald-600 hover:text-emerald-700"
+                              onClick={() => toggleActive(u, true)}
+                            >
+                              <LockOpen className="mr-1 h-3.5 w-3.5" /> Desbloquear
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => setConfirmBlock(u)}
+                            >
+                              <Lock className="mr-1 h-3.5 w-3.5" /> Bloquear
+                            </Button>
+                          )
+                        )}
                       </td>
+
                     </tr>
                   );
                 })}
