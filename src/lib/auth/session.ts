@@ -47,7 +47,15 @@ export async function refreshCurrentUser(): Promise<User | null> {
     notify();
     return null;
   }
-  const profile = await loadProfile(data.session.user.id, { fresh: true });
+  let profile: User | null = null;
+  try {
+    profile = await loadProfile(data.session.user.id, { fresh: true });
+  } catch {
+    await supabase.auth.signOut();
+    cachedUser = null;
+    notify();
+    return null;
+  }
   if (!profile) {
     await supabase.auth.signOut();
     cachedUser = null;
@@ -60,8 +68,13 @@ export async function refreshCurrentUser(): Promise<User | null> {
 async function bootstrap() {
   const { data } = await supabase.auth.getSession();
   if (data.session) {
-    const profile = await loadProfile(data.session.user.id, { fresh: true });
-    await applySessionProfile(profile);
+    try {
+      const profile = await loadProfile(data.session.user.id, { fresh: true });
+      await applySessionProfile(profile);
+    } catch {
+      await supabase.auth.signOut();
+      cachedUser = null;
+    }
   }
   initialDone = true;
   notify();
