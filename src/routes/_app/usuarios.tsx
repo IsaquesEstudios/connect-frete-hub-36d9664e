@@ -68,6 +68,7 @@ function UsuariosPage() {
   const [tab, setTab] = useState<TypeFilter>("todos");
   const [query, setQuery] = useState("");
   const [emails, setEmails] = useState<Record<string, string>>({});
+  const [editing, setEditing] = useState<User | null>(null);
 
   useEffect(() => {
     if (user && user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
@@ -186,13 +187,14 @@ function UsuariosPage() {
                   <th className="px-4 py-3 font-medium">CPF/CNPJ</th>
                   <th className="px-4 py-3 font-medium">Cidade/UF</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="px-4 py-8 text-center text-sm text-muted-foreground"
                     >
                       Nenhum usuário encontrado
@@ -241,6 +243,11 @@ function UsuariosPage() {
                           </span>
                         )}
                       </td>
+                      <td className="px-4 py-3 text-right">
+                        <Button size="sm" variant="ghost" onClick={() => setEditing(u)}>
+                          <Pencil className="mr-1 h-3.5 w-3.5" /> Editar
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -249,6 +256,11 @@ function UsuariosPage() {
           </div>
         </section>
       </div>
+      <AdminEditUserDialog
+        user={editing}
+        open={!!editing}
+        onOpenChange={(v) => !v && setEditing(null)}
+      />
     </div>
   );
 }
