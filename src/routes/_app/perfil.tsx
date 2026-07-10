@@ -120,6 +120,8 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [form, setForm] = useState<ProfileForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [docTipo, setDocTipo] = useState<DocTipo>(user?.type === "empresa" ? "cnpj" : "cpf");
+
 
   useEffect(() => {
     if (user) setForm(toProfileForm(user));
