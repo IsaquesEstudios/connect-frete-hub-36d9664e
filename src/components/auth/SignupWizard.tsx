@@ -382,16 +382,18 @@ function StepBasic({ data, update }: StepProps) {
           className={fieldInput}
         />
       </Field>
-      <Field label="Whatsapp">
+      <Field label="Whatsapp *">
         <Input
+          required
           value={data.whatsapp}
           onChange={(e) => update("whatsapp", e.target.value)}
           placeholder="(11) 90000-0000"
           className={fieldInput}
         />
       </Field>
-      <Field label="Email">
+      <Field label="Email *">
         <Input
+          required
           type="email"
           value={data.email}
           onChange={(e) => update("email", e.target.value)}
