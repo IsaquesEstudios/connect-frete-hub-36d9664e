@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth/useAuth";
 import { repo } from "@/lib/data";
+import { phoneDigits } from "@/lib/format-phone";
 
 export const Route = createFileRoute("/_app")({
   ssr: false,
