@@ -152,6 +152,7 @@ function ProfilePage() {
     try {
       await updateCurrentProfile(patchForUser(user, form));
       toast.success("Perfil atualizado com sucesso.");
+      navigate({ to: homeFor(user) as "/admin" });
     } catch (error) {
       toast.error((error as Error).message);
     } finally {
