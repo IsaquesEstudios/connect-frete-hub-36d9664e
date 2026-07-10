@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/loose-client";
 import { repo } from "@/lib/data";
 import { profileToUser } from "@/lib/data/supabaseRepository";
+import { translateAuthError } from "@/lib/auth/translate-error";
 import type { User, UserProfilePatch, UserType } from "@/lib/data";
 
 let cachedUser: User | null = null;
@@ -68,10 +69,10 @@ export async function login(email: string, password: string): Promise<User> {
     email: email.trim().toLowerCase(),
     password,
   });
-  if (error) throw new Error(error.message);
-  if (!data.user) throw new Error("Login falhou");
+  if (error) throw new Error(translateAuthError(error));
+  if (!data.user) throw new Error("Falha no login. Tente novamente.");
   const u = await loadProfile(data.user.id);
-  if (!u) throw new Error("Perfil não encontrado. Contate o admin.");
+  if (!u) throw new Error("Perfil não encontrado. Contate o administrador.");
   if (u.active === false) {
     await supabase.auth.signOut();
     throw new Error("Esta conta está desativada. Contate o administrador.");
@@ -183,8 +184,8 @@ export async function signup(input: SignupInput): Promise<User> {
     password: input.password,
     options: { emailRedirectTo: window.location.origin },
   });
-  if (error) throw new Error(error.message);
-  if (!data.user) throw new Error("Cadastro falhou");
+  if (error) throw new Error(translateAuthError(error));
+  if (!data.user) throw new Error("Não foi possível criar a conta.");
 
   // Generate user_number
   const prefix = input.type === "empresa" ? "EMP" : input.type === "motorista" ? "MOT" : "ADM";
@@ -200,7 +201,7 @@ export async function signup(input: SignupInput): Promise<User> {
 
   if (!data.session) {
     throw new Error(
-      "Conta criada, mas a confirmação de email está habilitada no Supabase. Desative em Authentication → Providers → Email → 'Confirm email' para poder entrar sem confirmar.",
+      "Conta criada, mas ainda não é possível entrar. Confirme seu email ou contate o administrador.",
     );
   }
 
@@ -225,7 +226,7 @@ export async function signup(input: SignupInput): Promise<User> {
     perfil_empresa: input.perfilEmpresa ?? null,
     site_rede_social: input.siteRedeSocial ?? null,
   });
-  if (insErr) throw new Error(`Perfil: ${insErr.message}`);
+  if (insErr) throw new Error(`Perfil: ${translateAuthError(insErr)}`);
 
 
   const u = await loadProfile(data.user.id);

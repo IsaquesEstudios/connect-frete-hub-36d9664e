@@ -79,7 +79,7 @@ function UsuariosPage() {
   const users = useMemo(() => repo.listUsers(), [v]);
 
   const filtered = useMemo(() => {
-    return users.filter((u) => {
+    const list = users.filter((u) => {
       if (tab !== "todos" && u.type !== tab) return false;
       if (query) {
         const q = query
@@ -103,7 +103,16 @@ function UsuariosPage() {
       }
       return true;
     });
-  }, [users, tab, query, emails]);
+    // Ordena: online primeiro, depois por último acesso (mais recente antes).
+    return [...list].sort((a, b) => {
+      const oa = repo.isOnline(a.id) ? 1 : 0;
+      const ob = repo.isOnline(b.id) ? 1 : 0;
+      if (oa !== ob) return ob - oa;
+      const la = repo.getLastSeen(a.id) ?? 0;
+      const lb = repo.getLastSeen(b.id) ?? 0;
+      return lb - la;
+    });
+  }, [users, tab, query, emails, ev]);
 
   // touch ephemeral version so online/lastSeen refresh
   void ev;

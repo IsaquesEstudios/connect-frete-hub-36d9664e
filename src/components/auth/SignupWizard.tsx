@@ -58,6 +58,7 @@ interface WizardData {
   rntrc: string;
   carroceria: string;
   carroceriaObs: string;
+  peso: string; // dígitos apenas
   // Redes sociais
   instagram: string;
   facebook: string;
@@ -85,6 +86,7 @@ const initial: WizardData = {
   rntrc: "",
   carroceria: "",
   carroceriaObs: "",
+  peso: "",
   instagram: "",
   facebook: "",
   youtube: "",
@@ -102,6 +104,7 @@ export function SignupWizard({
   const [data, setData] = useState<WizardData>(initial);
   const [step, setStep] = useState(0); // 0 = pick kind; 1..N sections
   const [loading, setLoading] = useState(false);
+  const [createdUser, setCreatedUser] = useState<User | null>(null);
 
   const isEmpresa = data.kind === "empresa";
   const totalSteps = isEmpresa ? 5 : 8;
@@ -113,14 +116,16 @@ export function SignupWizard({
     if (step === 0) return data.kind !== null;
 
     if (isEmpresa) {
-      if (step === 1)
-        return (
+      if (step === 1) {
+        const baseOk =
           /\S+@\S+\.\S+/.test(data.email) &&
           data.senha.length >= 6 &&
           docDigitsValid(data.documento, data.documentoTipo) &&
-          data.nomeFantasia.trim().length > 1 &&
-          phoneDigits(data.whatsapp).length >= 10
-        );
+          phoneDigits(data.whatsapp).length >= 10;
+        // Nome fantasia só é obrigatório para CNPJ
+        if (data.documentoTipo === "cnpj") return baseOk && data.nomeFantasia.trim().length > 1;
+        return baseOk && data.nome.trim().length > 1;
+      }
       if (step === 2) return true; // foto opcional
       if (step === 3) return !!data.perfilEmpresa;
       if (step === 4) return !!data.estado && !!data.cidade;
@@ -139,11 +144,11 @@ export function SignupWizard({
       );
 
     if (step === 2) return true;
-    if (step === 3) return !!data.cidade && !!data.estado;
+    if (step === 3) return !!data.estado && !!data.cidade;
     if (step === 4) return data.placa.trim().length >= 5;
     if (step === 5) return !!data.tipoVeiculo;
-    if (step === 6) return data.rntrc.trim().length >= 4;
-    if (step === 7) return !!data.carroceria;
+    if (step === 6) return true; // RNTRC opcional
+    if (step === 7) return !!data.carroceria && data.peso.replace(/\D/g, "").length > 0;
     if (step === 8) return true; // redes sociais opcional
     return true;
   };
@@ -159,11 +164,12 @@ export function SignupWizard({
       if (data.redeOutros.trim()) redes.outros = data.redeOutros.trim();
       const redesStr = Object.keys(redes).length ? JSON.stringify(redes) : undefined;
 
-      const carroceriaFinal = !isEmpresa && data.carroceria
-        ? data.carroceriaObs.trim()
-          ? `${data.carroceria} | Obs: ${data.carroceriaObs.trim()}`
-          : data.carroceria
-        : undefined;
+      const pesoDigits = data.peso.replace(/\D/g, "");
+      const pesoStr = pesoDigits ? `${Number(pesoDigits).toLocaleString("pt-BR")} kg` : "";
+      const carroceriaParts = !isEmpresa && data.carroceria
+        ? [data.carroceria, pesoStr ? `Peso: ${pesoStr}` : "", data.carroceriaObs.trim() ? `Obs: ${data.carroceriaObs.trim()}` : ""].filter(Boolean)
+        : [];
+      const carroceriaFinal = carroceriaParts.length ? carroceriaParts.join(" | ") : undefined;
       const veiculoFinal = !isEmpresa && data.tipoVeiculo
         ? data.tipoVeiculoObs.trim()
           ? `${data.tipoVeiculo} | Obs: ${data.tipoVeiculoObs.trim()}`
@@ -173,7 +179,7 @@ export function SignupWizard({
       const u = await signup({
         email: data.email,
         password: data.senha,
-        name: isEmpresa ? data.nomeFantasia.trim() : data.nome.trim(),
+        name: isEmpresa && data.documentoTipo === "cnpj" ? data.nomeFantasia.trim() : data.nome.trim(),
         type: data.kind as Kind,
         documentoTipo: data.documentoTipo,
         cnpj: data.documentoTipo === "cnpj" ? data.documento : undefined,
@@ -186,14 +192,14 @@ export function SignupWizard({
         placa: !isEmpresa ? data.placa : undefined,
         veiculo: veiculoFinal,
         tipoVeiculo: veiculoFinal,
-        rntrc: !isEmpresa ? data.rntrc : undefined,
+        rntrc: !isEmpresa && data.rntrc.trim() ? data.rntrc.trim() : undefined,
         carroceria: carroceriaFinal,
-        nomeFantasia: isEmpresa ? data.nomeFantasia.trim() : undefined,
+        nomeFantasia: isEmpresa && data.documentoTipo === "cnpj" ? data.nomeFantasia.trim() : undefined,
         perfilEmpresa: isEmpresa && data.perfilEmpresa ? data.perfilEmpresa : undefined,
         siteRedeSocial: redesStr,
       });
       toast.success(`Cadastro criado: ${u.number}`);
-      onDone(u);
+      setCreatedUser(u);
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -211,6 +217,15 @@ export function SignupWizard({
     setStep((s) => s - 1);
   };
 
+  if (createdUser) {
+    return (
+      <SuccessScreen
+        user={createdUser}
+        onContinue={() => onDone(createdUser)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-5">
       {step > 0 && <ProgressBar current={step} total={totalSteps} />}
@@ -225,7 +240,7 @@ export function SignupWizard({
 
       {!isEmpresa && step === 1 && <StepBasic data={data} update={update} />}
       {!isEmpresa && step === 2 && <StepFoto data={data} update={update} />}
-      {!isEmpresa && step === 3 && <StepLocal data={data} update={update} />}
+      {!isEmpresa && step === 3 && <StepLocalByEstado data={data} update={update} />}
       {!isEmpresa && step === 4 && <StepPlaca data={data} update={update} />}
       {!isEmpresa && step === 5 && <StepTipoVeiculo data={data} update={update} />}
       {!isEmpresa && step === 6 && <StepRntrc data={data} update={update} />}
@@ -264,6 +279,44 @@ export function SignupWizard({
           )}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function SuccessScreen({ user, onContinue }: { user: User; onContinue: () => void }) {
+  const link =
+    user.type === "motorista"
+      ? "https://chat.whatsapp.com/"
+      : "https://chat.whatsapp.com/";
+  const grupoLabel = user.type === "motorista" ? "motoristas" : "empresas";
+  return (
+    <div className="space-y-5 text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
+        <Check className="h-7 w-7" />
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold text-white">Cadastro concluído!</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          Seu código: <span className="font-mono text-sky-300">{user.number}</span>
+        </p>
+      </div>
+      <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-4 text-left">
+        <div className="text-sm font-medium text-white">Entre no grupo de {grupoLabel}</div>
+        <p className="mt-1 text-xs text-slate-400">
+          Fique por dentro de oportunidades e novidades no WhatsApp.
+        </p>
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-400"
+        >
+          Entrar no grupo
+        </a>
+      </div>
+      <Button type="button" onClick={onContinue} className="w-full">
+        Continuar para o sistema
+      </Button>
     </div>
   );
 }
@@ -668,11 +721,11 @@ function StepTipoVeiculo({ data, update }: StepProps) {
 
 function StepRntrc({ data, update }: StepProps) {
   return (
-    <Field required label="RNTRC do veículo">
+    <Field label="RNTRC do veículo (opcional)">
       <Input
         value={data.rntrc}
         onChange={(e) => update("rntrc", e.target.value)}
-        placeholder="Digite o RNTRC"
+        placeholder="Digite o RNTRC (se tiver)"
         className={fieldInput}
       />
     </Field>
@@ -689,11 +742,23 @@ function StepCarroceria({ data, update }: StepProps) {
         groups={CARROCERIAS}
         placeholder="Selecione a carroceria"
       />
+      <Field required label="Peso (kg)">
+        <Input
+          value={data.peso ? `${Number(data.peso.replace(/\D/g, "")).toLocaleString("pt-BR")} kg` : ""}
+          onChange={(e) => {
+            const digits = e.target.value.replace(/\D/g, "").slice(0, 7);
+            update("peso", digits);
+          }}
+          placeholder="Ex.: 15.000 kg"
+          inputMode="numeric"
+          className={fieldInput}
+        />
+      </Field>
       <Field label="Observações adicionais (opcional)">
         <Input
           value={data.carroceriaObs}
           onChange={(e) => update("carroceriaObs", e.target.value)}
-          placeholder="Ex.: capacidade, portas laterais, lonas..."
+          placeholder="Ex.: portas laterais, lonas..."
           className={fieldInput}
         />
       </Field>
@@ -804,14 +869,25 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
 
-      <Field required label="Nome fantasia">
-        <Input
-          value={data.nomeFantasia}
-          onChange={(e) => update("nomeFantasia", e.target.value)}
-          placeholder="Nome da empresa"
-          className={fieldInput}
-        />
-      </Field>
+      {data.documentoTipo === "cnpj" ? (
+        <Field required label="Nome fantasia">
+          <Input
+            value={data.nomeFantasia}
+            onChange={(e) => update("nomeFantasia", e.target.value)}
+            placeholder="Nome da empresa"
+            className={fieldInput}
+          />
+        </Field>
+      ) : (
+        <Field required label="Nome completo">
+          <Input
+            value={data.nome}
+            onChange={(e) => update("nome", e.target.value)}
+            placeholder="Seu nome"
+            className={fieldInput}
+          />
+        </Field>
+      )}
       <Field required label="Whatsapp">
         <Input
           required

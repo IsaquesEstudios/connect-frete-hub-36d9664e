@@ -8,6 +8,8 @@ import { useAuth } from "@/lib/auth/useAuth";
 import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { SignupWizard } from "@/components/auth/SignupWizard";
+import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
+
 
 
 export const Route = createFileRoute("/auth")({
@@ -165,53 +167,60 @@ function LoginForm({ onDone }: { onDone: (u: User) => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   return (
-    <form
-      className="space-y-3"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-          const u = await login(email, password);
-          toast.success(`Bem-vindo, ${u.name}`);
-          onDone(u);
-        } catch (err) {
-          toast.error((err as Error).message);
-        } finally {
-          setLoading(false);
-        }
-      }}
-    >
-      <GlassField label="Email">
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="username"
-          required
-          placeholder="voce@empresa.com"
-          className={fieldInput}
-        />
-      </GlassField>
-      <GlassField label="Senha" action={<SubmitArrow loading={loading} />}>
-        <Input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-          placeholder="••••••••"
-          className={fieldInput}
-        />
-      </GlassField>
+    <>
+      <form
+        className="space-y-3"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setLoading(true);
+          try {
+            const u = await login(email, password);
+            toast.success(`Bem-vindo, ${u.name}`);
+            onDone(u);
+          } catch (err) {
+            toast.error((err as Error).message);
+          } finally {
+            setLoading(false);
+          }
+        }}
+      >
+        <GlassField label="Email">
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="username"
+            required
+            placeholder="voce@empresa.com"
+            className={fieldInput}
+          />
+        </GlassField>
+        <GlassField label="Senha" action={<SubmitArrow loading={loading} />}>
+          <Input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            required
+            placeholder="••••••••"
+            className={fieldInput}
+          />
+        </GlassField>
 
-      <div className="pt-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-slate-400">
-        <div className="mb-1 font-medium text-slate-300">Contas de teste</div>
-        <div>Admin: admin@conectafrete.com / admin123</div>
-        <div>Empresas: empresa1@conectafrete.com / 123456</div>
-        <div>Motoristas: motorista1@conectafrete.com / 123456</div>
-      </div>
-    </form>
+        <div className="text-right">
+          <button
+            type="button"
+            onClick={() => setForgotOpen(true)}
+            className="text-xs text-sky-300 hover:text-sky-200 underline underline-offset-4"
+          >
+            Esqueci a senha
+          </button>
+        </div>
+      </form>
+      <ForgotPasswordDialog open={forgotOpen} onOpenChange={setForgotOpen} />
+    </>
   );
 }
