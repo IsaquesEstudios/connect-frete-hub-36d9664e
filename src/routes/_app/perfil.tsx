@@ -62,7 +62,7 @@ function toProfileForm(user: User): ProfileForm {
     ...emptyForm,
     name: user.name ?? "",
     email: user.email ?? "",
-    whatsapp: user.whatsapp ?? "",
+    whatsapp: formatPhone(user.whatsapp ?? ""),
     cpf: user.cpf ?? "",
     cidade: user.cidade ?? "",
     estado: user.estado ?? "",
