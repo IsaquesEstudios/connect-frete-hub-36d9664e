@@ -15,6 +15,11 @@ export const setExternalUserActive = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: true }> => {
     const serviceKey = process.env.EXT_SUPABASE_SERVICE_ROLE_KEY;
     if (!serviceKey) throw new Error("Configuração do servidor ausente.");
+    const serviceHeaders = () => {
+      const headers: Record<string, string> = { apikey: serviceKey };
+      if (!serviceKey.startsWith("sb_secret_")) headers.Authorization = `Bearer ${serviceKey}`;
+      return headers;
+    };
 
     const request = getRequest();
     const authHeader = request?.headers.get("authorization") ?? "";
@@ -30,7 +35,7 @@ export const setExternalUserActive = createServerFn({ method: "POST" })
 
     const adminProfileRes = await fetch(
       `${EXT_SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(authUser.id)}&select=type`,
-      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
+      { headers: serviceHeaders() },
     );
     if (!adminProfileRes.ok) throw new Error("Não foi possível validar o administrador.");
     const adminProfiles = (await adminProfileRes.json()) as Array<{ type?: string }>;
@@ -38,7 +43,7 @@ export const setExternalUserActive = createServerFn({ method: "POST" })
 
     const targetProfileRes = await fetch(
       `${EXT_SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(data.userId)}&select=type`,
-      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } },
+      { headers: serviceHeaders() },
     );
     if (!targetProfileRes.ok) throw new Error("Usuário não encontrado.");
     const targetProfiles = (await targetProfileRes.json()) as Array<{ type?: string }>;
@@ -49,8 +54,7 @@ export const setExternalUserActive = createServerFn({ method: "POST" })
     const updateRes = await fetch(`${EXT_SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(data.userId)}`, {
       method: "PATCH",
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        ...serviceHeaders(),
         "Content-Type": "application/json",
         Prefer: "return=minimal",
       },
@@ -61,8 +65,7 @@ export const setExternalUserActive = createServerFn({ method: "POST" })
     const banRes = await fetch(`${EXT_SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(data.userId)}`, {
       method: "PUT",
       headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
+        ...serviceHeaders(),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ ban_duration: data.active ? "none" : "876000h" }),
