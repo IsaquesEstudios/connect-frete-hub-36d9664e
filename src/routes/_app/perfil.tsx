@@ -198,9 +198,10 @@ function ProfilePage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Editable label="Nome" value={form.name} onChange={(value) => update("name", value)} />
-            <Editable label="Email" value={form.email} onChange={(value) => update("email", value)} />
-            <Editable label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
+            <Editable required label="Nome" value={form.name} onChange={(value) => update("name", value)} />
+            <Editable required label="Email" value={form.email} onChange={(value) => update("email", value)} />
+            <Editable required label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
+
             <DocumentoField
               tipo={docTipo}
               value={docTipo === "cpf" ? form.cpf : form.cnpj}
