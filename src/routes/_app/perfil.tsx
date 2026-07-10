@@ -141,7 +141,7 @@ function ProfilePage() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const missingWhats = !form.whatsapp || form.whatsapp.trim().length < 8;
+  const missingWhats = !form.whatsapp || phoneDigits(form.whatsapp).length < 10;
 
   const save = async () => {
     if (missingWhats) {
