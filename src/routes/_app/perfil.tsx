@@ -83,6 +83,7 @@ function toProfileForm(user: User): ProfileForm {
           tipoVeiculo: user.tipoVeiculo ?? "",
           rntrc: user.rntrc ?? "",
           carroceria: user.carroceria ?? "",
+          siteRedeSocial: user.siteRedeSocial ?? "",
         }
       : {}),
   };
