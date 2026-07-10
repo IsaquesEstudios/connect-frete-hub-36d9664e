@@ -217,6 +217,15 @@ export function SignupWizard({
     setStep((s) => s - 1);
   };
 
+  if (createdUser) {
+    return (
+      <SuccessScreen
+        user={createdUser}
+        onContinue={() => onDone(createdUser)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-5">
       {step > 0 && <ProgressBar current={step} total={totalSteps} />}
@@ -231,7 +240,7 @@ export function SignupWizard({
 
       {!isEmpresa && step === 1 && <StepBasic data={data} update={update} />}
       {!isEmpresa && step === 2 && <StepFoto data={data} update={update} />}
-      {!isEmpresa && step === 3 && <StepLocal data={data} update={update} />}
+      {!isEmpresa && step === 3 && <StepLocalByEstado data={data} update={update} />}
       {!isEmpresa && step === 4 && <StepPlaca data={data} update={update} />}
       {!isEmpresa && step === 5 && <StepTipoVeiculo data={data} update={update} />}
       {!isEmpresa && step === 6 && <StepRntrc data={data} update={update} />}
@@ -270,6 +279,44 @@ export function SignupWizard({
           )}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function SuccessScreen({ user, onContinue }: { user: User; onContinue: () => void }) {
+  const link =
+    user.type === "motorista"
+      ? "https://chat.whatsapp.com/"
+      : "https://chat.whatsapp.com/";
+  const grupoLabel = user.type === "motorista" ? "motoristas" : "empresas";
+  return (
+    <div className="space-y-5 text-center">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
+        <Check className="h-7 w-7" />
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold text-white">Cadastro concluído!</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          Seu código: <span className="font-mono text-sky-300">{user.number}</span>
+        </p>
+      </div>
+      <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-4 text-left">
+        <div className="text-sm font-medium text-white">Entre no grupo de {grupoLabel}</div>
+        <p className="mt-1 text-xs text-slate-400">
+          Fique por dentro de oportunidades e novidades no WhatsApp.
+        </p>
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-400"
+        >
+          Entrar no grupo
+        </a>
+      </div>
+      <Button type="button" onClick={onContinue} className="w-full">
+        Continuar para o sistema
+      </Button>
     </div>
   );
 }
