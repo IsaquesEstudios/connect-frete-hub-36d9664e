@@ -73,7 +73,7 @@ function typeColorClass(t: string) {
 }
 
 function UsuariosPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const v = useRepoVersion();
   const ev = useEphemeralVersion();
@@ -95,8 +95,10 @@ function UsuariosPage() {
   };
 
   useEffect(() => {
+    if (loading) return;
     if (user && user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
+
 
   useEffect(() => {
     getExternalUserEmails()
