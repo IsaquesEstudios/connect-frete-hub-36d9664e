@@ -93,7 +93,12 @@ class LocalRepository implements Repository {
       return u?.type === "admin" || u?.type === "colaborador";
     };
     const fromStaff = isStaff(input.fromUserId);
-    const conversationId = fromStaff ? input.toUserId : input.fromUserId;
+    const from = this.getUser(input.fromUserId);
+    const to = this.getUser(input.toUserId);
+    const staff = fromStaff ? from : to;
+    const nonStaff = fromStaff ? to : from;
+    const conversationId = `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
+
     const msg: Message = {
       id: `m_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       conversationId,
