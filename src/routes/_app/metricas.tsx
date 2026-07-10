@@ -150,14 +150,17 @@ function MetricsPage() {
       headStyles: { fillColor: [30, 64, 175] },
     });
 
+    const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
     autoTable(doc, {
-      head: [["Nome", "Telefone", "Email", "Tipo", "Não lidas", "Tags"]],
+      head: [["Nome", "Código", "Telefone", "Email", "Tipo", "Não lidas", "Tags"]],
       body: conversations.map((c) => {
         const u = c.user as { whatsapp?: string; email?: string };
+        const email = u.email || emailMap[c.user.id] || "";
         return [
           clean(c.user.name),
+          c.user.number,
           u.whatsapp || "",
-          u.email || "",
+          email,
           c.user.type,
           c.unreadForAdmin,
           clean(c.tagIds.map((id) => tagsById[id] || id).join(", ")),
