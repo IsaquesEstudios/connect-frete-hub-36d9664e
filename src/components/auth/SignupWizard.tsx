@@ -869,14 +869,25 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
 
-      <Field required label="Nome fantasia">
-        <Input
-          value={data.nomeFantasia}
-          onChange={(e) => update("nomeFantasia", e.target.value)}
-          placeholder="Nome da empresa"
-          className={fieldInput}
-        />
-      </Field>
+      {data.documentoTipo === "cnpj" ? (
+        <Field required label="Nome fantasia">
+          <Input
+            value={data.nomeFantasia}
+            onChange={(e) => update("nomeFantasia", e.target.value)}
+            placeholder="Nome da empresa"
+            className={fieldInput}
+          />
+        </Field>
+      ) : (
+        <Field required label="Nome completo">
+          <Input
+            value={data.nome}
+            onChange={(e) => update("nome", e.target.value)}
+            placeholder="Seu nome"
+            className={fieldInput}
+          />
+        </Field>
+      )}
       <Field required label="Whatsapp">
         <Input
           required
