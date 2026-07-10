@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppUsuariosRouteImport } from './routes/_app/usuarios'
 import { Route as AppPerfilRouteImport } from './routes/_app/perfil'
 import { Route as AppMotoristaRouteImport } from './routes/_app/motorista'
 import { Route as AppMetricasRouteImport } from './routes/_app/metricas'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppUsuariosRoute = AppUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppPerfilRoute = AppPerfilRouteImport.update({
   id: '/perfil',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/metricas': typeof AppMetricasRoute
   '/motorista': typeof AppMotoristaRoute
   '/perfil': typeof AppPerfilRoute
+  '/usuarios': typeof AppUsuariosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/metricas': typeof AppMetricasRoute
   '/motorista': typeof AppMotoristaRoute
   '/perfil': typeof AppPerfilRoute
+  '/usuarios': typeof AppUsuariosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_app/metricas': typeof AppMetricasRoute
   '/_app/motorista': typeof AppMotoristaRoute
   '/_app/perfil': typeof AppPerfilRoute
+  '/_app/usuarios': typeof AppUsuariosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/metricas'
     | '/motorista'
     | '/perfil'
+    | '/usuarios'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/metricas'
     | '/motorista'
     | '/perfil'
+    | '/usuarios'
   id:
     | '__root__'
     | '/'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_app/metricas'
     | '/_app/motorista'
     | '/_app/perfil'
+    | '/_app/usuarios'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/usuarios': {
+      id: '/_app/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AppUsuariosRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/perfil': {
       id: '/_app/perfil'
@@ -211,6 +230,7 @@ interface AppRouteRouteChildren {
   AppMetricasRoute: typeof AppMetricasRoute
   AppMotoristaRoute: typeof AppMotoristaRoute
   AppPerfilRoute: typeof AppPerfilRoute
+  AppUsuariosRoute: typeof AppUsuariosRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -220,6 +240,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppMetricasRoute: AppMetricasRoute,
   AppMotoristaRoute: AppMotoristaRoute,
   AppPerfilRoute: AppPerfilRoute,
+  AppUsuariosRoute: AppUsuariosRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
