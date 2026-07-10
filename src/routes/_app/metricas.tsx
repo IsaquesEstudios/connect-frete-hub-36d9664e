@@ -160,7 +160,7 @@ function MetricsPage() {
         return [
           clean(c.user.name),
           c.user.number,
-          u.whatsapp || "",
+          formatPhone(u.whatsapp || ""),
           email,
           c.user.type,
           c.unreadForAdmin,
