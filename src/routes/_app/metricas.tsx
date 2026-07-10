@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { repo } from "@/lib/data";
+import { getExternalUserEmails } from "@/lib/data/emails.functions";
 import { homeFor } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
@@ -59,7 +60,8 @@ function MetricsPage() {
     return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   }
 
-  function downloadReport() {
+  async function downloadReport() {
+    const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
     const lines: string[] = [];
     lines.push("Relatório ConectaFrete");
     lines.push(`Gerado em;${new Date().toLocaleString()}`);
@@ -81,14 +83,15 @@ function MetricsPage() {
     }
     lines.push("");
     lines.push("Conversas");
-    lines.push("Nome;Telefone;Email;Tipo;Código;Não lidas admin;Última mensagem;Tags");
+    lines.push("Nome;Código;Telefone;Email;Tipo;Não lidas admin;Última mensagem;Tags");
     const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
     for (const c of conversations) {
       const u = c.user as { whatsapp?: string; email?: string };
+      const email = u.email || emailMap[c.user.id] || "";
       const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join("|");
       const last = c.lastMessage ? new Date(c.lastMessage.createdAt).toLocaleString() : "";
       lines.push(
-        [c.user.name, u.whatsapp || "", u.email || "", c.user.type, c.user.number, c.unreadForAdmin, last, tagLabels]
+        [c.user.name, c.user.number, u.whatsapp || "", email, c.user.type, c.unreadForAdmin, last, tagLabels]
           .map(csvEscape)
           .join(";"),
       );
@@ -147,14 +150,17 @@ function MetricsPage() {
       headStyles: { fillColor: [30, 64, 175] },
     });
 
+    const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
     autoTable(doc, {
-      head: [["Nome", "Telefone", "Email", "Tipo", "Não lidas", "Tags"]],
+      head: [["Nome", "Código", "Telefone", "Email", "Tipo", "Não lidas", "Tags"]],
       body: conversations.map((c) => {
         const u = c.user as { whatsapp?: string; email?: string };
+        const email = u.email || emailMap[c.user.id] || "";
         return [
           clean(c.user.name),
+          c.user.number,
           u.whatsapp || "",
-          u.email || "",
+          email,
           c.user.type,
           c.unreadForAdmin,
           clean(c.tagIds.map((id) => tagsById[id] || id).join(", ")),
