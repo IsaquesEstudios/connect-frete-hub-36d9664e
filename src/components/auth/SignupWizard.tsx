@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
 import { formatPhone, phoneDigits, phonePlaceholder } from "@/lib/format-phone";
+import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
