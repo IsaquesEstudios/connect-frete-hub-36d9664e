@@ -188,11 +188,27 @@ function ProfilePage() {
             <Editable label="Nome" value={form.name} onChange={(value) => update("name", value)} />
             <Editable label="Email" value={form.email} onChange={(value) => update("email", value)} />
             <Editable label="Telefone / WhatsApp" value={form.whatsapp} onChange={(value) => update("whatsapp", value)} />
-            <Editable label="CPF" value={form.cpf} onChange={(value) => update("cpf", value)} />
+            <DocumentoField
+              tipo={docTipo}
+              value={docTipo === "cpf" ? form.cpf : form.cnpj}
+              onTipoChange={(t) => {
+                setDocTipo(t);
+                if (t === "cpf") { update("cnpj", ""); } else { update("cpf", ""); }
+              }}
+              onValueChange={(v) => update(docTipo === "cpf" ? "cpf" : "cnpj", v)}
+            />
             <Editable label="Cidade" value={form.cidade} onChange={(value) => update("cidade", value)} />
             <Editable label="Estado" value={form.estado} onChange={(value) => update("estado", value)} />
             <Editable label="Foto / URL" value={form.fotoUrl} onChange={(value) => update("fotoUrl", value)} />
           </div>
+
+          {user.type === "empresa" && (
+            <div className="space-y-4 border-t pt-5">
+              <h2 className="text-lg font-semibold text-foreground">Dados da empresa</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Editable label="Nome fantasia" value={form.nomeFantasia} onChange={(value) => update("nomeFantasia", value)} />
+                <Editable label="Perfil" value={form.perfilEmpresa} onChange={(value) => update("perfilEmpresa", value)} />
+
 
           {user.type === "empresa" && (
             <div className="space-y-4 border-t pt-5">
