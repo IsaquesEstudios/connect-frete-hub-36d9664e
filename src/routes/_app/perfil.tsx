@@ -11,6 +11,7 @@ import { homeFor, updateCurrentProfile } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserProfilePatch } from "@/lib/data";
 import { formatDoc, docPlaceholder, type DocTipo } from "@/lib/format-doc";
+import { formatPhone, phoneDigits } from "@/lib/format-phone";
 
 
 export const Route = createFileRoute("/_app/perfil")({
