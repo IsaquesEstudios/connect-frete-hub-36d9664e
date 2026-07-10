@@ -338,17 +338,24 @@ const fieldInput =
 function Field({
   label,
   children,
+  required,
 }: {
   label: string;
   children: React.ReactNode;
+  required?: boolean;
 }) {
   return (
     <div className={fieldWrap}>
-      <div className={fieldLabel}>{label}</div>
+      <div className={fieldLabel}>
+        {label}
+        {required && <span className="ml-1 text-red-500">*</span>}
+      </div>
       {children}
+      {required && <div className="text-[10px] text-red-500 mt-0.5">obrigatório</div>}
     </div>
   );
 }
+
 
 function StepBasic({ data, update }: StepProps) {
   return (
