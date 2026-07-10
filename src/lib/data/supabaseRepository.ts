@@ -170,15 +170,12 @@ class SupabaseRepository implements Repository {
   }
 
   private async bootstrap() {
-    await Promise.all([
-      this.loadUsers(),
-      this.loadTags(),
-      this.loadConvTags(),
-      this.loadMessages(),
-      this.loadBroadcasts(),
-    ]);
+    await this.loadUsers();
+    await Promise.all([this.loadTags(), this.loadConvTags(), this.loadMessages(), this.loadBroadcasts()]);
+    const { data } = await supabase.auth.getSession();
+    const current = data.session?.user.id ? this.getUser(data.session.user.id) : null;
     const admin = this.users.find((u) => u.type === "admin");
-    this.adminAuthId = admin?.id ?? null;
+    this.adminAuthId = current?.type === "admin" || current?.type === "colaborador" ? current.id : admin?.id ?? null;
 
     this.notify();
     if (!this.realtimeStarted) {
@@ -211,7 +208,7 @@ class SupabaseRepository implements Repository {
   }
   private async loadMessages() {
     const { data } = await supabase.from("messages").select("*").order("created_at");
-    if (data) this.messages = (data as MessageRow[]).map(mapMessage);
+    if (data) this.messages = (data as MessageRow[]).map((r) => this.mapMessage(r));
   }
   private async loadBroadcasts() {
     const { data } = await supabase
@@ -229,10 +226,10 @@ class SupabaseRepository implements Repository {
         { event: "*", schema: "public", table: "messages" },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            const m = mapMessage(payload.new as MessageRow);
+            const m = this.mapMessage(payload.new as MessageRow);
             if (!this.messages.find((x) => x.id === m.id)) this.messages.push(m);
           } else if (payload.eventType === "UPDATE") {
-            const m = mapMessage(payload.new as MessageRow);
+            const m = this.mapMessage(payload.new as MessageRow);
             const i = this.messages.findIndex((x) => x.id === m.id);
             if (i >= 0) this.messages[i] = m;
           } else if (payload.eventType === "DELETE") {
@@ -266,6 +263,38 @@ class SupabaseRepository implements Repository {
   getUser(idOrNumber: string) {
     return this.users.find((u) => u.id === idOrNumber || u.number === idOrNumber);
   }
+
+  private isStaff(user?: User) {
+    return user?.type === "admin" || user?.type === "colaborador";
+  }
+
+  private resolveConversationId(fromUserId: string, toUserId: string, fallback: string): string {
+    const from = this.getUser(fromUserId);
+    const to = this.getUser(toUserId);
+    if (!from || !to) return fallback;
+    const fromStaff = this.isStaff(from);
+    const toStaff = this.isStaff(to);
+    if (fromStaff === toStaff) return fallback;
+    const staff = fromStaff ? from : to;
+    const nonStaff = fromStaff ? to : from;
+    return `${nonStaff.number}__${staff.number}`;
+  }
+
+  private mapMessage(row: MessageRow): Message {
+    const msg = mapMessage(row);
+    msg.conversationId = this.resolveConversationId(row.from_user_id, row.to_user_id, row.conversation_id);
+    return msg;
+  }
+
+  private storageConversationId(fromUserId: string, toUserId: string): string {
+    const from = this.getUser(fromUserId);
+    const to = this.getUser(toUserId);
+    const fromStaff = this.isStaff(from);
+    const staff = fromStaff ? from : to;
+    const nonStaff = fromStaff ? to : from;
+    return nonStaff?.number ?? this.resolveConversationId(fromUserId, toUserId, "").split("__")[0] ?? "";
+  }
+
   nextNumberFor(_type: UserType): string {
     return "";
   }
@@ -330,13 +359,13 @@ class SupabaseRepository implements Repository {
     toUserId: string;
     body: string;
   }): Message {
-    const isStaffType = (t?: string) => t === "admin" || t === "colaborador";
-    const from = this.users.find((x) => x.id === fromUserId);
-    const to = this.users.find((x) => x.id === toUserId);
-    const fromStaff = isStaffType(from?.type);
+    const from = this.getUser(fromUserId);
+    const to = this.getUser(toUserId);
+    const fromStaff = this.isStaff(from);
     const staff = fromStaff ? from : to;
     const nonStaff = fromStaff ? to : from;
     const conversationId = `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
+    const dbConversationId = this.storageConversationId(fromUserId, toUserId);
     const tempId = `tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = Date.now();
     const msg: Message = {
@@ -355,7 +384,7 @@ class SupabaseRepository implements Repository {
     void supabase
       .from("messages")
       .insert({
-        conversation_id: conversationId,
+        conversation_id: dbConversationId,
         from_user_id: fromUserId,
         to_user_id: toUserId,
         body,
@@ -371,7 +400,7 @@ class SupabaseRepository implements Repository {
           console.error("sendMessage failed", error);
           return;
         }
-        const real = mapMessage(data as MessageRow);
+        const real = this.mapMessage(data as MessageRow);
         const tempIdx = this.messages.findIndex((m) => m.id === tempId);
         const realIdx = this.messages.findIndex((m) => m.id === real.id);
         if (realIdx >= 0) {
@@ -408,15 +437,22 @@ class SupabaseRepository implements Repository {
   deleteConversation(conversationId: string): void {
     const prevMsgs = this.messages;
     const prevConv = this.convTags;
+    const idsToDelete = this.messages
+      .filter((m) => m.conversationId === conversationId && !m.id.startsWith("tmp_"))
+      .map((m) => m.id);
+    const tagConversationId = conversationId.split("__")[0] || conversationId;
     this.messages = this.messages.filter((m) => m.conversationId !== conversationId);
-    this.convTags = this.convTags.filter((c) => c.conversationId !== conversationId);
+    this.convTags = this.convTags.filter(
+      (c) => c.conversationId !== conversationId && c.conversationId !== tagConversationId,
+    );
     this.notify();
     void (async () => {
       await supabase.from("conversation_tags").delete().eq("conversation_id", conversationId);
-      const { error } = await supabase
-        .from("messages")
-        .delete()
-        .eq("conversation_id", conversationId);
+      if (tagConversationId !== conversationId) {
+        await supabase.from("conversation_tags").delete().eq("conversation_id", tagConversationId);
+      }
+      const query = supabase.from("messages").delete();
+      const { error } = idsToDelete.length > 0 ? await query.in("id", idsToDelete) : await query.eq("conversation_id", conversationId);
       if (error) {
         console.error("deleteConversation failed", error);
         this.messages = prevMsgs;
@@ -647,7 +683,7 @@ class SupabaseRepository implements Repository {
         .then(({ data }) => {
           if (data) {
             for (const row of data as MessageRow[]) {
-              const m = mapMessage(row);
+              const m = this.mapMessage(row);
               if (!this.messages.find((x) => x.id === m.id)) this.messages.push(m);
             }
             this.notify();
