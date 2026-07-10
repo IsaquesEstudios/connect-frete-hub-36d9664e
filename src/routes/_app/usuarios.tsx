@@ -1,14 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search, Users } from "lucide-react";
+import { Pencil, Search, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { repo } from "@/lib/data";
+import type { User } from "@/lib/data";
 import { getExternalUserEmails } from "@/lib/data/emails.functions";
 import { homeFor } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import { useRepoVersion, useEphemeralVersion } from "@/lib/hooks/useRepo";
 import { formatPhone } from "@/lib/format-phone";
+import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
 
 export const Route = createFileRoute("/_app/usuarios")({
   head: () => ({ meta: [{ title: "Usuários — ConectaFrete" }] }),
