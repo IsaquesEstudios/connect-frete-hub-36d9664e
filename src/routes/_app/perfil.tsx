@@ -308,7 +308,9 @@ function DocumentoField({
         placeholder={docPlaceholder(tipo)}
         inputMode="numeric"
       />
+      <p className="text-[11px] text-destructive">obrigatório</p>
     </div>
+
   );
 }
 
