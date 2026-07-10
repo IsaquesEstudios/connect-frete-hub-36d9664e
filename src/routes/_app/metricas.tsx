@@ -60,7 +60,8 @@ function MetricsPage() {
     return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   }
 
-  function downloadReport() {
+  async function downloadReport() {
+    const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
     const lines: string[] = [];
     lines.push("Relatório ConectaFrete");
     lines.push(`Gerado em;${new Date().toLocaleString()}`);
@@ -82,14 +83,15 @@ function MetricsPage() {
     }
     lines.push("");
     lines.push("Conversas");
-    lines.push("Nome;Telefone;Email;Tipo;Código;Não lidas admin;Última mensagem;Tags");
+    lines.push("Nome;Código;Telefone;Email;Tipo;Não lidas admin;Última mensagem;Tags");
     const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
     for (const c of conversations) {
       const u = c.user as { whatsapp?: string; email?: string };
+      const email = u.email || emailMap[c.user.id] || "";
       const tagLabels = c.tagIds.map((id) => tagsById[id] || id).join("|");
       const last = c.lastMessage ? new Date(c.lastMessage.createdAt).toLocaleString() : "";
       lines.push(
-        [c.user.name, u.whatsapp || "", u.email || "", c.user.type, c.user.number, c.unreadForAdmin, last, tagLabels]
+        [c.user.name, c.user.number, u.whatsapp || "", email, c.user.type, c.unreadForAdmin, last, tagLabels]
           .map(csvEscape)
           .join(";"),
       );
