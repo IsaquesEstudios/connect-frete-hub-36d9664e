@@ -257,6 +257,14 @@ function ProfilePage() {
                 <Editable label="Tipo de veículo" value={form.tipoVeiculo} onChange={(value) => update("tipoVeiculo", value)} />
                 <Editable label="RNTRC" value={form.rntrc} onChange={(value) => update("rntrc", value)} />
                 <Editable label="Carroceria" value={form.carroceria} onChange={(value) => update("carroceria", value)} />
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Site / Redes sociais</Label>
+                  <Textarea
+                    value={form.siteRedeSocial}
+                    onChange={(event) => update("siteRedeSocial", event.target.value)}
+                    placeholder="Instagram, Facebook, site ou outros links"
+                  />
+                </div>
               </div>
             </div>
           )}
