@@ -142,7 +142,7 @@ export async function listColaboradores(): Promise<User[]> {
     .select("*")
     .eq("type", "colaborador")
     .order("user_number", { ascending: true });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(translateAuthError(error));
   return (data ?? []).map((r: unknown) => profileToUser(r as Parameters<typeof profileToUser>[0]));
 }
 
@@ -157,7 +157,7 @@ export async function createColaborador(input: { name: string; email: string; pa
     password: input.password,
     options: { emailRedirectTo: window.location.origin },
   });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(translateAuthError(error));
   if (!data.user) throw new Error("Não foi possível criar o usuário.");
 
   const { data: existing } = await supabase
@@ -189,17 +189,17 @@ export async function createColaborador(input: { name: string; email: string; pa
     notify();
   }
 
-  if (insErr) throw new Error(`Perfil: ${insErr.message}`);
+  if (insErr) throw new Error(`Perfil: ${translateAuthError(insErr)}`);
 }
 
 export async function setColaboradorActive(id: string, active: boolean): Promise<void> {
   const { error } = await supabase.from("profiles").update({ active }).eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(translateAuthError(error));
 }
 
 export async function deleteColaborador(id: string): Promise<void> {
   const { error } = await supabase.from("profiles").delete().eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(translateAuthError(error));
 }
 
 
