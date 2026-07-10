@@ -5,10 +5,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { homeFor, updateCurrentProfile } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User, UserProfilePatch } from "@/lib/data";
+import { formatDoc, docPlaceholder, type DocTipo } from "@/lib/format-doc";
+
 
 export const Route = createFileRoute("/_app/perfil")({
   head: () => ({ meta: [{ title: "Perfil — ConectaFrete" }] }),
