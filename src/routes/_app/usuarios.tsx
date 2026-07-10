@@ -147,7 +147,9 @@ function UsuariosPage() {
   // touch ephemeral version so online/lastSeen refresh
   void ev;
 
+  if (loading) return null;
   if (!user || user.type !== "admin") return null;
+
 
   return (
     <div className="min-h-screen bg-background p-8">
