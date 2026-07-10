@@ -330,10 +330,14 @@ class SupabaseRepository implements Repository {
     toUserId: string;
     body: string;
   }): Message {
-    const admin = this.adminAuthId;
-    const nonAdminAuthId = fromUserId === admin ? toUserId : fromUserId;
-    const nonAdmin = this.users.find((u) => u.id === nonAdminAuthId);
-    const conversationId = nonAdmin?.number ?? "";
+    const isStaff = (id: string) => {
+      const u = this.users.find((x) => x.id === id);
+      return u?.type === "admin" || u?.type === "colaborador";
+    };
+    const fromStaff = isStaff(fromUserId);
+    const nonStaffAuthId = fromStaff ? toUserId : fromUserId;
+    const nonStaff = this.users.find((u) => u.id === nonStaffAuthId);
+    const conversationId = nonStaff?.number ?? "";
     const tempId = `tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = Date.now();
     const msg: Message = {
@@ -343,8 +347,8 @@ class SupabaseRepository implements Repository {
       toUserId,
       body,
       createdAt: now,
-      readByAdmin: fromUserId === admin,
-      readByUser: fromUserId !== admin,
+      readByAdmin: fromStaff,
+      readByUser: !fromStaff,
     };
     this.messages.push(msg);
     this.notify();
@@ -356,8 +360,8 @@ class SupabaseRepository implements Repository {
         from_user_id: fromUserId,
         to_user_id: toUserId,
         body,
-        read_by_admin: fromUserId === admin,
-        read_by_user: fromUserId !== admin,
+        read_by_admin: fromStaff,
+        read_by_user: !fromStaff,
       })
       .select("*")
       .single()
