@@ -79,8 +79,14 @@ async function bootstrap() {
   initialDone = true;
   notify();
   supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (session) await applySessionProfile(await loadProfile(session.user.id, { fresh: true }));
-    else cachedUser = null;
+    if (session) {
+      try {
+        await applySessionProfile(await loadProfile(session.user.id, { fresh: true }));
+      } catch {
+        await supabase.auth.signOut();
+        cachedUser = null;
+      }
+    } else cachedUser = null;
     notify();
   });
 }
