@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
-import { Building2, Download, MessageSquare, Truck, MailWarning, Tags, FileSpreadsheet, FileText } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Building2, Download, MessageSquare, Truck, MailWarning, Tags, FileSpreadsheet, FileText, FileType, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { repo } from "@/lib/data";
 import { getExternalUserEmails } from "@/lib/data/emails.functions";
 import { homeFor } from "@/lib/auth/session";
@@ -29,8 +30,32 @@ function MetricsPage() {
     if (user && user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
   }, [user, navigate]);
 
-  const conversations = useMemo(() => repo.listConversations(), [v]);
+  const allConversations = useMemo(() => repo.listConversations(), [v]);
   const tags = useMemo(() => repo.listTags(), [v]);
+  const [filterUf, setFilterUf] = useState<string>("todos");
+  const [filterTag, setFilterTag] = useState<string>("todos");
+
+  const ufOptions = useMemo(() => {
+    const set = new Set<string>();
+    allConversations.forEach((c) => {
+      const uf = (c.user as { estado?: string }).estado;
+      if (uf) set.add(uf.toUpperCase());
+    });
+    return Array.from(set).sort();
+  }, [allConversations]);
+
+  const conversations = useMemo(() => {
+    return allConversations.filter((c) => {
+      if (filterUf !== "todos") {
+        const uf = ((c.user as { estado?: string }).estado || "").toUpperCase();
+        if (uf !== filterUf) return false;
+      }
+      if (filterTag !== "todos") {
+        if (!c.tagIds.includes(filterTag)) return false;
+      }
+      return true;
+    });
+  }, [allConversations, filterUf, filterTag]);
 
   const stats = useMemo(() => {
     const empresas = conversations.filter((c) => c.user.type === "empresa").length;
