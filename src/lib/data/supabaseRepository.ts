@@ -464,10 +464,14 @@ class SupabaseRepository implements Repository {
   }
 
   listConversations() {
-    const nonAdmins = this.users.filter((u) => u.type !== "admin");
-    return nonAdmins
+    const nonStaff = this.users.filter((u) => u.type !== "admin" && u.type !== "colaborador");
+    const adminNumber = this.users.find((u) => u.id === this.adminAuthId)?.number ?? "";
+    return nonStaff
       .map((user) => {
-        const conv = this.messages.filter((m) => m.conversationId === user.number);
+        const convId = `${user.number}__${adminNumber}`;
+        const conv = this.messages.filter(
+          (m) => m.conversationId === convId || m.conversationId === user.number,
+        );
         const lastMessage = [...conv].sort((a, b) => b.createdAt - a.createdAt)[0];
         const unreadForAdmin = conv.filter(
           (m) => m.toUserId === this.adminAuthId && !m.readByAdmin,
@@ -479,6 +483,7 @@ class SupabaseRepository implements Repository {
       })
       .sort((a, b) => (b.lastMessage?.createdAt ?? 0) - (a.lastMessage?.createdAt ?? 0));
   }
+
 
   // ============ tags ============
   listTags() {
