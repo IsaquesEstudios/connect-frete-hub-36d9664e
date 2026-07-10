@@ -126,11 +126,13 @@ function ProfilePage() {
   useEffect(() => {
     if (user) {
       setForm(toProfileForm(user));
-      if (user.cnpj) setDocTipo("cnpj");
-      else if (user.cpf) setDocTipo("cpf");
+      const u = user as User & { cnpj?: string; cpf?: string };
+      if (u.cnpj) setDocTipo("cnpj");
+      else if (u.cpf) setDocTipo("cpf");
       else setDocTipo(user.type === "empresa" ? "cnpj" : "cpf");
     }
   }, [user]);
+
 
 
   if (!user) return null;
