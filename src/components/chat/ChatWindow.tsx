@@ -73,7 +73,10 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const [recordSeconds, setRecordSeconds] = useState(0);
 
   const otherIsStaff = other.type === "admin" || other.type === "colaborador";
-  const conversationId = otherIsStaff ? me.number : other.number;
+  const staffNumber = otherIsStaff ? other.number : me.number;
+  const nonStaffNumber = otherIsStaff ? me.number : other.number;
+  const conversationId = `${nonStaffNumber}__${staffNumber}`;
+
 
   const messages = useMemo(() => repo.listMessages(conversationId), [conversationId, v]);
   const otherOnline = useMemo(() => repo.isOnline(other.id), [other.id, ev, v]);
