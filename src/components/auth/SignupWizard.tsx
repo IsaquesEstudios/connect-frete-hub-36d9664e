@@ -133,7 +133,7 @@ export function SignupWizard({
       return (
         data.nome.trim().length > 1 &&
         docDigitsValid(data.documento, data.documentoTipo) &&
-        data.whatsapp.trim().length >= 8 &&
+        phoneDigits(data.whatsapp).length >= 10 &&
         /\S+@\S+\.\S+/.test(data.email) &&
         data.senha.length >= 6
       );
