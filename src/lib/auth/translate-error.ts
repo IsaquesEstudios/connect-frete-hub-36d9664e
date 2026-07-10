@@ -21,6 +21,7 @@ const MAP: { pattern: RegExp; message: string }[] = [
   [/permission denied|not authorized|forbidden/i, "Sem permissão para executar esta ação."],
   [/violates row-level security/i, "Sem permissão para executar esta ação."],
   [/violates.*not-null|null value in column/i, "Preencha todos os campos obrigatórios."],
+  [/could not find the '?(\w+)'? column of '?(\w+)'? in the schema cache/i, "Erro interno: coluna '$1' não existe na tabela '$2'. Contate o suporte."],
   [/violates unique constraint/i, "Este valor já está em uso."],
   [/jwt|token/i, "Sessão expirada. Faça login novamente."],
 ].map(([p, m]) => ({ pattern: p as RegExp, message: m as string }));

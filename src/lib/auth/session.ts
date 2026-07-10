@@ -175,7 +175,8 @@ export async function createColaborador(input: { name: string; email: string; pa
     user_number,
     type: "colaborador",
     name: input.name,
-    email: input.email.trim().toLowerCase(),
+    // email vive em auth.users
+
     active: true,
   });
 
@@ -262,7 +263,8 @@ export async function signup(input: SignupInput): Promise<User> {
     user_number,
     type: input.type,
     name: input.name,
-    email: input.email.trim().toLowerCase(),
+    // email vive em auth.users; não replicar em profiles
+
     cnpj: input.cnpj ?? null,
     cpf: input.cpf ?? null,
     whatsapp: input.whatsapp ?? null,
