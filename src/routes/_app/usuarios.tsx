@@ -81,6 +81,18 @@ function UsuariosPage() {
   const [query, setQuery] = useState("");
   const [emails, setEmails] = useState<Record<string, string>>({});
   const [editing, setEditing] = useState<User | null>(null);
+  const [confirmBlock, setConfirmBlock] = useState<User | null>(null);
+
+  const toggleActive = async (u: User, next: boolean) => {
+    try {
+      await repo.updateUser(u.id, { active: next });
+      toast.success(next ? "Usuário desbloqueado." : "Usuário bloqueado.");
+    } catch (e) {
+      toast.error(translateAuthError(e));
+    } finally {
+      setConfirmBlock(null);
+    }
+  };
 
   useEffect(() => {
     if (user && user.type !== "admin") navigate({ to: homeFor(user) as "/admin" });
