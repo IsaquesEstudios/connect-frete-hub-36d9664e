@@ -14,7 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, CheckCheck, Clock, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
+import { Camera, CheckCheck, Clock, FileText, ImagePlus, Mic, Paperclip, Pencil, Send, Square, Trash2 } from "lucide-react";
+import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
 import { formatPhone } from "@/lib/format-phone";
@@ -78,6 +79,7 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const audioChunksRef = useRef<Blob[]>([]);
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
+  const [editOpen, setEditOpen] = useState(false);
 
   const otherIsStaff = other.type === "admin" || other.type === "colaborador";
   const staffNumber = otherIsStaff ? other.number : me.number;
@@ -331,8 +333,18 @@ export function ChatWindow({ me, other, viewer }: Props) {
               />
             )}
           </div>
+          {viewer === "admin" && other.type !== "admin" && (
+            <div className="mt-4">
+              <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-4 w-4 mr-1" /> Editar dados
+              </Button>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
+      <AdminEditUserDialog user={other} open={editOpen} onOpenChange={setEditOpen} />
+
+
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {groups.length === 0 && (
