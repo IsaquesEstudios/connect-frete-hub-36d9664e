@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Camera, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
+import { Camera, CheckCheck, Clock, FileText, ImagePlus, Mic, Paperclip, Send, Square, Trash2 } from "lucide-react";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
 import { formatPhone } from "@/lib/format-phone";
@@ -26,6 +26,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+
+function MessageTicks({ message, viewer }: { message: Message; viewer: "admin" | "user" }) {
+  if (message.id.startsWith("tmp_")) return <Clock className="h-3 w-3 opacity-80" aria-label="Enviando" />;
+  const read = viewer === "admin" ? message.readByUser : message.readByAdmin;
+  if (read) return <CheckCheck className="h-3.5 w-3.5 text-sky-300" aria-label="Lida" />;
+  return <CheckCheck className="h-3.5 w-3.5 opacity-80" aria-label="Entregue" />;
+}
 
 function fmtTime(ts: number) {
   const d = new Date(ts);
@@ -373,9 +380,10 @@ export function ChatWindow({ me, other, viewer }: Props) {
                       <div className="whitespace-pre-wrap break-words">{m.body}</div>
                     )}
                     <div
-                      className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} text-right ${isMedia ? "px-2 pb-1" : ""}`}
+                      className={`mt-1 text-[10px] flex items-center gap-1 justify-end ${mine ? "text-primary-foreground/70" : "text-muted-foreground"} ${isMedia ? "px-2 pb-1" : ""}`}
                     >
-                      {fmtTime(m.createdAt)}
+                      <span>{fmtTime(m.createdAt)}</span>
+                      {mine && <MessageTicks message={m} viewer={viewer} />}
                     </div>
                   </div>
                   {isAdmin && !mine && (
