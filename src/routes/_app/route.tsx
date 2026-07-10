@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth/useAuth";
+import { refreshCurrentUser } from "@/lib/auth/session";
 import { repo } from "@/lib/data";
 import { phoneDigits } from "@/lib/format-phone";
 
@@ -20,6 +21,21 @@ function AppGate() {
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    refreshCurrentUser()
+      .then((freshUser) => {
+        if (cancelled || freshUser) return;
+        toast.error("Sua conta foi desativada. Entre em contato com o administrador.");
+        navigate({ to: "/auth" });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, location.pathname, navigate]);
 
   // Força usuários antigos a preencher WhatsApp (obrigatório)
   useEffect(() => {

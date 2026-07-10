@@ -24,6 +24,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useRepoVersion, useEphemeralVersion } from "@/lib/hooks/useRepo";
 import { formatPhone } from "@/lib/format-phone";
 import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
+import { setExternalUserActive } from "@/lib/data/admin-users.functions";
 
 export const Route = createFileRoute("/_app/usuarios")({
   head: () => ({ meta: [{ title: "Usuários — ConectaFrete" }] }),
@@ -85,7 +86,8 @@ function UsuariosPage() {
 
   const toggleActive = async (u: User, next: boolean) => {
     try {
-      await repo.updateUser(u.id, { active: next });
+      await setExternalUserActive({ data: { userId: u.id, active: next } });
+      repo.applyLocalUserPatch(u.id, { active: next });
       toast.success(next ? "Usuário desbloqueado." : "Usuário bloqueado.");
     } catch (e) {
       toast.error(translateAuthError(e));

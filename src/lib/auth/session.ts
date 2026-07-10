@@ -12,12 +12,14 @@ function notify() {
   listeners.forEach((l) => l());
 }
 
-async function loadProfile(authId: string): Promise<User | null> {
+async function loadProfile(authId: string, options: { fresh?: boolean } = {}): Promise<User | null> {
   // First try cache (populated by repo bootstrap)
-  for (let i = 0; i < 30; i++) {
-    const u = repo.getUser(authId);
-    if (u) return u;
-    await new Promise((r) => setTimeout(r, 100));
+  if (!options.fresh) {
+    for (let i = 0; i < 30; i++) {
+      const u = repo.getUser(authId);
+      if (u) return u;
+      await new Promise((r) => setTimeout(r, 100));
+    }
   }
   // Fallback: fetch directly
   const { data } = await supabase.from("profiles").select("*").eq("id", authId).maybeSingle();
@@ -25,15 +27,40 @@ async function loadProfile(authId: string): Promise<User | null> {
   return profileToUser(data as Parameters<typeof profileToUser>[0]);
 }
 
+async function applySessionProfile(profile: User | null): Promise<User | null> {
+  if (profile?.active === false) {
+    await supabase.auth.signOut();
+    cachedUser = null;
+    notify();
+    return null;
+  }
+  if (profile) cachedUser = profile;
+  notify();
+  return cachedUser;
+}
+
+export async function refreshCurrentUser(): Promise<User | null> {
+  const { data } = await supabase.auth.getSession();
+  if (!data.session) {
+    cachedUser = null;
+    notify();
+    return null;
+  }
+  const profile = await loadProfile(data.session.user.id, { fresh: true });
+  if (!profile) return cachedUser;
+  return applySessionProfile(profile);
+}
+
 async function bootstrap() {
   const { data } = await supabase.auth.getSession();
   if (data.session) {
-    cachedUser = await loadProfile(data.session.user.id);
+    const profile = await loadProfile(data.session.user.id, { fresh: true });
+    await applySessionProfile(profile);
   }
   initialDone = true;
   notify();
   supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (session) cachedUser = await loadProfile(session.user.id);
+    if (session) await applySessionProfile(await loadProfile(session.user.id, { fresh: true }));
     else cachedUser = null;
     notify();
   });
