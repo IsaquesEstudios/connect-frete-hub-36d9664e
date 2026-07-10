@@ -400,8 +400,9 @@ function StepBasic({ data, update }: StepProps) {
         <Input
           required
           value={data.whatsapp}
-          onChange={(e) => update("whatsapp", e.target.value)}
-          placeholder="(11) 90000-0000"
+          onChange={(e) => update("whatsapp", formatPhone(e.target.value))}
+          placeholder={phonePlaceholder()}
+          inputMode="tel"
           className={fieldInput}
         />
       </Field>
