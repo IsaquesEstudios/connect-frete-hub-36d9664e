@@ -340,7 +340,7 @@ function AdminPanel() {
                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => {
-                          repo.deleteConversation(selectedUser.number);
+                          repo.deleteConversation(`${selectedUser.number}__${user.number}`);
                           setSelected(null);
                           setMobileChat(false);
                         }}
