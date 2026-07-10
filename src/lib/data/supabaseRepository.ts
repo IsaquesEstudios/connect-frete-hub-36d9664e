@@ -330,14 +330,13 @@ class SupabaseRepository implements Repository {
     toUserId: string;
     body: string;
   }): Message {
-    const isStaff = (id: string) => {
-      const u = this.users.find((x) => x.id === id);
-      return u?.type === "admin" || u?.type === "colaborador";
-    };
-    const fromStaff = isStaff(fromUserId);
-    const nonStaffAuthId = fromStaff ? toUserId : fromUserId;
-    const nonStaff = this.users.find((u) => u.id === nonStaffAuthId);
-    const conversationId = nonStaff?.number ?? "";
+    const isStaffType = (t?: string) => t === "admin" || t === "colaborador";
+    const from = this.users.find((x) => x.id === fromUserId);
+    const to = this.users.find((x) => x.id === toUserId);
+    const fromStaff = isStaffType(from?.type);
+    const staff = fromStaff ? from : to;
+    const nonStaff = fromStaff ? to : from;
+    const conversationId = `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
     const tempId = `tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = Date.now();
     const msg: Message = {
@@ -376,7 +375,6 @@ class SupabaseRepository implements Repository {
         const tempIdx = this.messages.findIndex((m) => m.id === tempId);
         const realIdx = this.messages.findIndex((m) => m.id === real.id);
         if (realIdx >= 0) {
-          // Realtime já entregou a mensagem — apenas remove o placeholder temp.
           if (tempIdx >= 0) this.messages.splice(tempIdx, 1);
         } else if (tempIdx >= 0) {
           this.messages[tempIdx] = real;
@@ -387,6 +385,7 @@ class SupabaseRepository implements Repository {
       });
     return msg;
   }
+
 
   deleteMessage(id: string): void {
     const prev = this.messages;
