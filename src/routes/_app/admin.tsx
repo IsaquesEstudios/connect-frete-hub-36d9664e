@@ -234,13 +234,17 @@ function AdminPanel() {
                   }`}
                 >
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-semibold text-white shrink-0 ${color}`}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-semibold text-white shrink-0 overflow-hidden ${color}`}
                   >
-                    {c.user.name
-                      .split(" ")
-                      .slice(0, 2)
-                      .map((s) => s[0])
-                      .join("")}
+                    {c.user.fotoUrl ? (
+                      <img src={c.user.fotoUrl} alt={c.user.name} className="h-full w-full object-cover" />
+                    ) : (
+                      c.user.name
+                        .split(" ")
+                        .slice(0, 2)
+                        .map((s) => s[0])
+                        .join("")
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
