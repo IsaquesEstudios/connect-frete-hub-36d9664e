@@ -317,7 +317,7 @@ class SupabaseRepository implements Repository {
         .update(row)
         .eq("id", user.id)
         .select("*")
-        .single()
+        .maybeSingle()
         .then(({ data, error }) => {
           if (error) {
             Object.assign(user, previous);
