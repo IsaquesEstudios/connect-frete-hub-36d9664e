@@ -121,7 +121,7 @@ function profilePatchToRow(patch: UserProfilePatch): Record<string, string | boo
   };
 
   put("name", patch.name);
-  put("email", patch.email);
+  // email vive em auth.users; a tabela profiles não tem essa coluna
   put("whatsapp", patch.whatsapp);
   put("cpf", patch.cpf);
   put("cnpj", patch.cnpj);
