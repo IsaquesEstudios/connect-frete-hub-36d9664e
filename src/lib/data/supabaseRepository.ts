@@ -501,7 +501,7 @@ class SupabaseRepository implements Repository {
   }
 
   listConversations() {
-    const nonStaff = this.users.filter((u) => u.type !== "admin" && u.type !== "colaborador");
+    const nonStaff = this.users.filter((u) => u.type !== "admin" && u.id !== this.adminAuthId);
     const adminNumber = this.users.find((u) => u.id === this.adminAuthId)?.number ?? "";
     return nonStaff
       .map((user) => {
