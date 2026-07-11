@@ -121,7 +121,7 @@ function profilePatchToRow(patch: UserProfilePatch): Record<string, string | boo
   };
 
   put("name", patch.name);
-  put("email", patch.email);
+  // email vive em auth.users; a tabela profiles não tem essa coluna
   put("whatsapp", patch.whatsapp);
   put("cpf", patch.cpf);
   put("cnpj", patch.cnpj);
@@ -317,7 +317,7 @@ class SupabaseRepository implements Repository {
         .update(row)
         .eq("id", user.id)
         .select("*")
-        .single()
+        .maybeSingle()
         .then(({ data, error }) => {
           if (error) {
             Object.assign(user, previous);
