@@ -115,6 +115,7 @@ function patchForUser(user: User, form: ProfileForm): UserProfilePatch {
     patch.tipoVeiculo = form.tipoVeiculo;
     patch.rntrc = form.rntrc;
     patch.carroceria = form.carroceria;
+    patch.peso = form.peso;
     patch.siteRedeSocial = form.siteRedeSocial;
   }
 
