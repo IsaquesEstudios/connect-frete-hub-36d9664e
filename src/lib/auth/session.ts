@@ -225,6 +225,7 @@ export interface SignupInput {
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
+  peso?: string;
   // empresa
   nomeFantasia?: string;
   perfilEmpresa?: "transportador" | "embarcador" | "agenciador";
