@@ -31,6 +31,7 @@ export interface MotoristaUser extends BaseUser {
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
+  peso?: string;
   siteRedeSocial?: string;
 }
 
