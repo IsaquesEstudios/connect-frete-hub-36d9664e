@@ -425,10 +425,20 @@ export function BroadcastDialog({
               </div>
             )}
 
-            <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-              Será enviada para <strong className="text-foreground">{recipients.length}</strong>{" "}
-              usuário(s).
-            </div>
+            {recipients.length === 0 ? (
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive flex items-center gap-2 animate-pulse">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-destructive" />
+                </span>
+                <strong>Selecione pelo menos 1 destinatário para enviar.</strong>
+              </div>
+            ) : (
+              <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+                Será enviada para <strong className="text-foreground">{recipients.length}</strong>{" "}
+                usuário(s).
+              </div>
+            )}
 
             <DialogFooter>
               <Button onClick={send} disabled={!canSend}>
