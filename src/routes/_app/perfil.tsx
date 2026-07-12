@@ -85,6 +85,7 @@ function toProfileForm(user: User): ProfileForm {
           tipoVeiculo: user.tipoVeiculo ?? "",
           rntrc: user.rntrc ?? "",
           carroceria: user.carroceria ?? "",
+          peso: user.peso ?? "",
           siteRedeSocial: user.siteRedeSocial ?? "",
         }
       : {}),
