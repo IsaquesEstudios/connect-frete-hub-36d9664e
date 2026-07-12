@@ -139,6 +139,7 @@ export type Database = {
           name: string
           nome_fantasia: string | null
           perfil_empresa: string | null
+          peso: string | null
           placa: string | null
           rntrc: string | null
           site_rede_social: string | null
@@ -164,6 +165,7 @@ export type Database = {
           name: string
           nome_fantasia?: string | null
           perfil_empresa?: string | null
+          peso?: string | null
           placa?: string | null
           rntrc?: string | null
           site_rede_social?: string | null
@@ -189,6 +191,7 @@ export type Database = {
           name?: string
           nome_fantasia?: string | null
           perfil_empresa?: string | null
+          peso?: string | null
           placa?: string | null
           rntrc?: string | null
           site_rede_social?: string | null
