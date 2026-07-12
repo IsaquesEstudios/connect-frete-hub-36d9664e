@@ -135,6 +135,7 @@ function profilePatchToRow(patch: UserProfilePatch): Record<string, string | boo
   put("tipo_veiculo", patch.tipoVeiculo);
   put("rntrc", patch.rntrc);
   put("carroceria", patch.carroceria);
+  put("peso", patch.peso);
   put("nome_fantasia", patch.nomeFantasia);
   put("perfil_empresa", patch.perfilEmpresa);
   put("site_rede_social", patch.siteRedeSocial);
