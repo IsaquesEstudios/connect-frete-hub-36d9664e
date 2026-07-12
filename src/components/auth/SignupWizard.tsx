@@ -166,9 +166,9 @@ export function SignupWizard({
       const redesStr = Object.keys(redes).length ? JSON.stringify(redes) : undefined;
 
       const pesoDigits = data.peso.replace(/\D/g, "");
-      const pesoStr = pesoDigits ? `${Number(pesoDigits).toLocaleString("pt-BR")} kg` : "";
+      const pesoFinal = pesoDigits ? `${Number(pesoDigits).toLocaleString("pt-BR")} kg` : undefined;
       const carroceriaParts = !isEmpresa && data.carroceria
-        ? [data.carroceria, pesoStr ? `Peso: ${pesoStr}` : "", data.carroceriaObs.trim() ? `Obs: ${data.carroceriaObs.trim()}` : ""].filter(Boolean)
+        ? [data.carroceria, data.carroceriaObs.trim() ? `Obs: ${data.carroceriaObs.trim()}` : ""].filter(Boolean)
         : [];
       const carroceriaFinal = carroceriaParts.length ? carroceriaParts.join(" | ") : undefined;
       const veiculoFinal = !isEmpresa && data.tipoVeiculo
