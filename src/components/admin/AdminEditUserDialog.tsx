@@ -157,9 +157,8 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
                 <Field label="Veículo"><Input value={form.veiculo || ""} onChange={(e) => set("veiculo", e.target.value)} /></Field>
                 <Field label="Tipo de veículo"><Input value={form.tipoVeiculo || ""} onChange={(e) => set("tipoVeiculo", e.target.value)} /></Field>
                 <Field label="RNTRC"><Input value={form.rntrc || ""} onChange={(e) => set("rntrc", e.target.value)} /></Field>
-                <Field label="Carroceria" className="md:col-span-2">
-                  <Input value={form.carroceria || ""} onChange={(e) => set("carroceria", e.target.value)} />
-                </Field>
+                <Field label="Carroceria"><Input value={form.carroceria || ""} onChange={(e) => set("carroceria", e.target.value)} /></Field>
+                <Field label="Peso (kg)"><Input value={form.peso || ""} onChange={(e) => set("peso", e.target.value)} /></Field>
               </>
             )}
           </div>
