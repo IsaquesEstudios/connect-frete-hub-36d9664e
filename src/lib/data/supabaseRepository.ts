@@ -83,6 +83,7 @@ export function profileToUser(p: ProfileRow): User {
       tipoVeiculo: p.tipo_veiculo ?? undefined,
       rntrc: p.rntrc ?? undefined,
       carroceria: p.carroceria ?? undefined,
+      peso: p.peso ?? undefined,
       siteRedeSocial: p.site_rede_social ?? undefined,
     };
   if (p.type === "colaborador") return { ...base, type: "colaborador" };
