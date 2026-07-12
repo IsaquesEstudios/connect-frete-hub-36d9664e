@@ -54,6 +54,7 @@ const emptyForm: ProfileForm = {
   tipoVeiculo: "",
   rntrc: "",
   carroceria: "",
+  peso: "",
   nomeFantasia: "",
   perfilEmpresa: "",
   siteRedeSocial: "",
