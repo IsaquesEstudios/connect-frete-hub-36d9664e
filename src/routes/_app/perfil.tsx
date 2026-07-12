@@ -34,6 +34,7 @@ type ProfileForm = {
   tipoVeiculo: string;
   rntrc: string;
   carroceria: string;
+  peso: string;
   nomeFantasia: string;
   perfilEmpresa: string;
   siteRedeSocial: string;
@@ -53,6 +54,7 @@ const emptyForm: ProfileForm = {
   tipoVeiculo: "",
   rntrc: "",
   carroceria: "",
+  peso: "",
   nomeFantasia: "",
   perfilEmpresa: "",
   siteRedeSocial: "",
@@ -83,6 +85,7 @@ function toProfileForm(user: User): ProfileForm {
           tipoVeiculo: user.tipoVeiculo ?? "",
           rntrc: user.rntrc ?? "",
           carroceria: user.carroceria ?? "",
+          peso: user.peso ?? "",
           siteRedeSocial: user.siteRedeSocial ?? "",
         }
       : {}),
@@ -112,6 +115,7 @@ function patchForUser(user: User, form: ProfileForm): UserProfilePatch {
     patch.tipoVeiculo = form.tipoVeiculo;
     patch.rntrc = form.rntrc;
     patch.carroceria = form.carroceria;
+    patch.peso = form.peso;
     patch.siteRedeSocial = form.siteRedeSocial;
   }
 
@@ -257,6 +261,7 @@ function ProfilePage() {
                 <Editable label="Tipo de veículo" value={form.tipoVeiculo} onChange={(value) => update("tipoVeiculo", value)} />
                 <Editable label="RNTRC" value={form.rntrc} onChange={(value) => update("rntrc", value)} />
                 <Editable label="Carroceria" value={form.carroceria} onChange={(value) => update("carroceria", value)} />
+                <Editable label="Peso (kg)" value={form.peso} onChange={(value) => update("peso", value)} />
                 <div className="space-y-2 md:col-span-2">
                   <Label>Site / Redes sociais</Label>
                   <Textarea

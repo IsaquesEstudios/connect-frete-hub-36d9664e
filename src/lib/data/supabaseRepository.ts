@@ -19,6 +19,7 @@ type ProfileRow = {
   tipo_veiculo: string | null;
   rntrc: string | null;
   carroceria: string | null;
+  peso: string | null;
   nome_fantasia: string | null;
   perfil_empresa: string | null;
   site_rede_social: string | null;
@@ -82,6 +83,7 @@ export function profileToUser(p: ProfileRow): User {
       tipoVeiculo: p.tipo_veiculo ?? undefined,
       rntrc: p.rntrc ?? undefined,
       carroceria: p.carroceria ?? undefined,
+      peso: p.peso ?? undefined,
       siteRedeSocial: p.site_rede_social ?? undefined,
     };
   if (p.type === "colaborador") return { ...base, type: "colaborador" };
@@ -133,6 +135,7 @@ function profilePatchToRow(patch: UserProfilePatch): Record<string, string | boo
   put("tipo_veiculo", patch.tipoVeiculo);
   put("rntrc", patch.rntrc);
   put("carroceria", patch.carroceria);
+  put("peso", patch.peso);
   put("nome_fantasia", patch.nomeFantasia);
   put("perfil_empresa", patch.perfilEmpresa);
   put("site_rede_social", patch.siteRedeSocial);

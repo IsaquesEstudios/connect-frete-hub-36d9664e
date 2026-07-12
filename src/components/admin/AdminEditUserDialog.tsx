@@ -43,6 +43,7 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       tipoVeiculo?: string;
       rntrc?: string;
       carroceria?: string;
+      peso?: string;
       nomeFantasia?: string;
       perfilEmpresa?: string;
       siteRedeSocial?: string;
@@ -60,6 +61,7 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       tipoVeiculo: u.tipoVeiculo ?? "",
       rntrc: u.rntrc ?? "",
       carroceria: u.carroceria ?? "",
+      peso: u.peso ?? "",
       nomeFantasia: u.nomeFantasia ?? "",
       perfilEmpresa: u.perfilEmpresa ?? "",
       siteRedeSocial: u.siteRedeSocial ?? "",
@@ -95,6 +97,7 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
         patch.tipoVeiculo = form.tipoVeiculo;
         patch.rntrc = form.rntrc;
         patch.carroceria = form.carroceria;
+        patch.peso = form.peso;
       }
       repo.updateUser(user.id, patch);
       if (active !== (user.active !== false)) {
@@ -154,9 +157,8 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
                 <Field label="Veículo"><Input value={form.veiculo || ""} onChange={(e) => set("veiculo", e.target.value)} /></Field>
                 <Field label="Tipo de veículo"><Input value={form.tipoVeiculo || ""} onChange={(e) => set("tipoVeiculo", e.target.value)} /></Field>
                 <Field label="RNTRC"><Input value={form.rntrc || ""} onChange={(e) => set("rntrc", e.target.value)} /></Field>
-                <Field label="Carroceria" className="md:col-span-2">
-                  <Input value={form.carroceria || ""} onChange={(e) => set("carroceria", e.target.value)} />
-                </Field>
+                <Field label="Carroceria"><Input value={form.carroceria || ""} onChange={(e) => set("carroceria", e.target.value)} /></Field>
+                <Field label="Peso (kg)"><Input value={form.peso || ""} onChange={(e) => set("peso", e.target.value)} /></Field>
               </>
             )}
           </div>

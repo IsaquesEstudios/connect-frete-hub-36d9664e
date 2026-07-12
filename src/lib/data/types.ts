@@ -31,6 +31,7 @@ export interface MotoristaUser extends BaseUser {
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
+  peso?: string;
   siteRedeSocial?: string;
 }
 
@@ -58,6 +59,7 @@ export type UserProfilePatch = Partial<{
   tipoVeiculo: string;
   rntrc: string;
   carroceria: string;
+  peso: string;
   nomeFantasia: string;
   perfilEmpresa: string;
   siteRedeSocial: string;

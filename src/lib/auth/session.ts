@@ -225,6 +225,7 @@ export interface SignupInput {
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
+  peso?: string;
   // empresa
   nomeFantasia?: string;
   perfilEmpresa?: "transportador" | "embarcador" | "agenciador";
@@ -276,6 +277,7 @@ export async function signup(input: SignupInput): Promise<User> {
     tipo_veiculo: input.tipoVeiculo ?? null,
     rntrc: input.rntrc ?? null,
     carroceria: input.carroceria ?? null,
+    peso: input.peso ?? null,
     nome_fantasia: input.nomeFantasia ?? null,
     perfil_empresa: input.perfilEmpresa ?? null,
     site_rede_social: input.siteRedeSocial ?? null,
