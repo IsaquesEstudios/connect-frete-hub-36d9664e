@@ -195,6 +195,7 @@ export function SignupWizard({
         tipoVeiculo: veiculoFinal,
         rntrc: !isEmpresa && data.rntrc.trim() ? data.rntrc.trim() : undefined,
         carroceria: carroceriaFinal,
+        peso: pesoFinal,
         nomeFantasia: isEmpresa && data.documentoTipo === "cnpj" ? data.nomeFantasia.trim() : undefined,
         perfilEmpresa: isEmpresa && data.perfilEmpresa ? data.perfilEmpresa : undefined,
         siteRedeSocial: redesStr,
