@@ -43,6 +43,7 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       tipoVeiculo?: string;
       rntrc?: string;
       carroceria?: string;
+      peso?: string;
       nomeFantasia?: string;
       perfilEmpresa?: string;
       siteRedeSocial?: string;
@@ -60,6 +61,7 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       tipoVeiculo: u.tipoVeiculo ?? "",
       rntrc: u.rntrc ?? "",
       carroceria: u.carroceria ?? "",
+      peso: u.peso ?? "",
       nomeFantasia: u.nomeFantasia ?? "",
       perfilEmpresa: u.perfilEmpresa ?? "",
       siteRedeSocial: u.siteRedeSocial ?? "",
