@@ -19,6 +19,7 @@ type ProfileRow = {
   tipo_veiculo: string | null;
   rntrc: string | null;
   carroceria: string | null;
+  peso: string | null;
   nome_fantasia: string | null;
   perfil_empresa: string | null;
   site_rede_social: string | null;
