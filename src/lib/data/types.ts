@@ -59,6 +59,7 @@ export type UserProfilePatch = Partial<{
   tipoVeiculo: string;
   rntrc: string;
   carroceria: string;
+  peso: string;
   nomeFantasia: string;
   perfilEmpresa: string;
   siteRedeSocial: string;
