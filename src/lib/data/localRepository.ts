@@ -41,6 +41,10 @@ class LocalRepository implements Repository {
     ensureSeed();
   }
 
+  isBootstrapped(): boolean {
+    return true;
+  }
+
   listUsers(): User[] {
     return readJSON<User[]>(K_USERS, []);
   }
