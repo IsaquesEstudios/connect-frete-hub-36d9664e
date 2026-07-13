@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FullscreenLoading } from "@/components/ui/loading";
 import { ChatWindow } from "./ChatWindow";
 import { ADMIN_ID, repo, type User } from "@/lib/data";
 import { messagePreview } from "@/lib/chat/messagePreview";
@@ -39,12 +40,8 @@ export function UserChatPanel({ me }: Props) {
 
   const selected = selectedId ? repo.getUser(selectedId) ?? null : null;
 
-  if (staff.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
-        Carregando central...
-      </div>
-    );
+  if (!repo.isBootstrapped() || staff.length === 0) {
+    return <FullscreenLoading label="Carregando central..." />;
   }
 
   return (

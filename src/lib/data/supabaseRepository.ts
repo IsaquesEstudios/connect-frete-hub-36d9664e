@@ -155,6 +155,7 @@ class SupabaseRepository implements Repository {
   private heartbeatTimer: number | null = null;
   private presenceChannel: ReturnType<typeof supabase.channel> | null = null;
   private pendingTagSaves = new Map<string, Promise<boolean>>();
+  private bootstrapped = false;
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -166,11 +167,17 @@ class SupabaseRepository implements Repository {
     }
   }
 
+  isBootstrapped(): boolean {
+    return this.bootstrapped;
+  }
+
   private notify() {
     this.subs.forEach((cb) => cb());
   }
 
   private async bootstrap() {
+    this.bootstrapped = false;
+    this.notify();
     await this.loadUsers();
     await Promise.all([this.loadTags(), this.loadConvTags(), this.loadMessages(), this.loadBroadcasts()]);
     const { data } = await supabase.auth.getSession();
@@ -178,6 +185,7 @@ class SupabaseRepository implements Repository {
     const admin = this.users.find((u) => u.type === "admin");
     this.adminAuthId = current?.type === "admin" || current?.type === "colaborador" ? current.id : admin?.id ?? null;
 
+    this.bootstrapped = true;
     this.notify();
     if (!this.realtimeStarted) {
       this.realtimeStarted = true;

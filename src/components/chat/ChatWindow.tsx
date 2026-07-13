@@ -3,6 +3,7 @@ import { ADMIN_ID, repo, type Message, type User } from "@/lib/data";
 import { useEphemeralVersion, useRepoVersion } from "@/lib/hooks/useRepo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoadingSpinner } from "@/components/ui/loading";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,12 +81,19 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
   const otherIsStaff = other.type === "admin" || other.type === "colaborador";
   const staffNumber = otherIsStaff ? other.number : me.number;
   const nonStaffNumber = otherIsStaff ? me.number : other.number;
   const conversationId = `${nonStaffNumber}__${staffNumber}`;
 
+  // Feedback visual ao trocar de conversa
+  useEffect(() => {
+    setSwitching(true);
+    const t = window.setTimeout(() => setSwitching(false), 250);
+    return () => clearTimeout(t);
+  }, [conversationId]);
 
   const messages = useMemo(() => repo.listMessages(conversationId), [conversationId, v]);
   const otherOnline = useMemo(() => repo.isOnline(other.id), [other.id, ev, v]);
@@ -354,7 +362,12 @@ export function ChatWindow({ me, other, viewer }: Props) {
 
 
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div ref={scrollRef} className="relative flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {(switching || !repo.isBootstrapped()) && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+            <LoadingSpinner size="md" label="Carregando conversa..." />
+          </div>
+        )}
         {groups.length === 0 && (
           <div className="text-center text-sm text-muted-foreground pt-10">
             Nenhuma mensagem ainda. Diga olá!
