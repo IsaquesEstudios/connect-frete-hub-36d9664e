@@ -27,7 +27,6 @@ export interface EmpresaUser extends BaseUser {
 export interface MotoristaUser extends BaseUser {
   type: "motorista";
   placa: string;
-  veiculo: string;
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
@@ -55,7 +54,6 @@ export type UserProfilePatch = Partial<{
   estado: string;
   fotoUrl: string;
   placa: string;
-  veiculo: string;
   tipoVeiculo: string;
   rntrc: string;
   carroceria: string;
