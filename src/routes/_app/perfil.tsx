@@ -30,7 +30,6 @@ type ProfileForm = {
   estado: string;
   fotoUrl: string;
   placa: string;
-  veiculo: string;
   tipoVeiculo: string;
   rntrc: string;
   carroceria: string;
@@ -50,7 +49,6 @@ const emptyForm: ProfileForm = {
   estado: "",
   fotoUrl: "",
   placa: "",
-  veiculo: "",
   tipoVeiculo: "",
   rntrc: "",
   carroceria: "",
@@ -81,7 +79,6 @@ function toProfileForm(user: User): ProfileForm {
     ...(user.type === "motorista"
       ? {
           placa: user.placa ?? "",
-          veiculo: user.veiculo ?? "",
           tipoVeiculo: user.tipoVeiculo ?? "",
           rntrc: user.rntrc ?? "",
           carroceria: user.carroceria ?? "",
@@ -111,7 +108,6 @@ function patchForUser(user: User, form: ProfileForm): UserProfilePatch {
 
   if (user.type === "motorista") {
     patch.placa = form.placa;
-    patch.veiculo = form.veiculo;
     patch.tipoVeiculo = form.tipoVeiculo;
     patch.rntrc = form.rntrc;
     patch.carroceria = form.carroceria;
@@ -257,7 +253,6 @@ function ProfilePage() {
               <h2 className="text-lg font-semibold text-foreground">Dados do motorista</h2>
               <div className="grid gap-4 md:grid-cols-2">
                 <Editable label="Placa" value={form.placa} onChange={(value) => update("placa", value)} />
-                <Editable label="Veículo" value={form.veiculo} onChange={(value) => update("veiculo", value)} />
                 <Editable label="Tipo de veículo" value={form.tipoVeiculo} onChange={(value) => update("tipoVeiculo", value)} />
                 <Editable label="RNTRC" value={form.rntrc} onChange={(value) => update("rntrc", value)} />
                 <Editable label="Carroceria" value={form.carroceria} onChange={(value) => update("carroceria", value)} />

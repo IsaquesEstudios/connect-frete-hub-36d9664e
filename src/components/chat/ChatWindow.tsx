@@ -310,7 +310,6 @@ export function ChatWindow({ me, other, viewer }: Props) {
             {other.type === "motorista" && (
               <>
                 <ProfileField label="Placa" value={other.placa} />
-                <ProfileField label="Veículo" value={other.veiculo} />
                 {other.tipoVeiculo && (
                   <ProfileField label="Tipo de veículo" value={other.tipoVeiculo} />
                 )}

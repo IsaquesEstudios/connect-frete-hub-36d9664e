@@ -41,7 +41,7 @@ export function AppHeader({ user, accent }: { user: User; accent: string }) {
               {user.type === "motorista" && (
                 <>
                   <Field label="Placa" value={user.placa} />
-                  <Field label="Veículo" value={user.veiculo} />
+                  {user.tipoVeiculo && <Field label="Tipo de veículo" value={user.tipoVeiculo} />}
                 </>
               )}
             </div>

@@ -9,7 +9,7 @@ export type BroadcastAudience =
 
 export type NewUserInput =
   | { type: "empresa"; name: string; password: string; cnpj: string }
-  | { type: "motorista"; name: string; password: string; placa: string; veiculo: string }
+  | { type: "motorista"; name: string; password: string; placa: string }
   | { type: "admin"; name: string; password: string };
 
 export interface Repository {

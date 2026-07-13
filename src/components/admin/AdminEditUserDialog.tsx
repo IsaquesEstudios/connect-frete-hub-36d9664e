@@ -39,7 +39,6 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       cnpj?: string;
       cpf?: string;
       placa?: string;
-      veiculo?: string;
       tipoVeiculo?: string;
       rntrc?: string;
       carroceria?: string;
@@ -57,7 +56,6 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       estado: u.estado ?? "",
       fotoUrl: u.fotoUrl ?? "",
       placa: u.placa ?? "",
-      veiculo: u.veiculo ?? "",
       tipoVeiculo: u.tipoVeiculo ?? "",
       rntrc: u.rntrc ?? "",
       carroceria: u.carroceria ?? "",
@@ -93,7 +91,6 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
       if (user.type === "motorista") {
         patch.cpf = form.cpf;
         patch.placa = form.placa;
-        patch.veiculo = form.veiculo;
         patch.tipoVeiculo = form.tipoVeiculo;
         patch.rntrc = form.rntrc;
         patch.carroceria = form.carroceria;
@@ -154,7 +151,6 @@ export function AdminEditUserDialog({ user, open, onOpenChange, onSaved }: Props
             {user.type === "motorista" && (
               <>
                 <Field label="Placa"><Input value={form.placa || ""} onChange={(e) => set("placa", e.target.value)} /></Field>
-                <Field label="Veículo"><Input value={form.veiculo || ""} onChange={(e) => set("veiculo", e.target.value)} /></Field>
                 <Field label="Tipo de veículo"><Input value={form.tipoVeiculo || ""} onChange={(e) => set("tipoVeiculo", e.target.value)} /></Field>
                 <Field label="RNTRC"><Input value={form.rntrc || ""} onChange={(e) => set("rntrc", e.target.value)} /></Field>
                 <Field label="Carroceria"><Input value={form.carroceria || ""} onChange={(e) => set("carroceria", e.target.value)} /></Field>

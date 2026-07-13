@@ -10,7 +10,6 @@ type ProfileRow = {
   cnpj: string | null;
   cpf: string | null;
   placa: string | null;
-  veiculo: string | null;
   email: string | null;
   whatsapp: string | null;
   cidade: string | null;
@@ -79,7 +78,6 @@ export function profileToUser(p: ProfileRow): User {
       ...base,
       type: "motorista",
       placa: p.placa ?? "",
-      veiculo: p.veiculo ?? "",
       tipoVeiculo: p.tipo_veiculo ?? undefined,
       rntrc: p.rntrc ?? undefined,
       carroceria: p.carroceria ?? undefined,
@@ -131,7 +129,6 @@ function profilePatchToRow(patch: UserProfilePatch): Record<string, string | boo
   put("estado", patch.estado);
   put("foto_url", patch.fotoUrl);
   put("placa", patch.placa);
-  put("veiculo", patch.veiculo);
   put("tipo_veiculo", patch.tipoVeiculo);
   put("rntrc", patch.rntrc);
   put("carroceria", patch.carroceria);

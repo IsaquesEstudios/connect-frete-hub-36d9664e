@@ -221,7 +221,6 @@ export interface SignupInput {
   estado?: string;
   // motorista
   placa?: string;
-  veiculo?: string;
   tipoVeiculo?: string;
   rntrc?: string;
   carroceria?: string;
@@ -273,7 +272,6 @@ export async function signup(input: SignupInput): Promise<User> {
     cidade: input.cidade ?? null,
     estado: input.estado ?? null,
     placa: input.placa ?? null,
-    veiculo: input.veiculo ?? null,
     tipo_veiculo: input.tipoVeiculo ?? null,
     rntrc: input.rntrc ?? null,
     carroceria: input.carroceria ?? null,
