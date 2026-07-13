@@ -155,6 +155,7 @@ class SupabaseRepository implements Repository {
   private heartbeatTimer: number | null = null;
   private presenceChannel: ReturnType<typeof supabase.channel> | null = null;
   private pendingTagSaves = new Map<string, Promise<boolean>>();
+  private bootstrapped = false;
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -164,6 +165,10 @@ class SupabaseRepository implements Repository {
         void this.bootstrap();
       });
     }
+  }
+
+  isBootstrapped(): boolean {
+    return this.bootstrapped;
   }
 
   private notify() {
