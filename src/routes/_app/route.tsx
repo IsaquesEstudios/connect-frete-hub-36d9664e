@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { FullscreenLoading } from "@/components/ui/loading";
 import { useAuth } from "@/lib/auth/useAuth";
 import { refreshCurrentUser } from "@/lib/auth/session";
 import { repo } from "@/lib/data";
@@ -54,12 +55,8 @@ function AppGate() {
     return () => repo.setPresence(user.id, false);
   }, [user]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
-        Carregando...
-      </div>
-    );
+  if (loading || !repo.isBootstrapped()) {
+    return <FullscreenLoading label="Carregando..." />;
   }
   if (!user) return null;
 
