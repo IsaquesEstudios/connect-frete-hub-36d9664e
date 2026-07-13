@@ -171,7 +171,7 @@ export function SignupWizard({
         ? [data.carroceria, data.carroceriaObs.trim() ? `Obs: ${data.carroceriaObs.trim()}` : ""].filter(Boolean)
         : [];
       const carroceriaFinal = carroceriaParts.length ? carroceriaParts.join(" | ") : undefined;
-      const veiculoFinal = !isEmpresa && data.tipoVeiculo
+      const tipoVeiculoFinal = !isEmpresa && data.tipoVeiculo
         ? data.tipoVeiculoObs.trim()
           ? `${data.tipoVeiculo} | Obs: ${data.tipoVeiculoObs.trim()}`
           : data.tipoVeiculo
@@ -191,8 +191,7 @@ export function SignupWizard({
         cidade: data.cidade || undefined,
         estado: data.estado || undefined,
         placa: !isEmpresa ? data.placa : undefined,
-        veiculo: veiculoFinal,
-        tipoVeiculo: veiculoFinal,
+        tipoVeiculo: tipoVeiculoFinal,
         rntrc: !isEmpresa && data.rntrc.trim() ? data.rntrc.trim() : undefined,
         carroceria: carroceriaFinal,
         peso: pesoFinal,
