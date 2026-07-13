@@ -179,8 +179,13 @@ class SupabaseRepository implements Repository {
     this.bootstrapped = false;
     this.notify();
     try {
-      await this.loadUsers();
-      await Promise.all([this.loadTags(), this.loadConvTags(), this.loadMessages(), this.loadBroadcasts()]);
+      await Promise.all([
+        this.loadUsers(),
+        this.loadTags(),
+        this.loadConvTags(),
+        this.loadMessages(),
+        this.loadBroadcasts(),
+      ]);
       const { data } = await supabase.auth.getSession();
       const current = data.session?.user.id ? this.getUser(data.session.user.id) : null;
       const admin = this.users.find((u) => u.type === "admin");
