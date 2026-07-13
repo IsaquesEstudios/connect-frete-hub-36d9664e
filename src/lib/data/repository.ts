@@ -52,6 +52,8 @@ export interface Repository {
   // subs
   subscribe(cb: () => void): () => void;
   subscribeEphemeral(cb: (e: { type: string; payload: unknown }) => void): () => void;
+  // loading
+  isBootstrapped(): boolean;
   // utils
   nextNumberFor(type: UserType): string;
 }
