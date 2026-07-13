@@ -179,8 +179,13 @@ class SupabaseRepository implements Repository {
     this.bootstrapped = false;
     this.notify();
     try {
-      await this.loadUsers();
-      await Promise.all([this.loadTags(), this.loadConvTags(), this.loadMessages(), this.loadBroadcasts()]);
+      await Promise.all([
+        this.loadUsers(),
+        this.loadTags(),
+        this.loadConvTags(),
+        this.loadMessages(),
+        this.loadBroadcasts(),
+      ]);
       const { data } = await supabase.auth.getSession();
       const current = data.session?.user.id ? this.getUser(data.session.user.id) : null;
       const admin = this.users.find((u) => u.type === "admin");
@@ -221,8 +226,17 @@ class SupabaseRepository implements Repository {
       }));
   }
   private async loadMessages() {
-    const { data } = await supabase.from("messages").select("*").order("created_at");
-    if (data) this.messages = (data as MessageRow[]).map((r) => this.mapMessage(r));
+    // Carrega as mensagens mais recentes primeiro (limite alto para caber o histórico visível).
+    // Isso acelera a exibição dos previews de conversa na abertura do painel.
+    const { data } = await supabase
+      .from("messages")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+    if (data) {
+      const rows = (data as MessageRow[]).slice().reverse();
+      this.messages = rows.map((r) => this.mapMessage(r));
+    }
   }
   private async loadBroadcasts() {
     const { data } = await supabase
