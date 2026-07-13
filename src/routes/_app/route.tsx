@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { refreshCurrentUser } from "@/lib/auth/session";
 import { repo } from "@/lib/data";
 import { phoneDigits } from "@/lib/format-phone";
+import { useRepoVersion } from "@/lib/hooks/useRepo";
 
 export const Route = createFileRoute("/_app")({
   ssr: false,
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/_app")({
 
 function AppGate() {
   const { user, loading } = useAuth();
+  const repoVersion = useRepoVersion();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,6 +58,7 @@ function AppGate() {
   }, [user]);
 
   if (loading || !repo.isBootstrapped()) {
+    void repoVersion;
     return <FullscreenLoading label="Carregando..." />;
   }
   if (!user) return null;

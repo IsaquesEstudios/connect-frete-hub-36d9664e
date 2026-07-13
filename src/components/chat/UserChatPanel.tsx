@@ -40,8 +40,16 @@ export function UserChatPanel({ me }: Props) {
 
   const selected = selectedId ? repo.getUser(selectedId) ?? null : null;
 
-  if (!repo.isBootstrapped() || staff.length === 0) {
+  if (!repo.isBootstrapped()) {
     return <FullscreenLoading label="Carregando central..." />;
+  }
+
+  if (staff.length === 0) {
+    return (
+      <div className="h-screen flex items-center justify-center px-6 text-center text-sm text-muted-foreground">
+        Nenhum atendente ativo encontrado no momento.
+      </div>
+    );
   }
 
   return (
