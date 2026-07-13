@@ -236,15 +236,23 @@ export function ChatWindow({ me, other, viewer }: Props) {
             className="flex items-center gap-3 border-b bg-card px-4 py-3 text-left w-full hover:bg-accent transition-colors"
             aria-label={`Ver perfil de ${other.name}`}
           >
-            <div
-              className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${otherColor}`}
-            >
-              {other.name
-                .split(" ")
-                .slice(0, 2)
-                .map((s) => s[0])
-                .join("")}
-            </div>
+            {other.fotoUrl ? (
+              <img
+                src={other.fotoUrl}
+                alt={other.name}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${otherColor}`}
+              >
+                {other.name
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((s) => s[0])
+                  .join("")}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <div className="font-medium truncate">{other.name}</div>
               <div className="text-xs text-muted-foreground">
