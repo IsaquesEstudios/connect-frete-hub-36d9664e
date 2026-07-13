@@ -81,12 +81,19 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
   const otherIsStaff = other.type === "admin" || other.type === "colaborador";
   const staffNumber = otherIsStaff ? other.number : me.number;
   const nonStaffNumber = otherIsStaff ? me.number : other.number;
   const conversationId = `${nonStaffNumber}__${staffNumber}`;
 
+  // Feedback visual ao trocar de conversa
+  useEffect(() => {
+    setSwitching(true);
+    const t = window.setTimeout(() => setSwitching(false), 250);
+    return () => clearTimeout(t);
+  }, [conversationId]);
 
   const messages = useMemo(() => repo.listMessages(conversationId), [conversationId, v]);
   const otherOnline = useMemo(() => repo.isOnline(other.id), [other.id, ev, v]);
