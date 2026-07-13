@@ -178,18 +178,23 @@ class SupabaseRepository implements Repository {
   private async bootstrap() {
     this.bootstrapped = false;
     this.notify();
-    await this.loadUsers();
-    await Promise.all([this.loadTags(), this.loadConvTags(), this.loadMessages(), this.loadBroadcasts()]);
-    const { data } = await supabase.auth.getSession();
-    const current = data.session?.user.id ? this.getUser(data.session.user.id) : null;
-    const admin = this.users.find((u) => u.type === "admin");
-    this.adminAuthId = current?.type === "admin" || current?.type === "colaborador" ? current.id : admin?.id ?? null;
+    try {
+      await this.loadUsers();
+      await Promise.all([this.loadTags(), this.loadConvTags(), this.loadMessages(), this.loadBroadcasts()]);
+      const { data } = await supabase.auth.getSession();
+      const current = data.session?.user.id ? this.getUser(data.session.user.id) : null;
+      const admin = this.users.find((u) => u.type === "admin");
+      this.adminAuthId = current?.type === "admin" || current?.type === "colaborador" ? current.id : admin?.id ?? null;
 
-    this.bootstrapped = true;
-    this.notify();
-    if (!this.realtimeStarted) {
-      this.realtimeStarted = true;
-      this.subscribeRealtime();
+      if (!this.realtimeStarted) {
+        this.realtimeStarted = true;
+        this.subscribeRealtime();
+      }
+    } catch (error) {
+      console.error("bootstrap failed", error);
+    } finally {
+      this.bootstrapped = true;
+      this.notify();
     }
   }
 
