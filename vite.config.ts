@@ -24,4 +24,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Build a standalone Node server (for self-hosting on VPS / Coolify / Docker).
+  // Output goes to `.output/` with `.output/server/index.mjs` as the entry.
+  nitro: {
+    preset: "node-server",
+  },
 });
+
