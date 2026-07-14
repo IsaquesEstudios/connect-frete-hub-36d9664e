@@ -2,18 +2,19 @@ import { Camera, ImageUp, X } from "lucide-react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { optimizeImageToDataUrl } from "@/lib/media/optimize";
 
-// Converte arquivo para dataURL (~limite 1MB para não estourar payload do banco).
-async function fileToDataUrl(file: File, maxBytes = 1_500_000): Promise<string> {
-  if (file.size > maxBytes) {
-    throw new Error(`Imagem muito grande (${Math.round(file.size / 1024)} KB). Máx.: ${Math.round(maxBytes / 1024)} KB.`);
+// Otimiza a imagem (redimensiona + comprime) antes de salvar, mantendo a foto
+// leve o suficiente para caber no banco sem perder qualidade perceptível.
+async function fileToDataUrl(file: File): Promise<string> {
+  try {
+    return await optimizeImageToDataUrl(file, {
+      maxDimension: 512,
+      targetBytes: 120_000,
+    });
+  } catch (err) {
+    throw new Error((err as Error).message || "Falha ao processar imagem.");
   }
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = () => res(String(reader.result));
-    reader.onerror = () => rej(reader.error ?? new Error("Falha ao ler imagem."));
-    reader.readAsDataURL(file);
-  });
 }
 
 export function PhotoUploader({

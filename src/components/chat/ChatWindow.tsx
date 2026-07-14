@@ -20,6 +20,7 @@ import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
 import { formatPhone } from "@/lib/format-phone";
+import { optimizeImageToDataUrl } from "@/lib/media/optimize";
 import {
   Sheet,
   SheetContent,
@@ -146,7 +147,10 @@ export function ChatWindow({ me, other, viewer }: Props) {
       return;
     }
     try {
-      const dataUrl = await fileToDataUrl(file);
+      // Otimiza imagens antes de enviar para economizar armazenamento.
+      const dataUrl = file.type.startsWith("image/")
+        ? await optimizeImageToDataUrl(file, { maxDimension: 1600, targetBytes: 400_000 })
+        : await fileToDataUrl(file);
       sendBody(dataUrl);
     } catch (e) {
       console.error(e);
@@ -174,8 +178,16 @@ export function ChatWindow({ me, other, viewer }: Props) {
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mime = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
-      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : "";
+      // Bitrate baixo (~24kbps) — voz continua nítida e reduz muito o tamanho.
+      const rec = new MediaRecorder(stream, {
+        ...(mime ? { mimeType: mime } : {}),
+        audioBitsPerSecond: 24_000,
+      });
       audioChunksRef.current = [];
       rec.ondataavailable = (e) => {
         if (e.data.size > 0) audioChunksRef.current.push(e.data);
