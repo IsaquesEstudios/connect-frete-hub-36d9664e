@@ -9,6 +9,7 @@ import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { SignupWizard } from "@/components/auth/SignupWizard";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 
 
