@@ -9,6 +9,7 @@ import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { SignupWizard } from "@/components/auth/SignupWizard";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 
 
@@ -199,14 +200,13 @@ function LoginForm({ onDone }: { onDone: (u: User) => void }) {
           />
         </GlassField>
         <GlassField label="Senha" action={<SubmitArrow loading={loading} />}>
-          <Input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
             required
             placeholder="••••••••"
-            className={fieldInput}
+            inputClassName={fieldInput}
           />
         </GlassField>
 

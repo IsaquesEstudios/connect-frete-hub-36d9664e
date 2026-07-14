@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
 import { formatPhone, phoneDigits, phonePlaceholder } from "@/lib/format-phone";
 import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
@@ -471,13 +472,12 @@ function StepBasic({ data, update }: StepProps) {
         />
       </Field>
       <Field required label="Senha (mín. 6)">
-        <Input
-          type="password"
+        <PasswordInput
           minLength={6}
           value={data.senha}
           onChange={(e) => update("senha", e.target.value)}
           placeholder="••••••••"
-          className={fieldInput}
+          inputClassName={fieldInput}
         />
       </Field>
     </div>
@@ -831,13 +831,12 @@ function StepBasicEmpresa({ data, update }: StepProps) {
         />
       </Field>
       <Field required label="Senha (mín. 6)">
-        <Input
-          type="password"
+        <PasswordInput
           minLength={6}
           value={data.senha}
           onChange={(e) => update("senha", e.target.value)}
           placeholder="••••••••"
-          className={fieldInput}
+          inputClassName={fieldInput}
         />
       </Field>
       <div className={fieldWrap}>

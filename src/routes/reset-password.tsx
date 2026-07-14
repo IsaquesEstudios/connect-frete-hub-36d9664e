@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/loose-client";
 import { translateAuthError } from "@/lib/auth/translate-error";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
@@ -63,20 +64,18 @@ function ResetPasswordPage() {
         </div>
         <div className="space-y-2">
           <Label>Nova senha</Label>
-          <Input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-white/[0.05] border-white/10 text-white"
+            inputClassName="bg-white/[0.05] border-white/10 text-white"
           />
         </div>
         <div className="space-y-2">
           <Label>Confirmar senha</Label>
-          <Input
-            type="password"
+          <PasswordInput
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            className="bg-white/[0.05] border-white/10 text-white"
+            inputClassName="bg-white/[0.05] border-white/10 text-white"
           />
         </div>
         <Button type="submit" disabled={loading} className="w-full">
