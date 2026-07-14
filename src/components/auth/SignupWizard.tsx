@@ -472,13 +472,12 @@ function StepBasic({ data, update }: StepProps) {
         />
       </Field>
       <Field required label="Senha (mín. 6)">
-        <Input
-          type="password"
+        <PasswordInput
           minLength={6}
           value={data.senha}
           onChange={(e) => update("senha", e.target.value)}
           placeholder="••••••••"
-          className={fieldInput}
+          inputClassName={fieldInput}
         />
       </Field>
     </div>
