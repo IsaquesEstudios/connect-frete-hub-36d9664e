@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { formatDoc, docPlaceholder, docDigitsValid } from "@/lib/format-doc";
 import { formatPhone, phoneDigits, phonePlaceholder } from "@/lib/format-phone";
 import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 import { signup } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
