@@ -22,15 +22,52 @@ function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Supabase entrega o token no hash da URL e cria uma sessão temporária.
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
+    (async () => {
+      try {
+        const url = new URL(window.location.href);
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+        const err = url.searchParams.get("error_description") || hash.get("error_description");
+        if (err) {
+          toast.error(decodeURIComponent(err));
+          navigate({ to: "/auth" });
+          return;
+        }
+
+        // Fluxo PKCE: ?code=...
+        const code = url.searchParams.get("code");
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          window.history.replaceState({}, "", "/reset-password");
+          setReady(true);
+          return;
+        }
+
+        // Fluxo legado: tokens no hash
+        const access_token = hash.get("access_token");
+        const refresh_token = hash.get("refresh_token");
+        if (access_token && refresh_token) {
+          const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+          if (error) throw error;
+          window.history.replaceState({}, "", "/reset-password");
+          setReady(true);
+          return;
+        }
+
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          setReady(true);
+          return;
+        }
+
         toast.error("Link inválido ou expirado. Solicite um novo.");
         navigate({ to: "/auth" });
-        return;
+      } catch (e) {
+        toast.error(translateAuthError(e));
+        navigate({ to: "/auth" });
       }
-      setReady(true);
-    });
+    })();
   }, [navigate]);
 
   const submit = async (e: React.FormEvent) => {
