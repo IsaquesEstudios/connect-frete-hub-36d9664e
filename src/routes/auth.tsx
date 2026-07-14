@@ -200,14 +200,13 @@ function LoginForm({ onDone }: { onDone: (u: User) => void }) {
           />
         </GlassField>
         <GlassField label="Senha" action={<SubmitArrow loading={loading} />}>
-          <Input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
             required
             placeholder="••••••••"
-            className={fieldInput}
+            inputClassName={fieldInput}
           />
         </GlassField>
 
