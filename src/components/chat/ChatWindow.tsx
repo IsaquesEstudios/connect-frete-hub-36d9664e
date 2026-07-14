@@ -20,6 +20,7 @@ import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
 import { AudioMessage } from "./AudioMessage";
 import { isAudioBody, isFileBody, isImageBody, parseFileBody } from "@/lib/chat/messagePreview";
 import { formatPhone } from "@/lib/format-phone";
+import { optimizeImageToDataUrl } from "@/lib/media/optimize";
 import {
   Sheet,
   SheetContent,
