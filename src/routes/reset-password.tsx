@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/loose-client";
 import { translateAuthError } from "@/lib/auth/translate-error";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
