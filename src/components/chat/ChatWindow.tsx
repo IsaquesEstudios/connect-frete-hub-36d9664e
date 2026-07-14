@@ -147,7 +147,10 @@ export function ChatWindow({ me, other, viewer }: Props) {
       return;
     }
     try {
-      const dataUrl = await fileToDataUrl(file);
+      // Otimiza imagens antes de enviar para economizar armazenamento.
+      const dataUrl = file.type.startsWith("image/")
+        ? await optimizeImageToDataUrl(file, { maxDimension: 1600, targetBytes: 400_000 })
+        : await fileToDataUrl(file);
       sendBody(dataUrl);
     } catch (e) {
       console.error(e);
