@@ -366,8 +366,7 @@ class SupabaseRepository implements Repository {
           if (error) {
             Object.assign(user, previous);
             this.notify();
-            console.error("updateUser failed", error);
-            alert("Não foi possível atualizar o perfil.");
+            reportError("Não foi possível atualizar o perfil", error);
             return;
           }
           if (data) {
@@ -471,10 +470,9 @@ class SupabaseRepository implements Repository {
       .eq("id", id)
       .then(({ error }) => {
         if (error) {
-          console.error("deleteMessage failed", error);
           this.messages = prev;
           this.notify();
-          alert("Não foi possível excluir a mensagem.");
+          reportError("Não foi possível excluir a mensagem", error);
         }
       });
   }
@@ -499,11 +497,10 @@ class SupabaseRepository implements Repository {
       const query = supabase.from("messages").delete();
       const { error } = idsToDelete.length > 0 ? await query.in("id", idsToDelete) : await query.eq("conversation_id", conversationId);
       if (error) {
-        console.error("deleteConversation failed", error);
         this.messages = prevMsgs;
         this.convTags = prevConv;
         this.notify();
-        alert("Não foi possível excluir a conversa.");
+        reportError("Não foi possível excluir a conversa", error);
       }
     })();
   }
@@ -592,11 +589,10 @@ class SupabaseRepository implements Repository {
         return true;
       })()
       .catch((error: unknown) => {
-        console.error("createTag failed", error);
         this.tags = this.tags.filter((t) => t.id !== id);
         this.convTags = this.convTags.filter((c) => c.tagId !== id);
         this.notify();
-        alert("Não foi possível salvar a tag.");
+        reportError("Não foi possível salvar a tag", error);
         return false;
       })
       .finally(() => {
@@ -622,10 +618,9 @@ class SupabaseRepository implements Repository {
         Object.assign(t, data as Tag);
         this.notify();
       })().catch((error: unknown) => {
-        console.error("updateTag failed", error);
         Object.assign(t, previous);
         this.notify();
-        alert("Não foi possível salvar as alterações da tag.");
+        reportError("Não foi possível salvar as alterações da tag", error);
       });
     return t;
   }
@@ -639,13 +634,10 @@ class SupabaseRepository implements Repository {
       await supabase.from("conversation_tags").delete().eq("tag_id", id);
       const { error } = await supabase.from("tags").delete().eq("id", id);
       if (error) {
-        console.error("deleteTag failed", error);
         this.tags = prevTags;
         this.convTags = prevConv;
         this.notify();
-        alert(
-          "Não foi possível excluir a tag no banco (provavelmente falta política RLS DELETE).",
-        );
+        reportError("Não foi possível excluir a tag", error);
       }
     })();
   }
@@ -682,10 +674,9 @@ class SupabaseRepository implements Repository {
         if (insertError) throw insertError;
       }
     })().catch((error) => {
-      console.error("setConversationTags failed", error);
       this.convTags = prevConv;
       this.notify();
-      alert("Não foi possível salvar as tags desta conversa.");
+      reportError("Não foi possível salvar as tags desta conversa", error);
     });
   }
 
