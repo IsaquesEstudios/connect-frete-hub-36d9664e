@@ -433,9 +433,13 @@ class SupabaseRepository implements Repository {
     const from = this.getUser(fromUserId);
     const to = this.getUser(toUserId);
     const fromStaff = this.isStaff(from);
+    const toStaff = this.isStaff(to);
     const staff = fromStaff ? from : to;
     const nonStaff = fromStaff ? to : from;
-    const conversationId = `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
+    const conversationId =
+      fromStaff && toStaff && from && to
+        ? this.staffPairId(from.number, to.number)
+        : `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
     const dbConversationId = this.storageConversationId(fromUserId, toUserId);
     const tempId = `tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = Date.now();
