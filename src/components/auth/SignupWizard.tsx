@@ -677,7 +677,7 @@ function GroupedSelect({
   return (
     <div className={fieldWrap}>
       <Label className={fieldLabel}>{label}</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value ?? ""} onValueChange={onChange}>
         <SelectTrigger className="h-7 border-0 bg-transparent p-0 text-sm text-white shadow-none focus:ring-0">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
