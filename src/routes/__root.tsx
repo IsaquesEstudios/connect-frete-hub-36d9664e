@@ -78,34 +78,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SV Logística — Central de mensagens" },
+      { title: "SV Logística — Conectando empresas e motoristas do Brasil" },
       {
         name: "description",
         content:
-          "Comunicação centralizada entre empresas de frete, motoristas e a central SV Logística.",
+          "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
       { name: "author", content: "SV Logística" },
-      { property: "og:title", content: "SV Logística — Central de mensagens" },
+      { property: "og:title", content: "SV Logística — Conectando empresas e motoristas do Brasil" },
       {
         property: "og:description",
         content:
-          "Comunicação centralizada entre empresas de frete, motoristas e a central SV Logística.",
+          "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "SV Logística — Central de mensagens" },
+      { name: "twitter:title", content: "SV Logística — Conectando empresas e motoristas do Brasil" },
       {
         name: "twitter:description",
         content:
-          "Comunicação centralizada entre empresas de frete, motoristas e a central SV Logística.",
+          "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1linkkC623Tk01n4cngErQTbu7G3/social-images/social-1784123556118-truck_15950558.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/1linkkC623Tk01n4cngErQTbu7G3/social-images/social-1784123556118-truck_15950558.webp" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,

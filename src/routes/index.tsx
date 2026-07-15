@@ -18,11 +18,11 @@ export const Route = createFileRoute("/")({
         content:
           "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
-      { property: "og:title", content: "SV Logística — Conectando empresas e motoristas" },
+      { property: "og:title", content: "SV Logística — Conectando empresas e motoristas do Brasil" },
       {
         property: "og:description",
         content:
-          "Central de comunicação para transportadoras, embarcadores e motoristas. Participe das comunidades no WhatsApp.",
+          "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
       { property: "og:type", content: "website" },
     ],
