@@ -76,11 +76,7 @@ function AuthPage() {
           }}
         >
           <div className="flex flex-col items-center text-center mb-6">
-            <img
-              src={logoAsset.url}
-              alt="SV Logística"
-              className="h-12 w-auto object-contain mb-4"
-            />
+            <Logo className="mb-4" iconClassName="h-8 w-8" textClassName="text-xl" />
             <h1 className="text-2xl font-semibold tracking-tight text-white">
               {mode === "login" ? "Bem-vindo de volta" : "Criar sua conta"}
             </h1>
