@@ -16,7 +16,7 @@ import { PhotoUploader } from "@/components/common/PhotoUploader";
 
 
 export const Route = createFileRoute("/_app/perfil")({
-  head: () => ({ meta: [{ title: "Perfil — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Perfil — SV Logística" }] }),
   component: ProfilePage,
 });
 

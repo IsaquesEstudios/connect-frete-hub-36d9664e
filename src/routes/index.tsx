@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { ArrowRight, MessageCircle, Radio, ShieldCheck, Truck } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { homeFor } from "@/lib/auth/session";
+import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
 
 export { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
@@ -11,13 +12,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "ConectaFrete — Conectando empresas e motoristas do Brasil" },
+      { title: "SV Logística — Conectando empresas e motoristas do Brasil" },
       {
         name: "description",
         content:
           "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
-      { property: "og:title", content: "ConectaFrete — Conectando empresas e motoristas" },
+      { property: "og:title", content: "SV Logística — Conectando empresas e motoristas" },
       {
         property: "og:description",
         content:
@@ -51,12 +52,13 @@ function LandingPage() {
       <div className="relative z-10">
         {/* Nav */}
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/20 ring-1 ring-sky-400/40">
-              <Truck className="h-5 w-5 text-sky-300" />
-            </div>
-            <span className="text-lg font-semibold tracking-tight">ConectaFrete</span>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img
+              src={logoAsset.url}
+              alt="SV Logística"
+              className="h-10 w-auto object-contain"
+            />
+          </Link>
           <Link
             to="/auth"
             className="inline-flex items-center gap-1.5 rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-sky-400 transition"
@@ -74,7 +76,7 @@ function LandingPage() {
             Conectando quem <span className="text-sky-300">move</span> o Brasil
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg text-slate-300">
-            O ConectaFrete aproxima transportadoras, embarcadores, agenciadores e
+            O SV Logística aproxima transportadoras, embarcadores, agenciadores e
             motoristas em um só lugar. Comunicação direta, ágil e centralizada com a nossa
             equipe.
           </p>
@@ -123,7 +125,7 @@ function LandingPage() {
 
         <footer className="border-t border-white/5 py-8">
           <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <span>© {new Date().getFullYear()} ConectaFrete. Todos os direitos reservados.</span>
+            <span>© {new Date().getFullYear()} SV Logística. Todos os direitos reservados.</span>
             <Link to="/auth" className="hover:text-slate-300 transition">
               Área do usuário
             </Link>

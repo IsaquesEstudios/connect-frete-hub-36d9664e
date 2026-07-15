@@ -7,6 +7,7 @@ import { homeFor, login } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
 import { SignupWizard } from "@/components/auth/SignupWizard";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { PasswordInput } from "@/components/auth/PasswordInput";
@@ -17,8 +18,8 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Entrar — ConectaFrete" },
-      { name: "description", content: "Acesse o ConectaFrete com seu email e senha." },
+      { title: "Entrar — SV Logística" },
+      { name: "description", content: "Acesse o SV Logística com seu email e senha." },
     ],
   }),
   component: AuthPage,
@@ -75,13 +76,18 @@ function AuthPage() {
           }}
         >
           <div className="flex flex-col items-center text-center mb-6">
+            <img
+              src={logoAsset.url}
+              alt="SV Logística"
+              className="h-12 w-auto object-contain mb-4"
+            />
             <h1 className="text-2xl font-semibold tracking-tight text-white">
               {mode === "login" ? "Bem-vindo de volta" : "Criar sua conta"}
             </h1>
             <p className="mt-1 text-sm text-slate-400">
               {mode === "login"
                 ? "Entre com seus dados para acessar."
-                : "Preencha para começar no ConectaFrete."}
+                : "Preencha para começar no SV Logística."}
             </p>
           </div>
 
@@ -118,7 +124,7 @@ function AuthPage() {
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-500">
-          © ConectaFrete
+          © SV Logística
         </p>
       </div>
     </div>

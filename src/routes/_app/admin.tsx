@@ -28,7 +28,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useRepoVersion } from "@/lib/hooks/useRepo";
 
 export const Route = createFileRoute("/_app/admin")({
-  head: () => ({ meta: [{ title: "Admin — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Admin — SV Logística" }] }),
   component: AdminPanel,
 });
 

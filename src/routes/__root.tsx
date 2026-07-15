@@ -78,26 +78,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ConectaFrete — Central de mensagens" },
+      { title: "SV Logística — Central de mensagens" },
       {
         name: "description",
         content:
-          "Comunicação centralizada entre empresas de frete, motoristas e a central ConectaFrete.",
+          "Comunicação centralizada entre empresas de frete, motoristas e a central SV Logística.",
       },
-      { name: "author", content: "ConectaFrete" },
-      { property: "og:title", content: "ConectaFrete — Central de mensagens" },
+      { name: "author", content: "SV Logística" },
+      { property: "og:title", content: "SV Logística — Central de mensagens" },
       {
         property: "og:description",
         content:
-          "Comunicação centralizada entre empresas de frete, motoristas e a central ConectaFrete.",
+          "Comunicação centralizada entre empresas de frete, motoristas e a central SV Logística.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "ConectaFrete — Central de mensagens" },
+      { name: "twitter:title", content: "SV Logística — Central de mensagens" },
       {
         name: "twitter:description",
         content:
-          "Comunicação centralizada entre empresas de frete, motoristas e a central ConectaFrete.",
+          "Comunicação centralizada entre empresas de frete, motoristas e a central SV Logística.",
       },
     ],
     links: [
