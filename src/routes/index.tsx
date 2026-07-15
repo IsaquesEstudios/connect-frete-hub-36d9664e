@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { ArrowRight, MessageCircle, Radio, ShieldCheck, Truck } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { homeFor } from "@/lib/auth/session";
-import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
+import { Logo } from "@/components/brand/Logo";
 
 export { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
@@ -53,11 +53,7 @@ function LandingPage() {
         {/* Nav */}
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <Link to="/" className="flex items-center">
-            <img
-              src={logoAsset.url}
-              alt="SV Logística"
-              className="h-10 w-auto object-contain"
-            />
+            <Logo iconClassName="h-7 w-7" textClassName="text-lg" />
           </Link>
           <Link
             to="/auth"
