@@ -7,7 +7,7 @@ import { homeFor, login } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { User } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
+import { Logo } from "@/components/brand/Logo";
 import { SignupWizard } from "@/components/auth/SignupWizard";
 import { ForgotPasswordDialog } from "@/components/auth/ForgotPasswordDialog";
 import { PasswordInput } from "@/components/auth/PasswordInput";
