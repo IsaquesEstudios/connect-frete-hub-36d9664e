@@ -968,7 +968,7 @@ function StepLocalByEstado({ data, update }: StepProps) {
       <div className={fieldWrap}>
         <Label className={fieldLabel}>Estado<span className="ml-1 text-red-500">*</span></Label>
         <Select
-          value={data.estado}
+          value={data.estado ?? ""}
           onValueChange={(v) => {
             update("estado", v);
             update("cidade", "");
