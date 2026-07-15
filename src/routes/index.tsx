@@ -53,11 +53,7 @@ function LandingPage() {
         {/* Nav */}
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <Link to="/" className="flex items-center">
-            <img
-              src={logoAsset.url}
-              alt="SV Logística"
-              className="h-10 w-auto object-contain"
-            />
+            <Logo iconClassName="h-7 w-7" textClassName="text-lg" />
           </Link>
           <Link
             to="/auth"
