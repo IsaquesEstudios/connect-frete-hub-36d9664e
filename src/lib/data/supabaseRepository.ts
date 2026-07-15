@@ -739,8 +739,8 @@ class SupabaseRepository implements Repository {
       // Se o destinatário também for staff (colaborador), usamos o mesmo formato
       // que o ChatWindow do admin espera: `${adminNumber}__${colabNumber}`.
       // Caso contrário, o número do não-staff basta (resolveConversationId reconstrói).
-      conversation_id: this.isStaff(r)
-        ? `${sender?.number ?? ""}__${r.number}`
+      conversation_id: this.isStaff(r) && sender
+        ? this.staffPairId(sender.number, r.number)
         : r.number,
       from_user_id: fromUserId,
       to_user_id: r.id,
