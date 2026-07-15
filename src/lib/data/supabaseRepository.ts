@@ -383,28 +383,25 @@ class SupabaseRepository implements Repository {
 
     const row = profilePatchToRow(patch);
     if (Object.keys(row).length > 0) {
-      void supabase
-        .from("profiles")
-        .update(row)
-        .eq("id", user.id)
-        .select("*")
-        .maybeSingle()
-        .then(({ data, error }) => {
-          if (error) {
-            Object.assign(user, previous);
-            this.notify();
-            reportError("Não foi possível atualizar o perfil", error);
-            return;
-          }
-          if (data) {
-            Object.assign(user, profileToUser(data as ProfileRow));
+      void (async () => {
+        try {
+          const { adminUpdateProfile } = await import("./admin-profile.functions");
+          const result = await adminUpdateProfile({ data: { userId: user.id, patch: row } });
+          if (result?.row) {
+            Object.assign(user, profileToUser(result.row as ProfileRow));
             this.notify();
           }
-        });
+        } catch (error) {
+          Object.assign(user, previous);
+          this.notify();
+          reportError("Não foi possível atualizar o perfil", error);
+        }
+      })();
     }
 
     return user;
   }
+
 
   applyLocalUserPatch(id: string, patch: UserProfilePatch): User | undefined {
     const user = this.getUser(id);
