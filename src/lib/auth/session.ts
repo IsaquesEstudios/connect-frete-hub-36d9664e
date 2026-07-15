@@ -3,10 +3,51 @@ import { repo } from "@/lib/data";
 import { profileToUser } from "@/lib/data/supabaseRepository";
 import { translateAuthError } from "@/lib/auth/translate-error";
 import type { User, UserProfilePatch, UserType } from "@/lib/data";
+import type { Session } from "@supabase/supabase-js";
 
 let cachedUser: User | null = null;
 let initialDone = false;
 const listeners = new Set<() => void>();
+
+const EXTERNAL_AUTH_STORAGE_KEY = "ext-sb-auth-token";
+
+function isInvalidRefreshToken(error: unknown): boolean {
+  const text = String(
+    error instanceof Error
+      ? error.message
+      : error && typeof error === "object"
+        ? JSON.stringify(error)
+        : error ?? "",
+  );
+  return /refresh_token_not_found|invalid refresh token/i.test(text);
+}
+
+async function clearBrokenSession() {
+  try {
+    await supabase.auth.signOut({ scope: "local" });
+  } catch {
+    // If the auth client itself is already broken, still remove the stale token below.
+  }
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem(EXTERNAL_AUTH_STORAGE_KEY);
+  }
+  cachedUser = null;
+  notify();
+}
+
+async function getSessionSafely(): Promise<Session | null> {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return data.session ?? null;
+  } catch (error) {
+    if (isInvalidRefreshToken(error)) {
+      await clearBrokenSession();
+      return null;
+    }
+    throw error;
+  }
+}
 
 function notify() {
   listeners.forEach((l) => l());
@@ -41,23 +82,23 @@ async function applySessionProfile(profile: User | null): Promise<User | null> {
 }
 
 export async function refreshCurrentUser(): Promise<User | null> {
-  const { data } = await supabase.auth.getSession();
-  if (!data.session) {
+  const session = await getSessionSafely();
+  if (!session) {
     cachedUser = null;
     notify();
     return null;
   }
   let profile: User | null = null;
   try {
-    profile = await loadProfile(data.session.user.id, { fresh: true });
+    profile = await loadProfile(session.user.id, { fresh: true });
   } catch {
-    await supabase.auth.signOut();
+    await clearBrokenSession();
     cachedUser = null;
     notify();
     return null;
   }
   if (!profile) {
-    await supabase.auth.signOut();
+    await clearBrokenSession();
     cachedUser = null;
     notify();
     return null;
@@ -66,15 +107,20 @@ export async function refreshCurrentUser(): Promise<User | null> {
 }
 
 async function bootstrap() {
-  const { data } = await supabase.auth.getSession();
-  if (data.session) {
-    try {
-      const profile = await loadProfile(data.session.user.id, { fresh: true });
-      await applySessionProfile(profile);
-    } catch {
-      await supabase.auth.signOut();
-      cachedUser = null;
+  try {
+    const session = await getSessionSafely();
+    if (session) {
+      try {
+        const profile = await loadProfile(session.user.id, { fresh: true });
+        await applySessionProfile(profile);
+      } catch {
+        await clearBrokenSession();
+        cachedUser = null;
+      }
     }
+  } catch (error) {
+    console.error("Falha ao iniciar sessão", error);
+    cachedUser = null;
   }
   initialDone = true;
   notify();
@@ -82,8 +128,9 @@ async function bootstrap() {
     if (session) {
       try {
         await applySessionProfile(await loadProfile(session.user.id, { fresh: true }));
-      } catch {
-        await supabase.auth.signOut();
+      } catch (error) {
+        if (isInvalidRefreshToken(error)) await clearBrokenSession();
+        else await clearBrokenSession();
         cachedUser = null;
       }
     } else cachedUser = null;
@@ -148,8 +195,7 @@ export async function listColaboradores(): Promise<User[]> {
 
 export async function createColaborador(input: { name: string; email: string; password: string }): Promise<void> {
   // Preserve current admin session — signUp replaces it with the new user's session.
-  const { data: currentSession } = await supabase.auth.getSession();
-  const adminSession = currentSession.session;
+  const adminSession = await getSessionSafely();
   const adminUser = cachedUser;
 
   const { data, error } = await supabase.auth.signUp({
@@ -232,6 +278,9 @@ export interface SignupInput {
 }
 
 export async function signup(input: SignupInput): Promise<User> {
+  // If the browser has a stale refresh token from an older attempt, clear it before creating the account.
+  await getSessionSafely();
+
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim().toLowerCase(),
     password: input.password,
