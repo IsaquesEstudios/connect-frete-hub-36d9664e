@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { ArrowRight, MessageCircle, Radio, ShieldCheck, Truck } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { homeFor } from "@/lib/auth/session";
+import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
 
 export { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
