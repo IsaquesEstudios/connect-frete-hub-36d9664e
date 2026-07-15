@@ -3,7 +3,7 @@ import { LogOut, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
-import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
+import { Logo } from "@/components/brand/Logo";
 import {
   Sheet,
   SheetContent,
