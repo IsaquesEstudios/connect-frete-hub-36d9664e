@@ -85,9 +85,13 @@ export function ChatWindow({ me, other, viewer }: Props) {
   const [switching, setSwitching] = useState(false);
 
   const otherIsStaff = other.type === "admin" || other.type === "colaborador";
+  const meIsStaff = me.type === "admin" || me.type === "colaborador";
   const staffNumber = otherIsStaff ? other.number : me.number;
   const nonStaffNumber = otherIsStaff ? me.number : other.number;
-  const conversationId = `${nonStaffNumber}__${staffNumber}`;
+  const conversationId =
+    meIsStaff && otherIsStaff
+      ? [me.number, other.number].sort().join("__")
+      : `${nonStaffNumber}__${staffNumber}`;
 
   // Feedback visual ao trocar de conversa
   useEffect(() => {
