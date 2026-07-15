@@ -1,6 +1,23 @@
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/loose-client";
+import { translateAuthError } from "@/lib/auth/translate-error";
 import type { BroadcastAudience, NewUserInput, Repository } from "./repository";
 import type { BroadcastMessage, Message, Tag, User, UserProfilePatch, UserType } from "./types";
+
+function reportError(title: string, error: unknown) {
+  const raw =
+    error && typeof error === "object"
+      ? (error as { message?: string; details?: string; hint?: string; code?: string })
+      : null;
+  const translated = translateAuthError(error);
+  const detail = raw?.details || raw?.hint;
+  const code = raw?.code;
+  const description = [translated, detail, code ? `(código ${code})` : null]
+    .filter(Boolean)
+    .join(" · ");
+  console.error(title, error);
+  toast.error(title, { description: description || undefined, duration: 10000 });
+}
 
 type ProfileRow = {
   id: string;
