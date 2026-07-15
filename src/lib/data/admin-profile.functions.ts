@@ -63,7 +63,7 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
       const text = await updateRes.text().catch(() => "");
       throw new Error(`Não foi possível salvar o perfil. ${text}`.trim());
     }
-    const rows = (await updateRes.json()) as Array<Record<string, unknown>>;
+    const rows = (await updateRes.json()) as Array<Record<string, string | number | boolean | null>>;
     if (!rows[0]) throw new Error("Perfil não encontrado.");
-    return { ok: true, row: rows[0] };
+    return { ok: true as const, row: rows[0] };
   });
