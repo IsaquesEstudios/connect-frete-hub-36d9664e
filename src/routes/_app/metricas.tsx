@@ -202,7 +202,7 @@ function MetricsPage() {
     const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
     const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
     const L: string[] = [];
-    L.push("RELATÓRIO CONECTAFRETE");
+    L.push("RELATÓRIO SV LOGÍSTICA");
     L.push(`Gerado em: ${new Date().toLocaleString()}`);
     L.push(`Filtros: UF=${filterUf}  Tag=${filterTag === "todos" ? "todas" : tagsById[filterTag] || filterTag}`);
     L.push("");
