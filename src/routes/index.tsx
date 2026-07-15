@@ -52,12 +52,13 @@ function LandingPage() {
       <div className="relative z-10">
         {/* Nav */}
         <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/20 ring-1 ring-sky-400/40">
-              <Truck className="h-5 w-5 text-sky-300" />
-            </div>
-            <span className="text-lg font-semibold tracking-tight">SV Logística</span>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img
+              src={logoAsset.url}
+              alt="SV Logística"
+              className="h-10 w-auto object-contain"
+            />
+          </Link>
           <Link
             to="/auth"
             className="inline-flex items-center gap-1.5 rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-sky-400 transition"
