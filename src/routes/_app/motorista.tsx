@@ -5,7 +5,7 @@ import { homeFor } from "@/lib/auth/session";
 import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/_app/motorista")({
-  head: () => ({ meta: [{ title: "Motorista — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Motorista — SV Logística" }] }),
   component: MotoristaPanel,
 });
 

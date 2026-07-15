@@ -10,7 +10,7 @@ export const seedUsers: User[] = [
     id: ADMIN_ID,
     number: ADMIN_ID,
     type: "admin",
-    name: "Central ConectaFrete",
+    name: "Central SV Logística",
     password: "admin",
     createdAt: now,
   },

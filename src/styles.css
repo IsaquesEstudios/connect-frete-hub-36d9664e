@@ -67,7 +67,7 @@
 
 :root {
   --radius: 0.625rem;
-  /* ConectaFrete brand — light theme (white background) */
+  /* SV Logística brand — light theme (white background) */
   --background: oklch(0.99 0 0);
   --foreground: oklch(0.2 0 0);
   --card: oklch(0.97 0 0);

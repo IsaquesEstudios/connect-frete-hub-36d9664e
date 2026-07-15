@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth/useAuth";
 
 export const Route = createFileRoute("/_app/configuracoes")({
-  head: () => ({ meta: [{ title: "Configurações — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Configurações — SV Logística" }] }),
   component: SettingsPage,
 });
 

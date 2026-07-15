@@ -27,7 +27,7 @@ import { AdminEditUserDialog } from "@/components/admin/AdminEditUserDialog";
 import { setExternalUserActive } from "@/lib/data/admin-users.functions";
 
 export const Route = createFileRoute("/_app/usuarios")({
-  head: () => ({ meta: [{ title: "Usuários — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Usuários — SV Logística" }] }),
   component: UsuariosPage,
 });
 

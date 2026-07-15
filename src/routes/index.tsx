@@ -11,13 +11,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "ConectaFrete — Conectando empresas e motoristas do Brasil" },
+      { title: "SV Logística — Conectando empresas e motoristas do Brasil" },
       {
         name: "description",
         content:
           "A central de comunicação que aproxima transportadoras, embarcadores e motoristas. Entre nas nossas comunidades no WhatsApp.",
       },
-      { property: "og:title", content: "ConectaFrete — Conectando empresas e motoristas" },
+      { property: "og:title", content: "SV Logística — Conectando empresas e motoristas" },
       {
         property: "og:description",
         content:
@@ -55,7 +55,7 @@ function LandingPage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/20 ring-1 ring-sky-400/40">
               <Truck className="h-5 w-5 text-sky-300" />
             </div>
-            <span className="text-lg font-semibold tracking-tight">ConectaFrete</span>
+            <span className="text-lg font-semibold tracking-tight">SV Logística</span>
           </div>
           <Link
             to="/auth"
@@ -74,7 +74,7 @@ function LandingPage() {
             Conectando quem <span className="text-sky-300">move</span> o Brasil
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg text-slate-300">
-            O ConectaFrete aproxima transportadoras, embarcadores, agenciadores e
+            O SV Logística aproxima transportadoras, embarcadores, agenciadores e
             motoristas em um só lugar. Comunicação direta, ágil e centralizada com a nossa
             equipe.
           </p>
@@ -123,7 +123,7 @@ function LandingPage() {
 
         <footer className="border-t border-white/5 py-8">
           <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <span>© {new Date().getFullYear()} ConectaFrete. Todos os direitos reservados.</span>
+            <span>© {new Date().getFullYear()} SV Logística. Todos os direitos reservados.</span>
             <Link to="/auth" className="hover:text-slate-300 transition">
               Área do usuário
             </Link>

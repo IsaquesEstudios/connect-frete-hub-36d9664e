@@ -17,7 +17,7 @@ import { useRepoVersion } from "@/lib/hooks/useRepo";
 import { formatPhone } from "@/lib/format-phone";
 
 export const Route = createFileRoute("/_app/metricas")({
-  head: () => ({ meta: [{ title: "Métricas — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Métricas — SV Logística" }] }),
   component: MetricsPage,
 });
 
@@ -88,7 +88,7 @@ function MetricsPage() {
   async function downloadReport() {
     const emailMap = await getExternalUserEmails().catch(() => ({}) as Record<string, string>);
     const lines: string[] = [];
-    lines.push("Relatório ConectaFrete");
+    lines.push("Relatório SV Logística");
     lines.push(`Gerado em;${new Date().toLocaleString()}`);
     lines.push("");
     lines.push("Resumo");
@@ -126,7 +126,7 @@ function MetricsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `relatorio-svlogistica-${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -140,7 +140,7 @@ function MetricsPage() {
     const tagsById = Object.fromEntries(tags.map((t) => [t.id, t.label] as const));
 
     doc.setFontSize(16);
-    doc.text("Relatório ConectaFrete", 40, 40);
+    doc.text("Relatório SV Logística", 40, 40);
     doc.setFontSize(10);
     doc.setTextColor(120);
     doc.text(`Gerado em ${new Date().toLocaleString()}`, 40, 56);
@@ -195,7 +195,7 @@ function MetricsPage() {
       headStyles: { fillColor: [30, 64, 175] },
     });
 
-    doc.save(`relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.pdf`);
+    doc.save(`relatorio-svlogistica-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
 
   async function downloadTXT() {
@@ -231,7 +231,7 @@ function MetricsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.download = `relatorio-svlogistica-${new Date().toISOString().slice(0, 10)}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -284,7 +284,7 @@ function MetricsPage() {
       sections: [{
         properties: {},
         children: [
-          new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Relatório ConectaFrete")] }),
+          new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("Relatório SV Logística")] }),
           new Paragraph(`Gerado em ${new Date().toLocaleString()}`),
           new Paragraph(`Filtros: UF=${filterUf}  Tag=${filterTag === "todos" ? "todas" : tagsById[filterTag] || filterTag}`),
           new Paragraph(""),
@@ -301,7 +301,7 @@ function MetricsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `relatorio-conectafrete-${new Date().toISOString().slice(0, 10)}.docx`;
+    a.download = `relatorio-svlogistica-${new Date().toISOString().slice(0, 10)}.docx`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

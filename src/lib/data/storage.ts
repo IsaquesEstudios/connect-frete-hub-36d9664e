@@ -1,8 +1,8 @@
 // Thin localStorage + BroadcastChannel wrapper.
 // UI must not touch localStorage directly — go through repository.
 
-const PREFIX = "conectafrete:";
-const CHANNEL = "conectafrete";
+const PREFIX = "svlogistica:";
+const CHANNEL = "svlogistica";
 
 type Listener = (key: string) => void;
 const listeners = new Set<Listener>();

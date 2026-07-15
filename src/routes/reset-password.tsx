@@ -10,7 +10,7 @@ import { PasswordInput } from "@/components/auth/PasswordInput";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Redefinir senha — ConectaFrete" }] }),
+  head: () => ({ meta: [{ title: "Redefinir senha — SV Logística" }] }),
   component: ResetPasswordPage,
 });
 
