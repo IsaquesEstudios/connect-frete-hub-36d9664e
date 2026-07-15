@@ -33,10 +33,16 @@ export const Route = createFileRoute("/")({
 function LandingPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [links, setLinks] = useState({ motoristas: WHATSAPP_MOTORISTAS, empresas: WHATSAPP_EMPRESAS });
+
+  useEffect(() => {
+    getWhatsappLinks().then(setLinks).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: homeFor(user) as "/admin" });
   }, [user, loading, navigate]);
+
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#050b1a] text-slate-100">
