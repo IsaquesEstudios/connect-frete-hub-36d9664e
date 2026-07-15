@@ -721,9 +721,15 @@ class SupabaseRepository implements Repository {
     fromUserId: string;
   }): BroadcastMessage {
     const recipients = this.resolveBroadcastRecipients(audience);
+    const sender = this.getUser(fromUserId);
     const now = Date.now();
     const rows = recipients.map((r) => ({
-      conversation_id: r.number,
+      // Se o destinatário também for staff (colaborador), usamos o mesmo formato
+      // que o ChatWindow do admin espera: `${adminNumber}__${colabNumber}`.
+      // Caso contrário, o número do não-staff basta (resolveConversationId reconstrói).
+      conversation_id: this.isStaff(r)
+        ? `${sender?.number ?? ""}__${r.number}`
+        : r.number,
       from_user_id: fromUserId,
       to_user_id: r.id,
       body,
