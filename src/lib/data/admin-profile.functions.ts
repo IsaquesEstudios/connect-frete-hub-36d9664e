@@ -12,7 +12,7 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
       })
       .parse(data),
   )
-  .handler(async ({ data }): Promise<{ ok: true; row: Record<string, unknown> }> => {
+  .handler(async ({ data }) => {
     const serviceKey = process.env.EXT_SUPABASE_SERVICE_ROLE_KEY;
     if (!serviceKey) throw new Error("Configuração do servidor ausente.");
     const serviceHeaders = (): Record<string, string> => {
