@@ -222,7 +222,15 @@ class SupabaseRepository implements Repository {
         this.loadMessages(),
         this.loadBroadcasts(),
       ]);
-      const { data } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession().catch(async (error) => {
+        const message = String(error instanceof Error ? error.message : error ?? "");
+        if (/refresh_token_not_found|invalid refresh token/i.test(message)) {
+          window.localStorage.removeItem("ext-sb-auth-token");
+          await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+          return { data: { session: null } };
+        }
+        throw error;
+      });
       const current = data.session?.user.id ? this.getUser(data.session.user.id) : null;
       const admin = this.users.find((u) => u.type === "admin");
       this.adminAuthId = current?.type === "admin" || current?.type === "colaborador" ? current.id : admin?.id ?? null;
