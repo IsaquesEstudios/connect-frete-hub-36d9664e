@@ -626,7 +626,7 @@ function StepLocal({ data, update }: StepProps) {
       <div className={cn(fieldWrap, !data.cidade && "opacity-50")}>
         <Label className={fieldLabel}>Estado<span className="ml-1 text-red-500">*</span></Label>
         <Select
-          value={data.estado}
+          value={data.estado ?? ""}
           onValueChange={(v) => update("estado", v)}
           disabled={!data.cidade}
         >
