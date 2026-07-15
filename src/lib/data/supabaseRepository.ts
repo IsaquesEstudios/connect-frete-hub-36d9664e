@@ -332,12 +332,18 @@ class SupabaseRepository implements Repository {
     return user?.type === "admin" || user?.type === "colaborador";
   }
 
+  private staffPairId(a: string, b: string): string {
+    const [x, y] = [a, b].sort();
+    return `${x}__${y}`;
+  }
+
   private resolveConversationId(fromUserId: string, toUserId: string, fallback: string): string {
     const from = this.getUser(fromUserId);
     const to = this.getUser(toUserId);
     if (!from || !to) return fallback;
     const fromStaff = this.isStaff(from);
     const toStaff = this.isStaff(to);
+    if (fromStaff && toStaff) return this.staffPairId(from.number, to.number);
     if (fromStaff === toStaff) return fallback;
     const staff = fromStaff ? from : to;
     const nonStaff = fromStaff ? to : from;
@@ -354,6 +360,8 @@ class SupabaseRepository implements Repository {
     const from = this.getUser(fromUserId);
     const to = this.getUser(toUserId);
     const fromStaff = this.isStaff(from);
+    const toStaff = this.isStaff(to);
+    if (fromStaff && toStaff && from && to) return this.staffPairId(from.number, to.number);
     const staff = fromStaff ? from : to;
     const nonStaff = fromStaff ? to : from;
     return nonStaff?.number ?? this.resolveConversationId(fromUserId, toUserId, "").split("__")[0] ?? "";
@@ -425,9 +433,13 @@ class SupabaseRepository implements Repository {
     const from = this.getUser(fromUserId);
     const to = this.getUser(toUserId);
     const fromStaff = this.isStaff(from);
+    const toStaff = this.isStaff(to);
     const staff = fromStaff ? from : to;
     const nonStaff = fromStaff ? to : from;
-    const conversationId = `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
+    const conversationId =
+      fromStaff && toStaff && from && to
+        ? this.staffPairId(from.number, to.number)
+        : `${nonStaff?.number ?? ""}__${staff?.number ?? ""}`;
     const dbConversationId = this.storageConversationId(fromUserId, toUserId);
     const tempId = `tmp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const now = Date.now();
@@ -727,8 +739,8 @@ class SupabaseRepository implements Repository {
       // Se o destinatário também for staff (colaborador), usamos o mesmo formato
       // que o ChatWindow do admin espera: `${adminNumber}__${colabNumber}`.
       // Caso contrário, o número do não-staff basta (resolveConversationId reconstrói).
-      conversation_id: this.isStaff(r)
-        ? `${sender?.number ?? ""}__${r.number}`
+      conversation_id: this.isStaff(r) && sender
+        ? this.staffPairId(sender.number, r.number)
         : r.number,
       from_user_id: fromUserId,
       to_user_id: r.id,
