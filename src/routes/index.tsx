@@ -110,7 +110,7 @@ function LandingPage() {
               icon={<Truck className="h-6 w-6" />}
               title="Comunidade de Motoristas"
               description="Cargas, dicas de rota, oportunidades e novidades exclusivas para caminhoneiros parceiros."
-              href={WHATSAPP_MOTORISTAS}
+              href={links.motoristas}
               accent="from-sky-500/20 to-transparent"
               iconRing="ring-sky-400/40 bg-sky-500/20 text-sky-300"
             />
