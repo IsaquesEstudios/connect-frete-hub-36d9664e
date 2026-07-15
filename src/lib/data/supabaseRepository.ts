@@ -10,13 +10,32 @@ function reportError(title: string, error: unknown) {
       ? (error as { message?: string; details?: string; hint?: string; code?: string })
       : null;
   const translated = translateAuthError(error);
-  const detail = raw?.details || raw?.hint;
   const code = raw?.code;
-  const description = [translated, detail, code ? `(código ${code})` : null]
-    .filter(Boolean)
-    .join(" · ");
+
+  // Explicações amigáveis por código do Postgres/PostgREST
+  const codeExplanations: Record<string, string> = {
+    "42501": "Seu usuário não tem permissão para essa operação (RLS).",
+    "23505": "Já existe um registro com esses dados (valor duplicado).",
+    "23503": "Referência inválida: o item vinculado não existe.",
+    "23502": "Um campo obrigatório ficou em branco.",
+    "23514": "Um dos valores enviados não passou na validação do banco.",
+    "PGRST301": "Sessão expirada. Faça login novamente.",
+    "PGRST116": "Nenhum registro encontrado.",
+    "PGRST204": "A tabela não tem a coluna esperada. Contate o suporte.",
+  };
+
+  const parts: string[] = [];
+  if (translated) parts.push(translated);
+  if (code && codeExplanations[code] && !parts.includes(codeExplanations[code])) {
+    parts.push(codeExplanations[code]);
+  }
+  if (raw?.details) parts.push(`Detalhe: ${raw.details}`);
+  if (raw?.hint) parts.push(`Dica: ${raw.hint}`);
+  if (code) parts.push(`Código: ${code}`);
+
+  const description = parts.filter(Boolean).join("\n");
   console.error(title, error);
-  toast.error(title, { description: description || undefined, duration: 10000 });
+  toast.error(title, { description: description || undefined, duration: 12000 });
 }
 
 type ProfileRow = {
