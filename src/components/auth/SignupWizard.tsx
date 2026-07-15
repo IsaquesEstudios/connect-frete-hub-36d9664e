@@ -938,6 +938,8 @@ function StepDetalhesEmpresa({ data, update }: StepProps) {
 
 function StepLocalByEstado({ data, update }: StepProps) {
   const [all, setAll] = useState<Municipio[] | null>(null);
+  const [query, setQuery] = useState(data.cidade);
+  const [openSug, setOpenSug] = useState(false);
 
   useEffect(() => {
     void loadMunicipios()
@@ -946,10 +948,20 @@ function StepLocalByEstado({ data, update }: StepProps) {
   }, []);
 
   const ufs = useMemo(() => (all ? listUFs(all) : []), [all]);
-  const cidades = useMemo(
-    () => (all && data.estado ? citiesByUF(all, data.estado) : []),
-    [all, data.estado],
-  );
+
+  // Sugestões filtradas por UF + query (limitadas para não travar o navegador
+  // ao renderizar centenas de municípios de uma vez).
+  const suggestions = useMemo(() => {
+    if (!all || !data.estado) return [];
+    const norm = (s: string) =>
+      s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const qn = norm(query.trim());
+    const list = all.filter((m) => m.uf === data.estado);
+    const filtered = qn
+      ? list.filter((m) => norm(m.nome).includes(qn))
+      : list;
+    return filtered.slice(0, 50).map((m) => m.nome);
+  }, [all, data.estado, query]);
 
   return (
     <div className="space-y-3">
@@ -960,6 +972,7 @@ function StepLocalByEstado({ data, update }: StepProps) {
           onValueChange={(v) => {
             update("estado", v);
             update("cidade", "");
+            setQuery("");
           }}
           disabled={!all}
         >
@@ -976,26 +989,43 @@ function StepLocalByEstado({ data, update }: StepProps) {
         </Select>
       </div>
 
-      <div className={cn(fieldWrap, !data.estado && "opacity-50")}>
-        <Label className={fieldLabel}>Cidade<span className="ml-1 text-red-500">*</span></Label>
-        <Select
-          value={data.cidade}
-          onValueChange={(v) => update("cidade", v)}
-          disabled={!data.estado}
-        >
-          <SelectTrigger className="h-7 border-0 bg-transparent p-0 text-sm text-white shadow-none focus:ring-0">
-            <SelectValue
-              placeholder={data.estado ? "Selecione a cidade" : "Selecione o estado primeiro"}
-            />
-          </SelectTrigger>
-          <SelectContent className="max-h-72">
-            {cidades.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
+      <div className={cn("relative", !data.estado && "opacity-50")}>
+        <Field label="Cidade" required>
+          <Input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setOpenSug(true);
+              if (data.cidade && e.target.value !== data.cidade) {
+                update("cidade", "");
+              }
+            }}
+            onFocus={() => setOpenSug(true)}
+            onBlur={() => setTimeout(() => setOpenSug(false), 150)}
+            disabled={!data.estado}
+            placeholder={data.estado ? "Digite para buscar a cidade..." : "Selecione o estado primeiro"}
+            className={fieldInput}
+          />
+        </Field>
+        {openSug && data.estado && suggestions.length > 0 && (
+          <div className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-xl border border-white/10 bg-[#0b1730] shadow-xl">
+            {suggestions.map((name) => (
+              <button
+                key={name}
+                type="button"
+                className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-white/5"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  update("cidade", name);
+                  setQuery(name);
+                  setOpenSug(false);
+                }}
+              >
+                {name}
+              </button>
             ))}
-          </SelectContent>
-        </Select>
+          </div>
+        )}
       </div>
     </div>
   );
