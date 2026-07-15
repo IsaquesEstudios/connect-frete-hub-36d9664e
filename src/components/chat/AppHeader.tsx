@@ -1,8 +1,9 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth/session";
 import type { User } from "@/lib/data";
+import logoAsset from "@/assets/sv-logistica-logo.png.asset.json";
 import {
   Sheet,
   SheetContent,
@@ -15,8 +16,14 @@ import {
 export function AppHeader({ user, accent }: { user: User; accent: string }) {
   const navigate = useNavigate();
   return (
-    <header className={`flex items-center gap-3 pl-12 pr-4 py-3 text-white ${accent}`}>
-      <div className="font-semibold tracking-tight">SV Logística</div>
+    <header className={`flex items-center gap-3 pl-12 pr-4 py-2 text-white ${accent}`}>
+      <Link to="/admin" className="flex items-center">
+        <img
+          src={logoAsset.url}
+          alt="SV Logística"
+          className="h-8 w-auto object-contain"
+        />
+      </Link>
       <div className="ml-auto flex items-center gap-2">
         <Sheet>
           <SheetTrigger asChild>
