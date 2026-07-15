@@ -1,12 +1,12 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, MessageCircle, Radio, ShieldCheck, Truck } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { homeFor } from "@/lib/auth/session";
 import { Logo } from "@/components/brand/Logo";
-
-export { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
 import { WHATSAPP_MOTORISTAS, WHATSAPP_EMPRESAS } from "@/lib/whatsapp-groups";
+import { getWhatsappLinks } from "@/lib/data/app-settings.functions";
+
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -33,10 +33,16 @@ export const Route = createFileRoute("/")({
 function LandingPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [links, setLinks] = useState({ motoristas: WHATSAPP_MOTORISTAS, empresas: WHATSAPP_EMPRESAS });
+
+  useEffect(() => {
+    getWhatsappLinks().then(setLinks).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: homeFor(user) as "/admin" });
   }, [user, loading, navigate]);
+
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#050b1a] text-slate-100">
@@ -104,7 +110,7 @@ function LandingPage() {
               icon={<Truck className="h-6 w-6" />}
               title="Comunidade de Motoristas"
               description="Cargas, dicas de rota, oportunidades e novidades exclusivas para caminhoneiros parceiros."
-              href={WHATSAPP_MOTORISTAS}
+              href={links.motoristas}
               accent="from-sky-500/20 to-transparent"
               iconRing="ring-sky-400/40 bg-sky-500/20 text-sky-300"
             />
@@ -112,7 +118,7 @@ function LandingPage() {
               icon={<ShieldCheck className="h-6 w-6" />}
               title="Comunidade de Empresas"
               description="Networking entre transportadoras, embarcadores e agenciadores. Encontre parceiros e feche fretes com confiança."
-              href={WHATSAPP_EMPRESAS}
+              href={links.empresas}
               accent="from-blue-500/20 to-transparent"
               iconRing="ring-blue-400/40 bg-blue-500/20 text-blue-300"
             />
