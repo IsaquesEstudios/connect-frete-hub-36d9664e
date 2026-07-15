@@ -118,7 +118,7 @@ function LandingPage() {
               icon={<ShieldCheck className="h-6 w-6" />}
               title="Comunidade de Empresas"
               description="Networking entre transportadoras, embarcadores e agenciadores. Encontre parceiros e feche fretes com confiança."
-              href={WHATSAPP_EMPRESAS}
+              href={links.empresas}
               accent="from-blue-500/20 to-transparent"
               iconRing="ring-blue-400/40 bg-blue-500/20 text-blue-300"
             />
